@@ -14,6 +14,44 @@
         .status-message { padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; margin-top: 10px; display: none; }
         button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* Estilos del MODAL */
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            z-index: 100; /* Siempre encima de todo */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4); /* Fondo semi-transparente */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* 10% desde arriba y centrado */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-content input, .modal-content button, .offer-form input, .offer-form select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
     </style>
     
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2292460164165663"
@@ -44,7 +82,7 @@
                 Fichas Racha: <strong id="fichas-racha">0</strong> |
                 Racha: <strong id="dias-racha">0</strong> días
             </div>
-            <button id="claim-button">Reclamar Puntos Diarios</button>
+            <button id="open-login-modal">Reclamar Puntos / Iniciar Sesión</button>
         </div>
 
         <div class="prize-info">
@@ -88,6 +126,38 @@
         </div>
 
     </div>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-modal-button">&times;</span>
+            <h2>Inicio de Sesión Diaria</h2>
+            
+            <div id="step-1-login">
+                <p>Ingresa tu Email para verificar tu cuenta y tu WhatsApp.</p>
+                <label for="reg-email">Email:</label>
+                <input type="email" id="reg-email" placeholder="tu@correo.com">
+                <label for="reg-wsp">Número de WhatsApp (Ej: 987654321):</label>
+                <input type="text" id="reg-wsp" placeholder="Sin código de país ni símbolos">
+                <button id="start-login-button">Continuar / Enviar Código</button>
+            </div>
+
+            <div id="step-2-validate" style="display:none;">
+                <p id="wsp-message">Hemos generado un código de 4 dígitos para tu WSP. Ingrésalo abajo para reclamar tus Puntos Diarios.</p>
+                <label for="validation-code">Código de 4 Dígitos:</label>
+                <input type="number" id="validation-code" maxlength="4" placeholder="Ej: 1234">
+                <button id="validate-code-button">Validar Código y Reclamar</button>
+                <p style="margin-top: 10px; cursor: pointer;" onclick="document.getElementById('step-2-validate').style.display='none'; document.getElementById('step-1-login').style.display='block';">← Volver</p>
+            </div>
+
+            <div id="step-3-success" style="display:none;">
+                <p style="color: green; font-weight: bold;">✅ ¡Validación exitosa!</p>
+                <p id="success-message">Puntos reclamados. Ya puedes cerrar esta ventana y hacer tu oferta.</p>
+            </div>
+            
+            <p class="status-message" id="login-status-message" style="display:none;"></p>
+        </div>
+    </div>
+
 
     <script src="script.js"></script>
 </body>
