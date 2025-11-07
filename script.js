@@ -1,5 +1,5 @@
 // 🚨 ¡REEMPLAZA ESTA LÍNEA CON LA URL REAL DE TU API DE APPS SCRIPT!
-const API_ENDPOINT_URL = 'https://script.google.com/macros/s/TU_URL_DE_IMPLEMENTACION/exec';
+const API_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbwFG1ejH_BsIJslhajUg-J9PafUlXKGn9QSrTZSumkAWhEMjacRfWhVwdpnfRtCteTZwg/exec';
 
 let userEmail = localStorage.getItem('subasta_user_email');
 let userWsp = localStorage.getItem('subasta_user_wsp');
@@ -148,7 +148,7 @@ async function handleStartLogin() {
             displayLoginMessage(data.message, false);
         }
     } catch (error) {
-        displayLoginMessage('Error de conexión al iniciar sesión.', false);
+        displayLoginMessage('Error de conexión al iniciar sesión. Verifica la URL de la API.', false);
     } finally {
         document.getElementById('start-login-button').disabled = false;
     }
