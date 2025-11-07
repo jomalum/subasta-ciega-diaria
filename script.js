@@ -1,5 +1,5 @@
 // 🚨 URL DE LA API: CORREGIDA CON LA QUE ME PROPORCIONASTE
-const API_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbwFG1ejH_BsIJslhajUg-J9PafUlXKGn9QSrTZSumkAWhEMjacRfWhVwdpnfRtCteTZwg/exec';
+const API_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec';
 
 let userEmail = localStorage.getItem('subasta_user_email');
 let userWsp = localStorage.getItem('subasta_user_wsp');
@@ -296,3 +296,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
