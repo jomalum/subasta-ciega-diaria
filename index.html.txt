@@ -15,10 +15,9 @@
         button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
     </style>
-    <script>
-        // Simulación de una carga lenta del script de AdSense
-        console.log("Espacio reservado para AdSense.");
-    </script>
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2292460164165663"
+         crossorigin="anonymous"></script>
     
 </head>
 <body>
@@ -26,7 +25,15 @@
         <h1>Subasta Ciega Diaria 💰</h1>
 
         <div style="text-align: center; margin-bottom: 15px;">
-            <div style="height: 90px; background-color: #f0f0f0; line-height: 90px;">[ANUNCIO ADSENSE BANNER]</div>
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-2292460164165663"
+                data-ad-slot="7373993521"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
         </div>
         
         <div class="dashboard">
@@ -62,7 +69,15 @@
         </div>
         
         <div style="text-align: center; margin: 20px 0;">
-            <div style="height: 250px; background-color: #f0f0f0; line-height: 250px;">[ANUNCIO ADSENSE BLOQUE]</div>
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-2292460164165663"
+                data-ad-slot="7373993521"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
         </div>
 
         <div class="results">
