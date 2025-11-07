@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subasta Ciega Diaria 💸</title>
+    <style>
+        /* Estilos CSS básicos para la interfaz */
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; text-align: center; }
+        .dashboard, .prize-info, .offer-form, .results { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .points-box { background-color: #e9f7ff; padding: 10px; border-radius: 4px; text-align: center; margin-bottom: 10px; }
+        .status-message { padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; margin-top: 10px; display: none; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+    </style>
+    <script>
+        // Simulación de una carga lenta del script de AdSense
+        console.log("Espacio reservado para AdSense.");
+    </script>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Subasta Ciega Diaria 💰</h1>
+
+        <div style="text-align: center; margin-bottom: 15px;">
+            <div style="height: 90px; background-color: #f0f0f0; line-height: 90px;">[ANUNCIO ADSENSE BANNER]</div>
+        </div>
+        
+        <div class="dashboard">
+            <h2>Mi Tablero</h2>
+            <p>Email: <strong id="user-email">Cargando...</strong></p>
+            <div class="points-box">
+                Puntos Diarios: <strong id="puntos-diarios">0</strong> |
+                Fichas Racha: <strong id="fichas-racha">0</strong> |
+                Racha: <strong id="dias-racha">0</strong> días
+            </div>
+            <button id="claim-button">Reclamar Puntos Diarios</button>
+        </div>
+
+        <div class="prize-info">
+            <h2>Premio de Hoy: <strong id="prize-name">Cargando...</strong></h2>
+            <p>Valor: <strong id="prize-value">N/A</strong></p>
+            <p>Cierre de Ofertas: <strong id="countdown">Calculando...</strong></p>
+        </div>
+
+        <div class="offer-form">
+            <h2>Mi Oferta Ciega</h2>
+            <p class="status-message" id="offer-message"></p>
+            <label for="offer-value">Valor de Oferta (1-1000):</label>
+            <input type="number" id="offer-value" min="1" max="1000" placeholder="Ej: 457">
+            
+            <label for="currency-type">Moneda a Usar:</label>
+            <select id="currency-type">
+                <option value="PUNTOS_DIARIOS">Puntos Diarios</option>
+                <option value="FICHAS_RACHA" disabled>Fichas Racha (Oferta Premium, 1 unidad)</option>
+            </select>
+            
+            <button id="submit-offer-button">Enviar Oferta</button>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <div style="height: 250px; background-color: #f0f0f0; line-height: 250px;">[ANUNCIO ADSENSE BLOQUE]</div>
+        </div>
+
+        <div class="results">
+            <h2>Resultado de Ayer: <strong id="yesterday-date">Cargando...</strong></h2>
+            <p>Ganador: <strong id="winner-email">PENDIENTE</strong></p>
+            <p>Oferta Ganadora: <strong id="winning-offer">N/A</strong></p>
+            <button id="share-button" style="display: none;">¡Compartir Victoria!</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
