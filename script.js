@@ -1,6 +1,6 @@
-// 🚨 URL DE LA API: CORREGIDA CON LA QUE ME PROPORCIONASTE
+// 🚨 URL DE LA API: DEBES PEGAR TU URL DE IMPLEMENTACIÓN DE APPS SCRIPT AQUÍ
+// Usa la URL de tu Versión 8:
 const API_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec'; 
-// ... el resto de tu código
 
 let userEmail = localStorage.getItem('subasta_user_email');
 let userWsp = localStorage.getItem('subasta_user_wsp');
@@ -30,6 +30,7 @@ function displayMessage(message, isSuccess = true) {
     msgEl.style.display = 'block';
     msgEl.style.backgroundColor = isSuccess ? '#d4edda' : '#f8d7da';
     msgEl.style.color = isSuccess ? '#155724' : '#721c24';
+    setTimeout(() => { msgEl.style.display = 'none'; }, 5000); // Ocultar después de 5 segundos
 }
 
 function displayLoginMessage(message, isSuccess = true) {
@@ -72,6 +73,14 @@ async function loadDashboardData() {
 
     try {
         const response = await fetch(`${API_ENDPOINT_URL}?action=get_dashboard_data&email=${userEmail}`);
+        
+        // Verifica si la respuesta fue un error de red (no es 200)
+        if (!response.ok) {
+            console.error('Error HTTP al cargar dashboard:', response.statusText);
+            document.getElementById('user-email').textContent = 'Error de Conexión';
+            return;
+        }
+
         const data = await response.json();
 
         if (data.success) {
@@ -80,6 +89,7 @@ async function loadDashboardData() {
         } else {
             document.getElementById('user-email').textContent = 'Visitante (No Logueado)';
             if (data.message.includes('no registrado')) {
+                // Si el backend dice que no existe, limpiamos el localStorage
                 localStorage.removeItem('subasta_user_email');
                 localStorage.removeItem('subasta_user_wsp');
                 userEmail = null;
@@ -87,7 +97,8 @@ async function loadDashboardData() {
             }
         }
     } catch (error) {
-        console.error('Error al cargar datos del dashboard:', error);
+        console.error('Error al cargar datos del dashboard (red/json):', error);
+        document.getElementById('user-email').textContent = 'Error de Conexión (Red)';
     }
 }
 
@@ -100,6 +111,7 @@ async function handleStartLogin() {
         displayLoginMessage("Ingresa un correo electrónico válido.", false);
         return;
     }
+    // Permite el formato de WSP (solo números)
     if (!/^\d{8,}$/.test(wsp)) {
         displayLoginMessage("Número de WhatsApp inválido (solo dígitos, min 8).", false);
         return;
@@ -117,6 +129,11 @@ async function handleStartLogin() {
                 wsp_number: wsp
             })
         });
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.success) {
@@ -135,7 +152,8 @@ async function handleStartLogin() {
             displayLoginMessage(data.message, false);
         }
     } catch (error) {
-        displayLoginMessage('Error de conexión al iniciar sesión. Asegúrate de la correcta Implementación del Apps Script.', false);
+        console.error('Error en handleStartLogin:', error);
+        displayLoginMessage('Error de conexión al iniciar sesión. Asegúrate de que la URL de tu Apps Script es correcta y el acceso es "Cualquiera".', false);
     } finally {
         document.getElementById('start-login-button').disabled = false;
     }
@@ -162,6 +180,11 @@ async function handleValidateCodeAndClaim() {
                 code: code
             })
         });
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
         const data = await response.json();
 
         if (data.success) {
@@ -181,6 +204,7 @@ async function handleValidateCodeAndClaim() {
             displayLoginMessage(data.message, false);
         }
     } catch (error) {
+        console.error('Error en handleValidateCodeAndClaim:', error);
         displayLoginMessage('Error de conexión al validar el código.', false);
     } finally {
         document.getElementById('validate-code-button').disabled = false;
@@ -210,25 +234,33 @@ async function handleSubmitOffer() {
             body: JSON.stringify({
                 action: 'submit_offer',
                 email: userEmail,
-                offer_value: offerValue,
+                offer_value: parseInt(offerValue),
                 currency_type: currencyType
             })
         });
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
         const data = await response.json();
 
         if (data.success) {
+            const currentDays = document.getElementById('dias-racha').textContent;
             const newUserData = {
                 puntos: data.new_points, 
                 fichas: data.new_fichas,
-                diasRacha: document.getElementById('dias-racha').textContent 
+                diasRacha: currentDays // Este dato no cambia al ofertar
             };
             updateDashboard(newUserData);
             displayMessage(data.message, true);
+            document.getElementById('offer-value').value = '';
         } else {
             displayMessage(data.message, false);
         }
     } catch (error) {
-        displayMessage('Error al enviar la oferta.', false);
+        console.error('Error al enviar la oferta:', error);
+        displayMessage('Error al enviar la oferta (red/servidor).', false);
     } finally {
         document.getElementById('submit-offer-button').disabled = false;
     }
@@ -238,6 +270,11 @@ async function handleSubmitOffer() {
 async function loadPrizeData() {
     try {
         const responsePrize = await fetch(`${API_ENDPOINT_URL}?action=get_current_prize`);
+        
+        if (!responsePrize.ok) {
+            throw new Error(`Error HTTP: ${responsePrize.status}`);
+        }
+
         const dataPrize = await responsePrize.json();
 
         if (dataPrize.success) {
@@ -250,7 +287,36 @@ async function loadPrizeData() {
 
             if (userEmail && dataPrize.prize.ganador === userEmail) {
                 document.getElementById('share-button').style.display = 'block';
+            } else {
+                document.getElementById('share-button').style.display = 'none';
             }
+            
+            // Lógica simple para el contador
+            // Asume que el cierre es a medianoche de la fecha del premio
+            const prizeDateStr = dataPrize.prize.fecha; // formato dd/MM/yyyy
+            const parts = prizeDateStr.split('/');
+            // La subasta del día actual cierra a medianoche del día siguiente
+            const deadline = new Date(parts[2], parts[1] - 1, parseInt(parts[0]) + 1, 0, 0, 0); 
+            
+            const updateCountdown = () => {
+                const now = new Date();
+                const diff = deadline.getTime() - now.getTime();
+                
+                if (diff < 0) {
+                    document.getElementById('countdown').textContent = 'Subasta Cerrada. Esperando resultados...';
+                    return;
+                }
+                
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdown').textContent = `${hours}h ${minutes}m ${seconds}s`;
+            };
+            
+            setInterval(updateCountdown, 1000);
+            updateCountdown(); 
+            
         }
     } catch (error) {
         console.error('Error al cargar datos del premio:', error);
@@ -297,7 +363,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-
-
-
