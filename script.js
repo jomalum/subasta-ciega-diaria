@@ -5,11 +5,11 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwQTHENsIOA2tLCuEmSfHAW
 
 let currentEmail = null;
 let currentWsp = null;
-let currentFullUserData = {}; // Para guardar datos del usuario
-const SESSION_EXPIRATION_MINUTES = 60; // Duración de la sesión: 1 hora
+let currentFullUserData = {};
+const SESSION_EXPIRATION_MINUTES = 60;
 
 // ============================
-// GESTIÓN DE SESIÓN Y PERSISTENCIA (NUEVO)
+// GESTIÓN DE SESIÓN Y PERSISTENCIA
 // ============================
 
 function saveSession(user) {
@@ -34,7 +34,7 @@ function loadSession() {
     const expiration = new Date(sessionData.expires);
     
     if (now > expiration) {
-        clearSession(false); // Sesión expirada, limpiar sin recargar
+        clearSession(false);
         return false; 
     }
 
@@ -42,7 +42,7 @@ function loadSession() {
     currentWsp = sessionData.wsp;
     currentFullUserData = sessionData.user;
     
-    showDashboard(sessionData.user); // Carga el dashboard con los datos persistentes
+    showDashboard(sessionData.user);
     
     return true; 
 }
@@ -130,7 +130,7 @@ async function startLogin() {
       status.className = 'status success';
       status.textContent = data.message;
       
-      saveSession(data.user); // GUARDA LA SESIÓN
+      saveSession(data.user);
       
       document.getElementById('login-section').classList.add('hidden');
       showDashboard(data.user); 
@@ -141,7 +141,7 @@ async function startLogin() {
   } catch (err) {
     console.error('Error en login:', err);
     status.className = 'status error';
-    status.textContent = 'Error de conexión al iniciar sesión. Verifica la URL del Apps Script.';
+    status.textContent = 'Error de conexión al iniciar sesión.';
   }
 }
 
@@ -180,7 +180,6 @@ async function startRegister() {
       status.className = 'status success';
       status.textContent = data.message;
       
-      // Limpiar campos del registro
       document.getElementById('register-email').value = '';
       document.getElementById('register-wsp').value = '';
       
@@ -195,7 +194,7 @@ async function startRegister() {
   } catch (err) {
     console.error('Error en registro:', err);
     status.className = 'status error';
-    status.textContent = 'Error de conexión al registrar usuario. Verifica la URL del Apps Script.';
+    status.textContent = 'Error de conexión al registrar usuario.';
   }
 }
 
@@ -209,7 +208,7 @@ function showDashboard(user) {
   // Ocultar todas las secciones primero
   document.getElementById('login-section').classList.add('hidden');
   document.getElementById('register-section').classList.add('hidden');
-  closeModal(); 
+  closeModal(); // IMPORTANTE: Cerrar modal al mostrar dashboard
   
   // Mostrar secciones del dashboard
   document.getElementById('dashboard-section').classList.remove('hidden');
@@ -218,6 +217,9 @@ function showDashboard(user) {
 
   const claimButton = document.getElementById('claim-credits-button');
   const hasFullName = user.nombre1 && user.nombre1.trim() !== '';
+  const hasFullData = hasFullName && 
+                     user.apellidoPaterno && user.apellidoPaterno.trim() !== '' && 
+                     user.apellidoMaterno && user.apellidoMaterno.trim() !== '';
 
   // Actualizar información del usuario
   document.getElementById('user-display-name').textContent = user.nombre1 ? user.nombre1.toUpperCase() : 'USUARIO';
@@ -225,9 +227,10 @@ function showDashboard(user) {
   document.getElementById('user-credits').textContent = user.puntos || 0;
   document.getElementById('user-fichas').textContent = user.fichas || 0;
   document.getElementById('user-streak').textContent = user.diasRacha || 0;
+  document.getElementById('user-email-display').textContent = currentEmail;
   
   // Lógica del botón de reclamar - CORREGIDO
-  if (!hasFullName) {
+  if (!hasFullData) {
     claimButton.textContent = '➡️ COMPLETA TUS DATOS';
     claimButton.style.background = '#ffc107';
     claimButton.style.color = '#000';
@@ -249,16 +252,19 @@ async function claimDailyCredits() {
   console.log('claimDailyCredits llamado');
   const user = currentFullUserData;
   
+  // Verificar si el usuario tiene datos completos
+  const hasFullData = user.nombre1 && user.nombre1.trim() !== '' && 
+                     user.apellidoPaterno && user.apellidoPaterno.trim() !== '' && 
+                     user.apellidoMaterno && user.apellidoMaterno.trim() !== '';
+
   // Si ya tiene datos completos, procede a reclamar directamente
-  if (user.nombre1 && user.nombre1.trim() !== '' && 
-      user.apellidoPaterno && user.apellidoPaterno.trim() !== '' && 
-      user.apellidoMaterno && user.apellidoMaterno.trim() !== '') {
+  if (hasFullData) {
     console.log('Usuario con datos completos, reclamando directamente');
     await submitFullUserDataAndClaim(true); // onlyClaim = true
     return;
   }
   
-  // Si no tiene datos completos, muestra el modal
+  // Si no tiene datos completos, muestra el modal para completarlos
   console.log('Usuario sin datos completos, mostrando modal');
   document.getElementById('modal-email').value = currentEmail;
   document.getElementById('modal-wsp').value = currentWsp || user.wspNumber;
@@ -276,7 +282,7 @@ async function claimDailyCredits() {
 async function submitFullUserDataAndClaim(onlyClaim = false) {
   console.log('submitFullUserDataAndClaim llamado con onlyClaim:', onlyClaim);
   
-  const status = document.getElementById('modal-status') || document.getElementById('dashboard-status');
+  const status = onlyClaim ? document.getElementById('dashboard-status') : document.getElementById('modal-status');
   const claimButton = document.getElementById('claim-credits-button');
 
   status.className = 'status';
