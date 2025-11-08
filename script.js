@@ -6,7 +6,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwQTHENsIOA2tLCuEmSfHAW
 let currentEmail = null;
 
 // ============================
-// FUNCIONES DE VISTAS
+// FUNCIONES DE VISTAS (Se mantienen igual)
 // ============================
 
 function showLoginSection(event) {
@@ -26,38 +26,39 @@ function showRegisterSection(event) {
 // FUNCIONES DE LOGIN Y REGISTRO
 // ============================
 
-async function checkUserExists() {
+async function startLogin() {
+  // Tomar los valores de los inputs de la sección de login
   const email = document.getElementById('login-email').value.trim();
+  const wsp = document.getElementById('login-wsp').value.trim();
   const status = document.getElementById('login-status');
   status.className = 'status';
-  status.textContent = 'Verificando usuario...';
+  status.textContent = 'Verificando credenciales...';
 
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify({
-        action: 'check_user_exists',
-        email: email
+        action: 'login_user', // Nueva acción para el login
+        email: email,
+        wsp_number: wsp
       })
     });
     const data = await res.json();
 
-    if (data.exists) {
+    if (data.success) {
       currentEmail = email;
-      // Si el usuario existe, pasa directamente a la validación de código
       status.className = 'status success';
-      status.textContent = 'Usuario encontrado. Por favor, ingresa tu código de validación.';
+      status.textContent = data.message;
+      
       document.getElementById('login-section').classList.add('hidden');
       document.getElementById('validation-section').classList.remove('hidden');
     } else {
       status.className = 'status error';
-      status.textContent = data.message || 'Usuario no encontrado. Por favor, regístrate.';
-      // Opcional: Llevar al usuario a la sección de registro
-      // showRegisterSection(); 
+      status.textContent = data.message;
     }
   } catch (err) {
     status.className = 'status error';
-    status.textContent = 'Error de conexión al verificar el usuario.';
+    status.textContent = 'Error de conexión al iniciar sesión. Verifica la URL del Apps Script.';
   }
 }
 
@@ -72,7 +73,7 @@ async function startRegister() {
     const res = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify({
-        action: 'register_new_user', // Nueva acción para el registro
+        action: 'register_new_user', // Acción para el registro (mantenemos unicidad)
         email: email,
         wsp_number: wsp
       })
@@ -134,9 +135,7 @@ async function validateCode() {
   }
 }
 
-// ============================
-// DASHBOARD Y OFERTAS
-// ============================
+// ... (El resto de las funciones se mantienen igual) ...
 
 function showDashboard(user) {
   // Oculta todas las secciones iniciales y muestra el tablero/oferta/premio
@@ -217,4 +216,3 @@ async function loadCurrentPrize() {
     status.textContent = 'Error al obtener el premio actual.';
   }
 }
-
