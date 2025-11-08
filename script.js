@@ -1,3 +1,4 @@
+
 // ============================
 // CONFIGURACIÓN DE LA API
 // ============================
@@ -44,7 +45,6 @@ async function startLogin() {
   status.className = 'status';
   status.textContent = 'Verificando credenciales...';
   
-  // Validación de 9 dígitos en el cliente
   if (!/^\d{9}$/.test(wsp)) {
     status.className = 'status error';
     status.textContent = 'Número de WhatsApp debe tener exactamente 9 dígitos.';
@@ -70,7 +70,7 @@ async function startLogin() {
       status.textContent = data.message;
       
       document.getElementById('login-section').classList.add('hidden');
-      showDashboard(data.user); // Redirección directa al dashboard
+      showDashboard(data.user); 
     } else {
       status.className = 'status error';
       status.textContent = data.message;
@@ -88,7 +88,6 @@ async function startRegister() {
   status.className = 'status';
   status.textContent = 'Registrando usuario...';
 
-  // Validación de 9 dígitos en el cliente
   if (!/^\d{9}$/.test(wsp)) {
     status.className = 'status error';
     status.textContent = 'Número de WhatsApp debe tener exactamente 9 dígitos.';
@@ -110,7 +109,6 @@ async function startRegister() {
       status.className = 'status success';
       status.textContent = data.message;
       
-      // Tras el registro, volvemos al login para que inicie sesión
       showLoginSection();
       document.getElementById('login-email').value = email;
       document.getElementById('login-wsp').value = wsp;
@@ -131,7 +129,6 @@ async function startRegister() {
 // ============================
 
 function showDashboard(user) {
-  // Oculta las secciones iniciales y muestra el tablero/oferta/premio
   document.getElementById('login-section').classList.add('hidden');
   document.getElementById('register-section').classList.add('hidden');
   closeModal(); 
@@ -140,44 +137,51 @@ function showDashboard(user) {
   document.getElementById('offer-section').classList.remove('hidden');
   document.getElementById('prize-section').classList.remove('hidden');
 
+  document.getElementById('user-display-name').textContent = user.nombre1 ? user.nombre1.toUpperCase() : 'USUARIO';
   document.getElementById('user-email').textContent = currentEmail;
-  document.getElementById('user-points').textContent = user.puntos;
+  document.getElementById('user-credits').textContent = user.puntos; // ID cambiado
   document.getElementById('user-fichas').textContent = user.fichas;
   document.getElementById('user-streak').textContent = user.diasRacha;
 }
 
-function claimDailyCredits() {
+async function claimDailyCredits() {
   const user = currentFullUserData;
   
-  // 1. Rellenar modal con datos predeterminados
+  // Revisar si Primer Nombre ya está lleno (indicador de que ya completó los datos)
+  if (user.nombre1 && user.nombre1.trim() !== '') {
+    // Si ya tiene datos, procede a reclamar directamente
+    await submitFullUserDataAndClaim(true);
+    return;
+  }
+  
+  // Si no tiene datos, muestra el modal y precarga la info
   document.getElementById('modal-email').value = currentEmail;
   document.getElementById('modal-wsp').value = currentWsp || user.wspNumber;
-  
-  // Rellenar campos de nombre
   document.getElementById('modal-nombre1').value = user.nombre1 || '';
   document.getElementById('modal-nombre2').value = user.nombre2 || '';
   document.getElementById('modal-apellidoPaterno').value = user.apellidoPaterno || '';
   document.getElementById('modal-apellidoMaterno').value = user.apellidoMaterno || '';
 
-  // 2. Mostrar modal
   openModal();
   document.getElementById('modal-status').classList.add('hidden'); // Limpiar status
 }
 
-async function submitFullUserDataAndClaim() {
+async function submitFullUserDataAndClaim(onlyClaim = false) {
   const status = document.getElementById('modal-status');
   status.className = 'status';
-  status.textContent = 'Guardando datos y reclamando puntos...';
   status.classList.remove('hidden');
+  status.textContent = onlyClaim ? 'Reclamando créditos...' : 'Guardando datos y reclamando créditos...';
 
   const data = {
-    nombre1: document.getElementById('modal-nombre1').value.trim(),
-    nombre2: document.getElementById('modal-nombre2').value.trim(),
-    apellidoPaterno: document.getElementById('modal-apellidoPaterno').value.trim(),
-    apellidoMaterno: document.getElementById('modal-apellidoMaterno').value.trim(),
+    email: currentEmail,
+    only_claim: onlyClaim,
+    nombre1: onlyClaim ? currentFullUserData.nombre1 : document.getElementById('modal-nombre1').value.trim(),
+    nombre2: onlyClaim ? currentFullUserData.nombre2 : document.getElementById('modal-nombre2').value.trim(),
+    apellidoPaterno: onlyClaim ? currentFullUserData.apellidoPaterno : document.getElementById('modal-apellidoPaterno').value.trim(),
+    apellidoMaterno: onlyClaim ? currentFullUserData.apellidoMaterno : document.getElementById('modal-apellidoMaterno').value.trim(),
   };
 
-  if (!data.nombre1 || !data.apellidoPaterno || !data.apellidoMaterno) {
+  if (!onlyClaim && (!data.nombre1 || !data.apellidoPaterno || !data.apellidoMaterno)) {
     status.className = 'status error';
     status.textContent = 'Error: Primer Nombre, Apellido Paterno y Apellido Materno son obligatorios.';
     return;
@@ -188,7 +192,6 @@ async function submitFullUserDataAndClaim() {
       method: 'POST',
       body: JSON.stringify({
         action: 'submit_full_data_and_claim',
-        email: currentEmail,
         ...data 
       })
     });
@@ -200,15 +203,18 @@ async function submitFullUserDataAndClaim() {
       
       if (result.user) {
         showDashboard(result.user);
+        // Actualizar datos locales después de reclamar o guardar
+        Object.assign(currentFullUserData, result.user);
+        currentFullUserData.nombre1 = data.nombre1; // Asegurar que el nombre actualizado esté en los datos locales
+        currentFullUserData.nombre2 = data.nombre2;
+        currentFullUserData.apellidoPaterno = data.apellidoPaterno;
+        currentFullUserData.apellidoMaterno = data.apellidoMaterno;
       }
       
-      // Actualizar los datos locales del usuario
-      currentFullUserData.nombre1 = data.nombre1;
-      currentFullUserData.nombre2 = data.nombre2;
-      currentFullUserData.apellidoPaterno = data.apellidoPaterno;
-      currentFullUserData.apellidoMaterno = data.apellidoMaterno;
-
-      setTimeout(closeModal, 2000); 
+      // Cerrar modal solo si no hubo error
+      if (!onlyClaim) {
+        setTimeout(closeModal, 2000); 
+      }
       
     } else {
       status.className = 'status error';
@@ -221,7 +227,7 @@ async function submitFullUserDataAndClaim() {
 }
 
 // ============================
-// OFERTAS Y PREMIOS
+// OFERTAS Y PREMIOS (Mantenidas)
 // ============================
 
 async function submitOffer() {
@@ -252,7 +258,7 @@ async function submitOffer() {
     if (data.success) {
       status.className = 'status success';
       status.textContent = data.message;
-      document.getElementById('user-points').textContent = data.new_points;
+      document.getElementById('user-credits').textContent = data.new_points;
       document.getElementById('user-fichas').textContent = data.new_fichas;
     } else {
       status.className = 'status error';
@@ -287,4 +293,3 @@ async function loadCurrentPrize() {
     status.textContent = 'Error al obtener el premio actual.';
   }
 }
-
