@@ -5,7 +5,6 @@
   <title>Subasta Ciega Diaria</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ... (CSS se mantiene igual) ... */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f7fb;
@@ -58,6 +57,32 @@
       color: #777;
       margin-top: 30px;
     }
+    /* New styles for the modal */
+    .modal {
+      display: none; 
+      position: fixed; 
+      z-index: 1; 
+      left: 0;
+      top: 0;
+      width: 100%; 
+      height: 100%; 
+      overflow: auto; 
+      background-color: rgb(0,0,0); 
+      background-color: rgba(0,0,0,0.4); 
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto; 
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%; 
+      max-width: 500px;
+      border-radius: 8px;
+    }
+    .modal-content input[readonly] {
+      color: #777;
+    }
   </style>
 </head>
 <body>
@@ -68,8 +93,8 @@
       <h3>🚀 Inicio de Sesión</h3>
       <label>Email:</label>
       <input type="email" id="login-email" placeholder="tuemail@ejemplo.com">
-      <label>Número de WhatsApp:</label>
-      <input type="text" id="login-wsp" placeholder="Ej: 987654321">
+      <label>Número de WhatsApp (9 dígitos):</label>
+      <input type="text" id="login-wsp" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" inputmode="numeric">
       <button onclick="startLogin()">Ingresar</button>
       <div id="login-status" class="status hidden"></div>
       
@@ -82,22 +107,14 @@
       <h3>✍️ Registro de Nuevo Usuario</h3>
       <label>Email:</label>
       <input type="email" id="register-email" placeholder="tuemail@ejemplo.com">
-      <label>Número de WhatsApp:</label>
-      <input type="text" id="register-wsp" placeholder="Ej: 987654321">
-      <button onclick="startRegister()">Registrarme y Enviar Código</button>
+      <label>Número de WhatsApp (9 dígitos):</label>
+      <input type="text" id="register-wsp" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" inputmode="numeric">
+      <button onclick="startRegister()">Registrarme</button>
       <div id="register-status" class="status hidden"></div>
       
       <p style="text-align: center; margin-top: 20px; color: #777;">
         <a href="#" onclick="showLoginSection(event)">Volver a Iniciar Sesión.</a>
       </p>
-    </div>
-
-    <div class="form-section hidden" id="validation-section">
-      <h3>Validar Código</h3>
-      <label>Ingresa el código recibido:</label>
-      <input type="text" id="validation-code" placeholder="Ej: 1234">
-      <button onclick="validateCode()">Validar y Reclamar Puntos</button>
-      <div id="validation-status" class="status hidden"></div>
     </div>
 
     <div class="form-section hidden" id="dashboard-section">
@@ -106,6 +123,7 @@
       <p><b>Puntos:</b> <span id="user-points"></span></p>
       <p><b>Fichas:</b> <span id="user-fichas"></span></p>
       <p><b>Racha Actual:</b> <span id="user-streak"></span> días</p>
+      <button onclick="claimDailyCredits()" style="background: #28a745;">Recoger Créditos del Día</button>
       <button onclick="loadCurrentPrize()">Ver Premio del Día</button>
       <div id="dashboard-status" class="status hidden"></div>
     </div>
@@ -133,6 +151,30 @@
 
     <div class="footer">
       © 2025 Subasta Ciega Diaria | Sistema basado en Google Apps Script
+    </div>
+  </div>
+
+  <div id="data-completion-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Completa tus Datos Personales</h3>
+      <p>Necesitas completar tus datos para recoger tus créditos diarios.</p>
+      <label>Email:</label>
+      <input type="email" id="modal-email" readonly style="background: #eee;">
+      <label>Número de WhatsApp:</label>
+      <input type="text" id="modal-wsp" readonly style="background: #eee;">
+      
+      <label>Primer Nombre (Obligatorio):</label>
+      <input type="text" id="modal-nombre1" placeholder="Primer Nombre">
+      <label>Segundo Nombre (Opcional):</label>
+      <input type="text" id="modal-nombre2" placeholder="Segundo Nombre">
+      <label>Apellido Paterno (Obligatorio):</label>
+      <input type="text" id="modal-apellidoPaterno" placeholder="Apellido Paterno">
+      <label>Apellido Materno (Obligatorio):</label>
+      <input type="text" id="modal-apellidoMaterno" placeholder="Apellido Materno">
+      
+      <button onclick="submitFullUserDataAndClaim()">Guardar Datos y Reclamar Puntos</button>
+      <button onclick="closeModal()" style="background: #ccc;">Cerrar</button>
+      <div id="modal-status" class="status hidden"></div>
     </div>
   </div>
 
