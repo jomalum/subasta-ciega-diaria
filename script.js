@@ -4,21 +4,32 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbwQTHENsIOA2tLCuEmSfHAW8lucD7LSK4TwN75bM3nXjr4JNDKTxKSIfJL_AWtO7Pdjlw/exec';
 
 let currentEmail = null;
+let currentWsp = null;
+let currentFullUserData = {}; // Para guardar datos del usuario
 
 // ============================
-// FUNCIONES DE VISTAS (Se mantienen igual)
+// FUNCIONES DE VISTAS
 // ============================
-
 function showLoginSection(event) {
   if (event) event.preventDefault();
   document.getElementById('register-section').classList.add('hidden');
   document.getElementById('login-section').classList.remove('hidden');
+  closeModal();
 }
 
 function showRegisterSection(event) {
   if (event) event.preventDefault();
   document.getElementById('login-section').classList.add('hidden');
   document.getElementById('register-section').classList.remove('hidden');
+  closeModal();
+}
+
+function openModal() {
+  document.getElementById('data-completion-modal').style.display = 'block';
+}
+
+function closeModal() {
+  document.getElementById('data-completion-modal').style.display = 'none';
 }
 
 
@@ -27,18 +38,24 @@ function showRegisterSection(event) {
 // ============================
 
 async function startLogin() {
-  // Tomar los valores de los inputs de la sección de login
   const email = document.getElementById('login-email').value.trim();
   const wsp = document.getElementById('login-wsp').value.trim();
   const status = document.getElementById('login-status');
   status.className = 'status';
   status.textContent = 'Verificando credenciales...';
+  
+  // Validación de 9 dígitos en el cliente
+  if (!/^\d{9}$/.test(wsp)) {
+    status.className = 'status error';
+    status.textContent = 'Número de WhatsApp debe tener exactamente 9 dígitos.';
+    return;
+  }
 
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify({
-        action: 'login_user', // Nueva acción para el login
+        action: 'login_user',
         email: email,
         wsp_number: wsp
       })
@@ -47,11 +64,13 @@ async function startLogin() {
 
     if (data.success) {
       currentEmail = email;
+      currentWsp = wsp; 
+      currentFullUserData = data.user; 
       status.className = 'status success';
       status.textContent = data.message;
       
       document.getElementById('login-section').classList.add('hidden');
-      document.getElementById('validation-section').classList.remove('hidden');
+      showDashboard(data.user); // Redirección directa al dashboard
     } else {
       status.className = 'status error';
       status.textContent = data.message;
@@ -69,11 +88,18 @@ async function startRegister() {
   status.className = 'status';
   status.textContent = 'Registrando usuario...';
 
+  // Validación de 9 dígitos en el cliente
+  if (!/^\d{9}$/.test(wsp)) {
+    status.className = 'status error';
+    status.textContent = 'Número de WhatsApp debe tener exactamente 9 dígitos.';
+    return;
+  }
+  
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify({
-        action: 'register_new_user', // Acción para el registro (mantenemos unicidad)
+        action: 'register_new_user',
         email: email,
         wsp_number: wsp
       })
@@ -81,12 +107,14 @@ async function startRegister() {
     const data = await res.json();
 
     if (data.success) {
-      currentEmail = email;
       status.className = 'status success';
       status.textContent = data.message;
       
-      document.getElementById('register-section').classList.add('hidden');
-      document.getElementById('validation-section').classList.remove('hidden');
+      // Tras el registro, volvemos al login para que inicie sesión
+      showLoginSection();
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-wsp').value = wsp;
+      
     } else {
       status.className = 'status error';
       status.textContent = data.message;
@@ -98,50 +126,15 @@ async function startRegister() {
 }
 
 
-async function validateCode() {
-  const code = document.getElementById('validation-code').value.trim();
-  const status = document.getElementById('validation-status');
-  status.className = 'status';
-  status.textContent = 'Validando...';
-  
-  if (!currentEmail) {
-    status.className = 'status error';
-    status.textContent = 'Error: No se ha iniciado sesión o registrado un correo.';
-    return;
-  }
-  
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'validate_code_and_claim',
-        email: currentEmail,
-        code: code
-      })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      status.className = 'status success';
-      status.textContent = data.message;
-      showDashboard(data.user);
-    } else {
-      status.className = 'status error';
-      status.textContent = data.message;
-    }
-  } catch (err) {
-    status.className = 'status error';
-    status.textContent = 'Error de conexión al validar código.';
-  }
-}
-
-// ... (El resto de las funciones se mantienen igual) ...
+// ============================
+// DASHBOARD Y CRÉDITOS DIARIOS
+// ============================
 
 function showDashboard(user) {
-  // Oculta todas las secciones iniciales y muestra el tablero/oferta/premio
+  // Oculta las secciones iniciales y muestra el tablero/oferta/premio
   document.getElementById('login-section').classList.add('hidden');
   document.getElementById('register-section').classList.add('hidden');
-  document.getElementById('validation-section').classList.add('hidden');
+  closeModal(); 
   
   document.getElementById('dashboard-section').classList.remove('hidden');
   document.getElementById('offer-section').classList.remove('hidden');
@@ -152,6 +145,84 @@ function showDashboard(user) {
   document.getElementById('user-fichas').textContent = user.fichas;
   document.getElementById('user-streak').textContent = user.diasRacha;
 }
+
+function claimDailyCredits() {
+  const user = currentFullUserData;
+  
+  // 1. Rellenar modal con datos predeterminados
+  document.getElementById('modal-email').value = currentEmail;
+  document.getElementById('modal-wsp').value = currentWsp || user.wspNumber;
+  
+  // Rellenar campos de nombre
+  document.getElementById('modal-nombre1').value = user.nombre1 || '';
+  document.getElementById('modal-nombre2').value = user.nombre2 || '';
+  document.getElementById('modal-apellidoPaterno').value = user.apellidoPaterno || '';
+  document.getElementById('modal-apellidoMaterno').value = user.apellidoMaterno || '';
+
+  // 2. Mostrar modal
+  openModal();
+  document.getElementById('modal-status').classList.add('hidden'); // Limpiar status
+}
+
+async function submitFullUserDataAndClaim() {
+  const status = document.getElementById('modal-status');
+  status.className = 'status';
+  status.textContent = 'Guardando datos y reclamando puntos...';
+  status.classList.remove('hidden');
+
+  const data = {
+    nombre1: document.getElementById('modal-nombre1').value.trim(),
+    nombre2: document.getElementById('modal-nombre2').value.trim(),
+    apellidoPaterno: document.getElementById('modal-apellidoPaterno').value.trim(),
+    apellidoMaterno: document.getElementById('modal-apellidoMaterno').value.trim(),
+  };
+
+  if (!data.nombre1 || !data.apellidoPaterno || !data.apellidoMaterno) {
+    status.className = 'status error';
+    status.textContent = 'Error: Primer Nombre, Apellido Paterno y Apellido Materno son obligatorios.';
+    return;
+  }
+  
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'submit_full_data_and_claim',
+        email: currentEmail,
+        ...data 
+      })
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      status.className = 'status success';
+      status.textContent = result.message;
+      
+      if (result.user) {
+        showDashboard(result.user);
+      }
+      
+      // Actualizar los datos locales del usuario
+      currentFullUserData.nombre1 = data.nombre1;
+      currentFullUserData.nombre2 = data.nombre2;
+      currentFullUserData.apellidoPaterno = data.apellidoPaterno;
+      currentFullUserData.apellidoMaterno = data.apellidoMaterno;
+
+      setTimeout(closeModal, 2000); 
+      
+    } else {
+      status.className = 'status error';
+      status.textContent = result.message;
+    }
+  } catch (err) {
+    status.className = 'status error';
+    status.textContent = 'Error de conexión al enviar datos y reclamar puntos.';
+  }
+}
+
+// ============================
+// OFERTAS Y PREMIOS
+// ============================
 
 async function submitOffer() {
   const value = document.getElementById('offer-value').value;
@@ -216,4 +287,3 @@ async function loadCurrentPrize() {
     status.textContent = 'Error al obtener el premio actual.';
   }
 }
-
