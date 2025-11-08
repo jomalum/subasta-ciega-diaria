@@ -1,4 +1,3 @@
-
 // ============================
 // CONFIGURACIÓN DE LA API
 // ============================
@@ -142,7 +141,7 @@ function showDashboard(user) {
 
   document.getElementById('user-display-name').textContent = user.nombre1 ? user.nombre1.toUpperCase() : 'USUARIO';
   document.getElementById('user-email').textContent = currentEmail;
-  document.getElementById('user-credits').textContent = user.puntos; 
+  document.getElementById('user-credits').textContent = user.puntos; // ID CORRECTO
   document.getElementById('user-fichas').textContent = user.fichas;
   document.getElementById('user-streak').textContent = user.diasRacha;
   
@@ -187,7 +186,6 @@ async function submitFullUserDataAndClaim(onlyClaim = false) {
   const data = {
     email: currentEmail,
     only_claim: onlyClaim,
-    // Asegurarse de enviar los datos que ya tenemos si solo vamos a reclamar
     nombre1: onlyClaim ? currentFullUserData.nombre1 : document.getElementById('modal-nombre1').value.trim(),
     nombre2: onlyClaim ? currentFullUserData.nombre2 : document.getElementById('modal-nombre2').value.trim(),
     apellidoPaterno: onlyClaim ? currentFullUserData.apellidoPaterno : document.getElementById('modal-apellidoPaterno').value.trim(),
@@ -215,7 +213,8 @@ async function submitFullUserDataAndClaim(onlyClaim = false) {
       status.textContent = result.message;
       
       if (result.user) {
-        showDashboard(result.user);
+        // Asegura que los créditos se muestren al actualizar el dashboard
+        showDashboard(result.user); 
         
         // Actualizar datos locales
         Object.assign(currentFullUserData, result.user);
@@ -242,7 +241,7 @@ async function submitFullUserDataAndClaim(onlyClaim = false) {
 }
 
 // ============================
-// OFERTAS Y PREMIOS (Mantenidas)
+// OFERTAS Y PREMIOS
 // ============================
 
 async function submitOffer() {
@@ -273,7 +272,7 @@ async function submitOffer() {
     if (data.success) {
       status.className = 'status success';
       status.textContent = data.message;
-      document.getElementById('user-credits').textContent = data.new_points;
+      document.getElementById('user-credits').textContent = data.new_points; // ID CORRECTO
       document.getElementById('user-fichas').textContent = data.new_fichas;
     } else {
       status.className = 'status error';
