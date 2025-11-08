@@ -5,6 +5,7 @@
   <title>Subasta Ciega Diaria</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* ... (CSS se mantiene igual) ... */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f7fb;
@@ -65,10 +66,11 @@
 
     <div class="form-section" id="login-section">
       <h3>🚀 Inicio de Sesión</h3>
-      <p>Ingresa tu correo para continuar.</p>
       <label>Email:</label>
       <input type="email" id="login-email" placeholder="tuemail@ejemplo.com">
-      <button onclick="checkUserExists()">Continuar</button>
+      <label>Número de WhatsApp:</label>
+      <input type="text" id="login-wsp" placeholder="Ej: 987654321">
+      <button onclick="startLogin()">Ingresar</button>
       <div id="login-status" class="status hidden"></div>
       
       <p style="text-align: center; margin-top: 20px; color: #777;">
