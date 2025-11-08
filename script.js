@@ -6,6 +6,56 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwQTHENsIOA2tLCuEmSfHAW
 let currentEmail = null;
 let currentWsp = null;
 let currentFullUserData = {}; // Para guardar datos del usuario
+const SESSION_EXPIRATION_MINUTES = 60; // Duración de la sesión: 1 hora
+
+// ============================
+// GESTIÓN DE SESIÓN Y PERSISTENCIA (NUEVO)
+// ============================
+
+function saveSession(user) {
+    const expiration = new Date();
+    expiration.setTime(expiration.getTime() + (SESSION_EXPIRATION_MINUTES * 60 * 1000));
+    
+    const sessionData = {
+        email: currentEmail,
+        wsp: currentWsp,
+        user: user,
+        expires: expiration.toISOString()
+    };
+    localStorage.setItem('userSession', JSON.stringify(sessionData));
+}
+
+function loadSession() {
+    const sessionStr = localStorage.getItem('userSession');
+    if (!sessionStr) return false;
+    
+    const sessionData = JSON.parse(sessionStr);
+    const now = new Date();
+    const expiration = new Date(sessionData.expires);
+    
+    if (now > expiration) {
+        clearSession(false); // Sesión expirada, limpiar sin recargar
+        return false; 
+    }
+
+    currentEmail = sessionData.email;
+    currentWsp = sessionData.wsp;
+    currentFullUserData = sessionData.user;
+    
+    showDashboard(sessionData.user); // Carga el dashboard con los datos persistentes
+    
+    return true; 
+}
+
+function clearSession(reload = true) {
+    localStorage.removeItem('userSession');
+    currentEmail = null;
+    currentWsp = null;
+    currentFullUserData = {};
+    if (reload) {
+        location.reload(); 
+    }
+}
 
 // ============================
 // FUNCIONES DE VISTAS
@@ -14,6 +64,7 @@ function showLoginSection(event) {
   if (event) event.preventDefault();
   document.getElementById('register-section').classList.add('hidden');
   document.getElementById('login-section').classList.remove('hidden');
+  document.getElementById('dashboard-section').classList.add('hidden'); // Ocultar dashboard si se vuelve al login
   closeModal();
 }
 
@@ -67,6 +118,8 @@ async function startLogin() {
       currentFullUserData = data.user; 
       status.className = 'status success';
       status.textContent = data.message;
+      
+      saveSession(data.user); // GUARDA LA SESIÓN
       
       document.getElementById('login-section').classList.add('hidden');
       showDashboard(data.user); 
@@ -141,11 +194,11 @@ function showDashboard(user) {
 
   document.getElementById('user-display-name').textContent = user.nombre1 ? user.nombre1.toUpperCase() : 'USUARIO';
   document.getElementById('user-email').textContent = currentEmail;
-  document.getElementById('user-credits').textContent = user.puntos; // ID CORREGIDO
+  document.getElementById('user-credits').textContent = user.puntos; // ID CORRECTO
   document.getElementById('user-fichas').textContent = user.fichas;
   document.getElementById('user-streak').textContent = user.diasRacha;
   
-  // Establecer el texto del botón basado en si los datos están llenos
+  // Lógica del botón de reclamar
   if (!hasFullName) {
     claimButton.textContent = '➡️ COMPLETA TUS DATOS';
   } else {
@@ -156,9 +209,8 @@ function showDashboard(user) {
 async function claimDailyCredits() {
   const user = currentFullUserData;
   
-  // Revisar si Primer Nombre ya está lleno 
+  // Si ya tiene datos, procede a reclamar directamente
   if (user.nombre1 && user.nombre1.trim() !== '') {
-    // Si ya tiene datos, procede a reclamar directamente
     await submitFullUserDataAndClaim(true); // onlyClaim = true
     return;
   }
@@ -176,7 +228,7 @@ async function claimDailyCredits() {
 }
 
 async function submitFullUserDataAndClaim(onlyClaim = false) {
-  const status = document.getElementById('modal-status');
+  const status = document.getElementById('modal-status') || document.getElementById('dashboard-status');
   const claimButton = document.getElementById('claim-credits-button');
 
   status.className = 'status';
@@ -223,6 +275,8 @@ async function submitFullUserDataAndClaim(onlyClaim = false) {
         currentFullUserData.apellidoPaterno = data.apellidoPaterno;
         currentFullUserData.apellidoMaterno = data.apellidoMaterno;
 
+        saveSession(currentFullUserData); // GUARDA LA SESIÓN ACTUALIZADA
+        
         // Si se llenaron los datos por primera vez, actualizamos el botón y cerramos el modal
         if (!onlyClaim) {
            claimButton.textContent = '✅ RECOGER CRÉDITOS DEL DÍA';
@@ -272,7 +326,7 @@ async function submitOffer() {
     if (data.success) {
       status.className = 'status success';
       status.textContent = data.message;
-      document.getElementById('user-credits').textContent = data.new_points; // ID CORREGIDO
+      document.getElementById('user-credits').textContent = data.new_points; // ID CORRECTO
       document.getElementById('user-fichas').textContent = data.new_fichas;
     } else {
       status.className = 'status error';
@@ -307,3 +361,16 @@ async function loadCurrentPrize() {
     status.textContent = 'Error al obtener el premio actual.';
   }
 }
+
+// ============================
+// INICIALIZACIÓN
+// ============================
+
+function init() {
+    // Si loadSession() devuelve true, la sesión fue cargada y el dashboard está visible.
+    if (!loadSession()) {
+        showLoginSection(); // Si no hay sesión activa o expiró, muestra el login.
+    }
+}
+
+init();
