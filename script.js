@@ -137,20 +137,30 @@ function showDashboard(user) {
   document.getElementById('offer-section').classList.remove('hidden');
   document.getElementById('prize-section').classList.remove('hidden');
 
+  const claimButton = document.getElementById('claim-credits-button');
+  const hasFullName = user.nombre1 && user.nombre1.trim() !== '';
+
   document.getElementById('user-display-name').textContent = user.nombre1 ? user.nombre1.toUpperCase() : 'USUARIO';
   document.getElementById('user-email').textContent = currentEmail;
-  document.getElementById('user-credits').textContent = user.puntos; // ID cambiado
+  document.getElementById('user-credits').textContent = user.puntos; 
   document.getElementById('user-fichas').textContent = user.fichas;
   document.getElementById('user-streak').textContent = user.diasRacha;
+  
+  // Establecer el texto del botón basado en si los datos están llenos
+  if (!hasFullName) {
+    claimButton.textContent = '➡️ COMPLETA TUS DATOS';
+  } else {
+    claimButton.textContent = '✅ RECOGER CRÉDITOS DEL DÍA';
+  }
 }
 
 async function claimDailyCredits() {
   const user = currentFullUserData;
   
-  // Revisar si Primer Nombre ya está lleno (indicador de que ya completó los datos)
+  // Revisar si Primer Nombre ya está lleno 
   if (user.nombre1 && user.nombre1.trim() !== '') {
     // Si ya tiene datos, procede a reclamar directamente
-    await submitFullUserDataAndClaim(true);
+    await submitFullUserDataAndClaim(true); // onlyClaim = true
     return;
   }
   
@@ -163,11 +173,13 @@ async function claimDailyCredits() {
   document.getElementById('modal-apellidoMaterno').value = user.apellidoMaterno || '';
 
   openModal();
-  document.getElementById('modal-status').classList.add('hidden'); // Limpiar status
+  document.getElementById('modal-status').classList.add('hidden'); 
 }
 
 async function submitFullUserDataAndClaim(onlyClaim = false) {
   const status = document.getElementById('modal-status');
+  const claimButton = document.getElementById('claim-credits-button');
+
   status.className = 'status';
   status.classList.remove('hidden');
   status.textContent = onlyClaim ? 'Reclamando créditos...' : 'Guardando datos y reclamando créditos...';
@@ -175,6 +187,7 @@ async function submitFullUserDataAndClaim(onlyClaim = false) {
   const data = {
     email: currentEmail,
     only_claim: onlyClaim,
+    // Asegurarse de enviar los datos que ya tenemos si solo vamos a reclamar
     nombre1: onlyClaim ? currentFullUserData.nombre1 : document.getElementById('modal-nombre1').value.trim(),
     nombre2: onlyClaim ? currentFullUserData.nombre2 : document.getElementById('modal-nombre2').value.trim(),
     apellidoPaterno: onlyClaim ? currentFullUserData.apellidoPaterno : document.getElementById('modal-apellidoPaterno').value.trim(),
@@ -203,17 +216,19 @@ async function submitFullUserDataAndClaim(onlyClaim = false) {
       
       if (result.user) {
         showDashboard(result.user);
-        // Actualizar datos locales después de reclamar o guardar
+        
+        // Actualizar datos locales
         Object.assign(currentFullUserData, result.user);
-        currentFullUserData.nombre1 = data.nombre1; // Asegurar que el nombre actualizado esté en los datos locales
+        currentFullUserData.nombre1 = data.nombre1;
         currentFullUserData.nombre2 = data.nombre2;
         currentFullUserData.apellidoPaterno = data.apellidoPaterno;
         currentFullUserData.apellidoMaterno = data.apellidoMaterno;
-      }
-      
-      // Cerrar modal solo si no hubo error
-      if (!onlyClaim) {
-        setTimeout(closeModal, 2000); 
+
+        // Si se llenaron los datos por primera vez, actualizamos el botón y cerramos el modal
+        if (!onlyClaim) {
+           claimButton.textContent = '✅ RECOGER CRÉDITOS DEL DÍA';
+           setTimeout(closeModal, 2000); 
+        }
       }
       
     } else {
