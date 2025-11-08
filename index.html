@@ -61,24 +61,30 @@
     .modal {
       display: none; 
       position: fixed; 
-      z-index: 1000; /* Asegura que esté por encima de todo */
+      z-index: 1000; 
       left: 0;
       top: 0;
       width: 100%; 
       height: 100%; 
       overflow: auto; 
-      background-color: rgba(0,0,0,0.6); /* Fondo semi-transparente */
-      padding-top: 0; /* Centrado vertical */
+      background-color: rgba(0,0,0,0.6); 
+      padding-top: 0; 
     }
     .modal-content {
       background-color: #fefefe;
-      margin: 15% auto; /* Ajustado para centrar verticalmente mejor */
-      padding: 25px;
-      border: 1px solid #0057e7; /* Borde para enmarcar */
+      margin: 10% auto; /* Ajustado para centrar verticalmente mejor */
+      padding: 30px; /* Más padding para enmarcar */
+      border: 1px solid #0057e7; 
       width: 90%; 
-      max-width: 450px;
+      max-width: 400px; /* Ligeramente más estrecho para centrar mejor el contenido */
       border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    }
+    .modal-content input, .modal-content button {
+        /* Los inputs se ven mejor al 100% de max-width en este contenedor estrecho. */
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
     }
     .modal-content input[readonly] {
       background: #f0f0f0;
@@ -133,7 +139,7 @@
       <p><b>Créditos:</b> <span id="user-credits"></span></p>
       <p><b>Fichas:</b> <span id="user-fichas"></span></p>
       <p><b>Racha Actual:</b> <span id="user-streak"></span> días</p>
-      <button onclick="claimDailyCredits()" style="background: #28a745;">Recoger Créditos del Día</button>
+      <button id="claim-credits-button" onclick="claimDailyCredits()" style="background: #28a745;">Recoger Créditos del Día</button>
       <button onclick="loadCurrentPrize()">Ver Premio del Día</button>
       <div id="dashboard-status" class="status hidden"></div>
     </div>
