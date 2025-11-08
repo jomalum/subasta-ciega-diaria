@@ -57,31 +57,40 @@
       color: #777;
       margin-top: 30px;
     }
-    /* New styles for the modal */
+    /* New styles for the modal - Ajuste para enmarcar y centrar */
     .modal {
       display: none; 
       position: fixed; 
-      z-index: 1; 
+      z-index: 1000; /* Asegura que esté por encima de todo */
       left: 0;
       top: 0;
       width: 100%; 
       height: 100%; 
       overflow: auto; 
-      background-color: rgb(0,0,0); 
-      background-color: rgba(0,0,0,0.4); 
-      padding-top: 60px;
+      background-color: rgba(0,0,0,0.6); /* Fondo semi-transparente */
+      padding-top: 0; /* Centrado vertical */
     }
     .modal-content {
       background-color: #fefefe;
-      margin: 5% auto; 
-      padding: 20px;
-      border: 1px solid #888;
+      margin: 15% auto; /* Ajustado para centrar verticalmente mejor */
+      padding: 25px;
+      border: 1px solid #0057e7; /* Borde para enmarcar */
       width: 90%; 
-      max-width: 500px;
-      border-radius: 8px;
+      max-width: 450px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.25);
     }
     .modal-content input[readonly] {
-      color: #777;
+      background: #f0f0f0;
+      color: #555;
+    }
+    .centered-name {
+      text-align: center;
+      color: #0057e7;
+      margin-bottom: 10px;
+      font-size: 1.5em;
+      font-weight: bold;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -118,9 +127,10 @@
     </div>
 
     <div class="form-section hidden" id="dashboard-section">
+      <div id="user-display-name" class="centered-name"></div>
       <h3>Mi Tablero</h3>
       <p><b>Email:</b> <span id="user-email"></span></p>
-      <p><b>Puntos:</b> <span id="user-points"></span></p>
+      <p><b>Créditos:</b> <span id="user-credits"></span></p>
       <p><b>Fichas:</b> <span id="user-fichas"></span></p>
       <p><b>Racha Actual:</b> <span id="user-streak"></span> días</p>
       <button onclick="claimDailyCredits()" style="background: #28a745;">Recoger Créditos del Día</button>
@@ -134,7 +144,7 @@
       <input type="number" id="offer-value" min="1" max="1000" placeholder="Ej: 25">
       <label>Tipo de Moneda:</label>
       <select id="currency-type">
-        <option value="PUNTOS_DIARIOS">Puntos Diarios</option>
+        <option value="PUNTOS_DIARIOS">Créditos Diarios</option>
         <option value="FICHAS_RACHA">Fichas de Racha</option>
       </select>
       <button onclick="submitOffer()">Enviar Oferta</button>
@@ -157,11 +167,11 @@
   <div id="data-completion-modal" class="modal hidden">
     <div class="modal-content">
       <h3>Completa tus Datos Personales</h3>
-      <p>Necesitas completar tus datos para recoger tus créditos diarios.</p>
+      <p>Necesitas completar tus datos **solo una vez** para recoger tus créditos diarios.</p>
       <label>Email:</label>
-      <input type="email" id="modal-email" readonly style="background: #eee;">
+      <input type="email" id="modal-email" readonly>
       <label>Número de WhatsApp:</label>
-      <input type="text" id="modal-wsp" readonly style="background: #eee;">
+      <input type="text" id="modal-wsp" readonly>
       
       <label>Primer Nombre (Obligatorio):</label>
       <input type="text" id="modal-nombre1" placeholder="Primer Nombre">
@@ -172,8 +182,7 @@
       <label>Apellido Materno (Obligatorio):</label>
       <input type="text" id="modal-apellidoMaterno" placeholder="Apellido Materno">
       
-      <button onclick="submitFullUserDataAndClaim()">Guardar Datos y Reclamar Puntos</button>
-      <button onclick="closeModal()" style="background: #ccc;">Cerrar</button>
+      <button onclick="submitFullUserDataAndClaim()">Guardar Datos y Reclamar Créditos</button>
       <div id="modal-status" class="status hidden"></div>
     </div>
   </div>
