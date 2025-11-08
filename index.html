@@ -64,13 +64,30 @@
     <h1>🎯 Subasta Ciega Diaria</h1>
 
     <div class="form-section" id="login-section">
-      <h3>Inicio de Sesión Diaria</h3>
+      <h3>🚀 Inicio de Sesión</h3>
+      <p>Ingresa tu correo para continuar.</p>
       <label>Email:</label>
-      <input type="email" id="email" placeholder="tuemail@ejemplo.com">
-      <label>Número de WhatsApp:</label>
-      <input type="text" id="wsp" placeholder="Ej: 987654321">
-      <button onclick="startLogin()">Continuar / Enviar Código</button>
+      <input type="email" id="login-email" placeholder="tuemail@ejemplo.com">
+      <button onclick="checkUserExists()">Continuar</button>
       <div id="login-status" class="status hidden"></div>
+      
+      <p style="text-align: center; margin-top: 20px; color: #777;">
+        ¿Aún no tienes cuenta? <a href="#" onclick="showRegisterSection(event)">Regístrate aquí.</a>
+      </p>
+    </div>
+
+    <div class="form-section hidden" id="register-section">
+      <h3>✍️ Registro de Nuevo Usuario</h3>
+      <label>Email:</label>
+      <input type="email" id="register-email" placeholder="tuemail@ejemplo.com">
+      <label>Número de WhatsApp:</label>
+      <input type="text" id="register-wsp" placeholder="Ej: 987654321">
+      <button onclick="startRegister()">Registrarme y Enviar Código</button>
+      <div id="register-status" class="status hidden"></div>
+      
+      <p style="text-align: center; margin-top: 20px; color: #777;">
+        <a href="#" onclick="showLoginSection(event)">Volver a Iniciar Sesión.</a>
+      </p>
     </div>
 
     <div class="form-section hidden" id="validation-section">
@@ -120,4 +137,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
