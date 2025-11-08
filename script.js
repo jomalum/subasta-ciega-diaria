@@ -141,7 +141,7 @@ function showDashboard(user) {
 
   document.getElementById('user-display-name').textContent = user.nombre1 ? user.nombre1.toUpperCase() : 'USUARIO';
   document.getElementById('user-email').textContent = currentEmail;
-  document.getElementById('user-credits').textContent = user.puntos; // ID CORRECTO
+  document.getElementById('user-credits').textContent = user.puntos; // ID CORREGIDO
   document.getElementById('user-fichas').textContent = user.fichas;
   document.getElementById('user-streak').textContent = user.diasRacha;
   
@@ -213,7 +213,7 @@ async function submitFullUserDataAndClaim(onlyClaim = false) {
       status.textContent = result.message;
       
       if (result.user) {
-        // Asegura que los créditos se muestren al actualizar el dashboard
+        // Esto refresca la UI y MUESTRA el nuevo saldo de créditos
         showDashboard(result.user); 
         
         // Actualizar datos locales
@@ -272,7 +272,7 @@ async function submitOffer() {
     if (data.success) {
       status.className = 'status success';
       status.textContent = data.message;
-      document.getElementById('user-credits').textContent = data.new_points; // ID CORRECTO
+      document.getElementById('user-credits').textContent = data.new_points; // ID CORREGIDO
       document.getElementById('user-fichas').textContent = data.new_fichas;
     } else {
       status.className = 'status error';
@@ -307,4 +307,3 @@ async function loadCurrentPrize() {
     status.textContent = 'Error al obtener el premio actual.';
   }
 }
-
