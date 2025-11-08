@@ -307,3 +307,4 @@ async function loadCurrentPrize() {
     status.textContent = 'Error al obtener el premio actual.';
   }
 }
+
