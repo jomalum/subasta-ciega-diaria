@@ -25,66 +25,86 @@
     }
     .form-section {
       margin-bottom: 25px;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      background: #fafafa;
     }
     input, select, button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       margin-top: 8px;
       border-radius: 6px;
       border: 1px solid #ccc;
       font-size: 15px;
+      box-sizing: border-box;
     }
     button {
       background: #0078ff;
       color: white;
       font-weight: bold;
       cursor: pointer;
+      border: none;
+      transition: background 0.3s;
     }
     button:hover {
       background: #005fcc;
+    }
+    button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
     }
     .status {
       margin-top: 10px;
       padding: 10px;
       border-radius: 6px;
+      font-size: 14px;
     }
-    .success { background: #e7f8e7; color: #237a23; }
-    .error { background: #fde4e4; color: #b22222; }
-    .hidden { display: none; }
+    .success { 
+      background: #e7f8e7; 
+      color: #237a23; 
+      border: 1px solid #237a23;
+    }
+    .error { 
+      background: #fde4e4; 
+      color: #b22222; 
+      border: 1px solid #b22222;
+    }
+    .hidden { 
+      display: none; 
+    }
     .footer {
       text-align: center;
       font-size: 13px;
       color: #777;
       margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
     }
-    /* New styles for the modal - Ajustado para centrar y enmarcar */
+    /* Modal styles */
     .modal {
-      display: none; 
-      position: fixed; 
-      z-index: 1000; 
+      position: fixed;
+      z-index: 1000;
       left: 0;
       top: 0;
-      width: 100%; 
-      height: 100%; 
-      overflow: auto; 
-      background-color: rgba(0,0,0,0.6); 
-      padding-top: 0; 
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .modal-content {
       background-color: #fefefe;
-      margin: 10% auto; 
-      padding: 30px; 
-      border: 1px solid #0057e7; 
-      width: 90%; 
-      max-width: 400px; 
+      padding: 30px;
+      border: 2px solid #0057e7;
+      width: 90%;
+      max-width: 500px;
       border-radius: 12px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.25);
     }
-    .modal-content input, .modal-content button {
-        /* Centra los campos dentro del modal */
-        margin-left: auto; 
-        margin-right: auto;
-        display: block;
+    .modal-content input {
+      margin-bottom: 15px;
     }
     .modal-content input[readonly] {
       background: #f0f0f0;
@@ -93,10 +113,76 @@
     .centered-name {
       text-align: center;
       color: #0057e7;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       font-size: 1.5em;
       font-weight: bold;
       text-transform: uppercase;
+    }
+    .user-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #0057e7;
+    }
+    .stat-label {
+      font-size: 0.9em;
+      color: #666;
+    }
+    .dashboard-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .logout-btn {
+      background: #dc3545;
+      margin-top: 10px;
+    }
+    .logout-btn:hover {
+      background: #c82333;
+    }
+    .section-title {
+      color: #0057e7;
+      border-bottom: 2px solid #0057e7;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: 600;
+      color: #333;
+      display: block;
+      margin-bottom: 5px;
+    }
+    a {
+      color: #0078ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px auto;
+        padding: 15px;
+      }
+      .user-stats {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -104,12 +190,17 @@
   <div class="container">
     <h1>🎯 Subasta Ciega Diaria</h1>
 
+    <!-- Sección de Login -->
     <div class="form-section" id="login-section">
-      <h3>🚀 Inicio de Sesión</h3>
-      <label>Email:</label>
-      <input type="email" id="login-email" placeholder="tuemail@ejemplo.com">
-      <label>Número de WhatsApp (9 dígitos):</label>
-      <input type="text" id="login-wsp" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" inputmode="numeric">
+      <h3 class="section-title">🚀 Inicio de Sesión</h3>
+      <div class="form-group">
+        <label for="login-email">Email:</label>
+        <input type="email" id="login-email" placeholder="tuemail@ejemplo.com" required>
+      </div>
+      <div class="form-group">
+        <label for="login-wsp">Número de WhatsApp (9 dígitos):</label>
+        <input type="text" id="login-wsp" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" inputmode="numeric" required>
+      </div>
       <button onclick="startLogin()">Ingresar</button>
       <div id="login-status" class="status hidden"></div>
       
@@ -118,12 +209,17 @@
       </p>
     </div>
 
+    <!-- Sección de Registro -->
     <div class="form-section hidden" id="register-section">
-      <h3>✍️ Registro de Nuevo Usuario</h3>
-      <label>Email:</label>
-      <input type="email" id="register-email" placeholder="tuemail@ejemplo.com">
-      <label>Número de WhatsApp (9 dígitos):</label>
-      <input type="text" id="register-wsp" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" inputmode="numeric">
+      <h3 class="section-title">✍️ Registro de Nuevo Usuario</h3>
+      <div class="form-group">
+        <label for="register-email">Email:</label>
+        <input type="email" id="register-email" placeholder="tuemail@ejemplo.com" required>
+      </div>
+      <div class="form-group">
+        <label for="register-wsp">Número de WhatsApp (9 dígitos):</label>
+        <input type="text" id="register-wsp" placeholder="Ej: 987654321" pattern="[0-9]{9}" maxlength="9" inputmode="numeric" required>
+      </div>
       <button onclick="startRegister()">Registrarme</button>
       <div id="register-status" class="status hidden"></div>
       
@@ -132,36 +228,79 @@
       </p>
     </div>
 
+    <!-- Sección del Dashboard -->
     <div class="form-section hidden" id="dashboard-section">
       <div id="user-display-name" class="centered-name"></div>
-      <h3>Mi Tablero</h3>
-      <p><b>Email:</b> <span id="user-email"></span></p>
-      <p><b>Créditos:</b> <span id="user-credits"></span></p> <p><b>Fichas:</b> <span id="user-fichas"></span></p>
-      <p><b>Racha Actual:</b> <span id="user-streak"></span> días</p>
-      <button id="claim-credits-button" onclick="claimDailyCredits()" style="background: #28a745;">Recoger Créditos del Día</button>
-      <button onclick="loadCurrentPrize()">Ver Premio del Día</button>
-      <button onclick="clearSession()" style="background: #dc3545; margin-top: 15px;">Cerrar Sesión</button>
+      <h3 class="section-title">📊 Mi Tablero</h3>
+      
+      <div class="user-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="user-credits">0</div>
+          <div class="stat-label">Créditos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="user-fichas">0</div>
+          <div class="stat-label">Fichas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="user-streak">0</div>
+          <div class="stat-label">Días de Racha</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="user-email-display"></div>
+          <div class="stat-label">Email</div>
+        </div>
+      </div>
+
+      <div class="dashboard-actions">
+        <button id="claim-credits-button" onclick="claimDailyCredits()">Recoger Créditos del Día</button>
+        <button onclick="loadCurrentPrize()">🎁 Ver Premio del Día</button>
+        <button onclick="clearSession()" class="logout-btn">🚪 Cerrar Sesión</button>
+      </div>
       <div id="dashboard-status" class="status hidden"></div>
     </div>
 
+    <!-- Sección de Ofertas -->
     <div class="form-section hidden" id="offer-section">
-      <h3>Ofertar por el Premio de Hoy</h3>
-      <label>Monto de Oferta:</label>
-      <input type="number" id="offer-value" min="1" max="1000" placeholder="Ej: 25">
-      <label>Tipo de Moneda:</label>
-      <select id="currency-type">
-        <option value="PUNTOS_DIARIOS">Créditos Diarios</option>
-        <option value="FICHAS_RACHA">Fichas de Racha</option>
-      </select>
+      <h3 class="section-title">💰 Ofertar por el Premio de Hoy</h3>
+      <div class="form-group">
+        <label for="offer-value">Monto de Oferta:</label>
+        <input type="number" id="offer-value" min="1" max="1000" placeholder="Ej: 25" required>
+      </div>
+      <div class="form-group">
+        <label for="currency-type">Tipo de Moneda:</label>
+        <select id="currency-type">
+          <option value="PUNTOS_DIARIOS">Créditos Diarios</option>
+          <option value="FICHAS_RACHA">Fichas de Racha</option>
+        </select>
+      </div>
       <button onclick="submitOffer()">Enviar Oferta</button>
       <div id="offer-status" class="status hidden"></div>
     </div>
 
+    <!-- Sección de Premios -->
     <div class="form-section hidden" id="prize-section">
-      <h3>🎁 Premio de Hoy</h3>
-      <p><b>Nombre:</b> <span id="prize-name"></span></p>
-      <p><b>Valor:</b> $<span id="prize-value"></span></p>
-      <p><b>Ganador Anterior:</b> <span id="prize-winner"></span></p>
+      <h3 class="section-title">🎁 Premio de Hoy</h3>
+      <div class="prize-info">
+        <div class="form-group">
+          <label>Nombre del Premio:</label>
+          <div style="padding: 10px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e0e0e0;">
+            <span id="prize-name">Cargando...</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Valor del Premio:</label>
+          <div style="padding: 10px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e0e0e0;">
+            $<span id="prize-value">0</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Ganador Anterior:</label>
+          <div style="padding: 10px; background: #f8f9fa; border-radius: 6px; border: 1px solid #e0e0e0;">
+            <span id="prize-winner">Cargando...</span>
+          </div>
+        </div>
+      </div>
       <div id="prize-status" class="status hidden"></div>
     </div>
 
@@ -170,26 +309,47 @@
     </div>
   </div>
 
+  <!-- Modal para Completar Datos -->
   <div id="data-completion-modal" class="modal hidden">
     <div class="modal-content">
-      <h3>Completa tus Datos Personales</h3>
-      <p>Necesitas completar tus datos **solo una vez** para recoger tus créditos diarios.</p>
-      <label>Email:</label>
-      <input type="email" id="modal-email" readonly>
-      <label>Número de WhatsApp:</label>
-      <input type="text" id="modal-wsp" readonly>
+      <h3 style="color: #0057e7; text-align: center;">📝 Completa tus Datos Personales</h3>
+      <p style="text-align: center; color: #666; margin-bottom: 20px;">
+        Necesitas completar tus datos <strong>solo una vez</strong> para recoger tus créditos diarios.
+      </p>
       
-      <label>Primer Nombre (Obligatorio):</label>
-      <input type="text" id="modal-nombre1" placeholder="Primer Nombre">
-      <label>Segundo Nombre (Opcional):</label>
-      <input type="text" id="modal-nombre2" placeholder="Segundo Nombre">
-      <label>Apellido Paterno (Obligatorio):</label>
-      <input type="text" id="modal-apellidoPaterno" placeholder="Apellido Paterno">
-      <label>Apellido Materno (Obligatorio):</label>
-      <input type="text" id="modal-apellidoMaterno" placeholder="Apellido Materno">
+      <div class="form-group">
+        <label>Email:</label>
+        <input type="email" id="modal-email" readonly>
+      </div>
+      <div class="form-group">
+        <label>Número de WhatsApp:</label>
+        <input type="text" id="modal-wsp" readonly>
+      </div>
       
-      <button onclick="submitFullUserDataAndClaim()">Guardar Datos y Reclamar Créditos</button>
+      <div class="form-group">
+        <label>Primer Nombre <span style="color: red;">*</span>:</label>
+        <input type="text" id="modal-nombre1" placeholder="Primer Nombre" required>
+      </div>
+      <div class="form-group">
+        <label>Segundo Nombre (Opcional):</label>
+        <input type="text" id="modal-nombre2" placeholder="Segundo Nombre">
+      </div>
+      <div class="form-group">
+        <label>Apellido Paterno <span style="color: red;">*</span>:</label>
+        <input type="text" id="modal-apellidoPaterno" placeholder="Apellido Paterno" required>
+      </div>
+      <div class="form-group">
+        <label>Apellido Materno <span style="color: red;">*</span>:</label>
+        <input type="text" id="modal-apellidoMaterno" placeholder="Apellido Materno" required>
+      </div>
+      
+      <button onclick="submitFullUserDataAndClaim()" style="background: #28a745;">💾 Guardar Datos y Reclamar Créditos</button>
+      <button onclick="closeModal()" style="background: #6c757d; margin-top: 10px;">❌ Cancelar</button>
       <div id="modal-status" class="status hidden"></div>
+      
+      <p style="font-size: 12px; color: #888; margin-top: 15px; text-align: center;">
+        * Campos obligatorios
+      </p>
     </div>
   </div>
 
