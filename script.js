@@ -1,12 +1,10 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
-
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec"; // Reemplazar con su URL
 // Obtiene referencias
 const modal = document.getElementById('modal-registro');
 const messageBox = document.getElementById('msg');
 const regEmailInput = document.getElementById('reg-email');
 const regPhoneInput = document.getElementById('reg-phone');
-
 // Referencias del nuevo modal de error
 const errorModal = document.getElementById('error-modal');
 const errorContent = document.getElementById('error-content');
@@ -14,27 +12,35 @@ const errorContent = document.getElementById('error-content');
 // --- Funciones del Modal de Error Personalizado ---
 
 function showErrorModal(message) {
-    errorContent.textContent = message;
-    errorModal.style.display = 'block';
+    if (errorContent && errorModal) {
+      errorContent.textContent = message;
+      errorModal.style.display = 'block';
+    }
 }
 
 function closeErrorModal() {
-    errorModal.style.display = 'none';
+    if (errorModal) {
+      errorModal.style.display = 'none';
+    }
 }
 
 
 // --- Funciones del Modal de Registro (UI) ---
 
 function register() {
-  modal.style.display = "block";
-  messageBox.textContent = '';
-  regEmailInput.value = '';
-  regPhoneInput.value = '';
-  closeErrorModal();
+  if (modal) {
+    modal.style.display = "block";
+    messageBox.textContent = '';
+    regEmailInput.value = '';
+    regPhoneInput.value = '';
+    closeErrorModal();
+  }
 }
 
 function closeModal() {
-  modal.style.display = "none";
+  if (modal) {
+    modal.style.display = "none";
+  }
 }
 
 
@@ -46,7 +52,6 @@ async function submitRegistration() {
 
   // Validación local (antes de enviar al servidor)
   const validationErrorMsg = 'Por favor, rellena los campos de registro correctamente:\n\n- El CORREO ELECTRÓNICO debe ser válido (ej. A@B.COM).\n- El N° DE CELULAR debe tener 9 dígitos.';
-
   if (email === '' || !email.includes('@') || phone.length !== 9) {
     showErrorModal(validationErrorMsg);
     return;
@@ -69,7 +74,6 @@ async function submitRegistration() {
       body: formData,
       redirect: 'follow'
     });
-
     const result = await response.json();
     
     if (result.success) {
@@ -96,8 +100,13 @@ async function submitRegistration() {
 // --- Lógica de Login (Conexión con Google Sheets) ---
 
 async function login() {
-  const email = document.getElementById('email').value.trim();
-  const phone = document.getElementById('phone').value.trim();
+  const emailInput = document.getElementById('email');
+  const phoneInput = document.getElementById('phone');
+  
+  if (!emailInput || !phoneInput) return;
+  
+  const email = emailInput.value.trim();
+  const phone = phoneInput.value.trim();
   
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
@@ -120,7 +129,6 @@ async function login() {
       body: formData,
       redirect: 'follow'
     });
-
     const result = await response.json();
     
     if (result.success) {
@@ -130,7 +138,7 @@ async function login() {
       // window.location.href = 'pagina_principal.html';
     } else {
       messageBox.textContent = '❌ ' + result.message;
-      messageBox.style.color = '#E53935'; // Rojo de error
+      messageBox.style.color = '#E53935';
     }
   } catch (error) {
     messageBox.textContent = '❌ Error de Conexión: No se pudo conectar con el servidor.';
@@ -138,4 +146,3 @@ async function login() {
     console.error('Error:', error);
   }
 }
-
