@@ -1,10 +1,12 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec"; // Reemplazar con su URL
-// Obtiene referencias
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
+
+// Obtiene referencias (asegura que estén disponibles al cargar)
 const modal = document.getElementById('modal-registro');
 const messageBox = document.getElementById('msg');
 const regEmailInput = document.getElementById('reg-email');
 const regPhoneInput = document.getElementById('reg-phone');
+
 // Referencias del nuevo modal de error
 const errorModal = document.getElementById('error-modal');
 const errorContent = document.getElementById('error-content');
@@ -50,7 +52,6 @@ async function submitRegistration() {
   const email = regEmailInput.value.trim();
   const phone = regPhoneInput.value.trim();
 
-  // Validación local (antes de enviar al servidor)
   const validationErrorMsg = 'Por favor, rellena los campos de registro correctamente:\n\n- El CORREO ELECTRÓNICO debe ser válido (ej. A@B.COM).\n- El N° DE CELULAR debe tener 9 dígitos.';
   if (email === '' || !email.includes('@') || phone.length !== 9) {
     showErrorModal(validationErrorMsg);
@@ -60,10 +61,9 @@ async function submitRegistration() {
   // Datos a enviar a Google Apps Script
   const formData = new FormData();
   formData.append('action', 'register');
-  formData.append('email', email);
+  formData.append('email', email); // Se envía en MAYÚSCULAS gracias al HTML
   formData.append('phone', phone);
   
-  // Deshabilitar botón para evitar envíos múltiples
   const confirmButton = document.querySelector('.modal-footer .green');
   confirmButton.textContent = 'Registrando...';
   confirmButton.disabled = true;
@@ -72,20 +72,19 @@ async function submitRegistration() {
     const response = await fetch(WEB_APP_URL, {
       method: 'POST',
       body: formData,
-      redirect: 'follow'
+      // La redirección 'follow' es estándar, pero podría fallar en algunos entornos
+      redirect: 'follow' 
     });
     const result = await response.json();
     
     if (result.success) {
       messageBox.textContent = '✅ ' + result.message + ' Ya puedes iniciar sesión.';
-      messageBox.style.color = '#43A047'; // Verde de éxito
+      messageBox.style.color = '#43A047';
       
-      // Llenar campos de login y cerrar modal
       document.getElementById('email').value = email;
       document.getElementById('phone').value = phone;
       closeModal();
     } else {
-      // Mostrar error que viene del servidor (ej. usuario ya existe)
       showErrorModal('❌ Error de Registro:\n\n' + result.message);
     }
   } catch (error) {
@@ -110,14 +109,14 @@ async function login() {
   
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
-    messageBox.style.color = '#E53935'; // Rojo de error
+    messageBox.style.color = '#E53935'; 
     return;
   }
   
   // Datos a enviar a Google Apps Script
   const formData = new FormData();
   formData.append('action', 'login');
-  formData.append('email', email);
+  formData.append('email', email); // Se envía en MAYÚSCULAS gracias al HTML
   formData.append('phone', phone);
   
   messageBox.textContent = 'Iniciando sesión...';
@@ -133,9 +132,9 @@ async function login() {
     
     if (result.success) {
       messageBox.textContent = '✅ ' + result.message + ' Bienvenido!';
-      messageBox.style.color = '#00897B'; // Turquesa de éxito
-      // Aquí iría la redirección a la página principal
-      // window.location.href = 'pagina_principal.html';
+      messageBox.style.color = '#00897B'; 
+      // Aquí iría la redirección a la página principal:
+      // window.location.href = `${WEB_APP_URL}?page=main`;
     } else {
       messageBox.textContent = '❌ ' + result.message;
       messageBox.style.color = '#E53935';
