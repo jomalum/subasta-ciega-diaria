@@ -1,61 +1,43 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Subasta Ciega | Login / Registro</title>
-<style>
-  body {
-    background: linear-gradient(135deg, #0078ff, #00c6ff);
-    font-family: Arial, sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-  }
-  .box {
-    background: white;
-    padding: 30px;
-    border-radius: 14px;
-    width: 100%;
-    max-width: 360px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    text-align: center;
-  }
-  h2 { margin-bottom: 20px; }
-  input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-  }
-  button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 20px;
-    border: none;
-    border-radius: 6px;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  .btn-login { background: #0078ff; }
-  .btn-login:hover { background: #005fcc; }
-  .btn-register { background: #28a745; }
-  .btn-register:hover { background: #218838; }
-  .status {
-    margin-top: 15px;
-    padding: 8px;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-  .error { background: #ffe5e5; color: #b10000; }
-  .success { background: #e6ffe6; color: #006600; }
-</style>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body {
+      background: #1e90ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      text-align: center;
+    }
+    .input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
+    }
+    .blue { background: #007bff; }
+    .green { background: #28a745; }
+    .msg { margin-top: 10px; color: red; }
+  </style>
 </head>
 
 <body>
@@ -63,132 +45,19 @@
 <div class="box">
   <h2>Bienvenido</h2>
 
-  <input type="text" id="email" placeholder="Correo electrónico" oninput="formatEmail()">
+  <input type="text" id="email" class="input" placeholder="EMAIL" oninput="this.value=this.value.toUpperCase()">
 
-  <input type="text" id="wsp" placeholder="Número WhatsApp (9 dígitos)" maxlength="9"
-         oninput="soloNumeros(this)">
+  <input type="text" id="phone" class="input" placeholder="CELULAR" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
-  <button class="btn-login" onclick="login()">Iniciar Sesión</button>
+  <button class="btn blue" onclick="login()">Iniciar Sesión</button>
+  <hr>
+  <button class="btn green" onclick="register()">Registrar Usuario Nuevo</button>
 
-  <hr style="margin-top:20px; margin-bottom:20px;">
-
-  <button class="btn-register" onclick="registrar()">Registrar Usuario Nuevo</button>
-
-  <div id="status" class="status"></div>
+  <div id="msg" class="msg"></div>
 </div>
 
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwQTHENsIOA2tLCuEmSfHAW8lucD7LSK4TwN75bM3nXjr4JNDKTxKSIfJL_AWtO7Pdjlw/exec";
-
-// ======== CORRECCIÓN CAMPOS =========
-
-// Convertir correo a mayúsculas visualmente
-function formatEmail() {
-  const emailInput = document.getElementById("email");
-  emailInput.value = emailInput.value.toUpperCase();
-}
-
-// Solo números en WhatsApp
-function soloNumeros(input) {
-  input.value = input.value.replace(/[^0-9]/g, ""); // elimina todo lo que no sea número
-}
-
-// =========================
-// INICIAR SESIÓN
-// =========================
-async function login() {
-  const email = document.getElementById("email").value.trim().toLowerCase(); // enviar en minúscula
-  const wsp = document.getElementById("wsp").value.trim();
-  const status = document.getElementById("status");
-
-  status.textContent = "Procesando...";
-  status.className = "status";
-
-  if (!email || !wsp) {
-    status.textContent = "Completa ambos campos.";
-    status.className = "status error";
-    return;
-  }
-
-  if (wsp.length !== 9) {
-    status.textContent = "El número debe tener exactamente 9 dígitos.";
-    status.className = "status error";
-    return;
-  }
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "start_login",
-        email: email,
-        wsp_number: wsp
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      status.textContent = data.message;
-      status.className = "status success";
-    } else {
-      status.textContent = data.message;
-      status.className = "status error";
-    }
-  } catch (e) {
-    status.textContent = "Error de conexión con el servidor.";
-    status.className = "status error";
-  }
-}
-
-// =========================
-// REGISTRAR USUARIO NUEVO
-// =========================
-async function registrar() {
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const wsp = document.getElementById("wsp").value.trim();
-  const status = document.getElementById("status");
-
-  status.textContent = "Registrando...";
-  status.className = "status";
-
-  if (!email || !wsp) {
-    status.textContent = "Completa ambos campos.";
-    status.className = "status error";
-    return;
-  }
-
-  if (wsp.length !== 9) {
-    status.textContent = "El número debe tener exactamente 9 dígitos.";
-    status.className = "status error";
-    return;
-  }
-
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "start_login",
-        email: email,
-        wsp_number: wsp
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      status.textContent = "Usuario registrado con éxito. Se envió el código.";
-      status.className = "status success";
-    } else {
-      status.textContent = data.message;
-      status.className = "status error";
-    }
-  } catch {
-    status.textContent = "Error al conectar con el servidor.";
-    status.className = "status error";
-  }
-}
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
+
