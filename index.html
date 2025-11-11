@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <title>Login</title>
 <style>
-/* Colores Pasteles */
+/* Colores y Degradado Turquesa */
 body {
-  /* Degradado de Melón a un tono más claro/durazno */
-  background: linear-gradient(135deg, #FFDAB9 0%, #FFC1A0 100%); /* Degradado Melón */
+  /* Degradado Turquesa: De un tono oscuro a uno más claro */
+  background: linear-gradient(135deg, #00B8D4 0%, #4DD0E1 100%); /* Degradado Turquesa */
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -26,7 +26,7 @@ body {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
-  border: 1px solid #F3A4A4; /* Tono más melón para el borde */
+  border: 1px solid #00B8D4; /* Borde turquesa */
   border-radius: 8px;
   box-sizing: border-box;
 }
@@ -35,7 +35,6 @@ body {
   padding: 14px;
   margin: 8px 0;
   border: none;
-  /* El texto de los botones ya es blanco, lo mantenemos SOLIDO */
   color: white; 
   font-size: 16px;
   border-radius: 8px;
@@ -44,13 +43,13 @@ body {
   transition: background 0.3s;
 }
 
-/* Colores Pastel para botones */
-.blue { background: #A0CED9; } /* Azul/Cian Pastel */
-.blue:hover { background: #8AB8C7; }
-.green { background: #B5EAD7; } /* Verde Menta Pastel */
-.green:hover { background: #96D1B9; }
-.red { background: #FFADAD; } /* Rojo/Rosa Pastel para Volver/Error */
-.red:hover { background: #E89797; }
+/* Colores de ALTO CONTRASTE para botones */
+.blue { background: #00897B; } /* Turquesa Oscuro (Teal) para Iniciar Sesión */
+.blue:hover { background: #00695C; }
+.green { background: #43A047; } /* Verde Fuerte para Registrar */
+.green:hover { background: #388E3C; }
+.red { background: #E53935; } /* Rojo Fuerte para Volver/Error */
+.red:hover { background: #C62828; }
 
 .msg { margin-top: 15px; font-weight: bold; padding: 5px; }
 
@@ -109,7 +108,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
   text-align: center;
-  border-left: 8px solid #FFADAD; 
+  border-left: 8px solid #E53935; /* Color rojo fuerte */
 }
 #error-content {
     color: #333;
@@ -118,18 +117,18 @@ body {
     white-space: pre-line;
 }
 #error-modal h4 {
-    color: #E89797;
+    color: #E53935;
     margin-top: 0;
     font-size: 18px;
 }
 #error-modal .btn {
-    background: #FFADAD;
+    background: #E53935;
     width: 100px;
     padding: 10px;
     font-weight: normal;
 }
 #error-modal .btn:hover {
-    background: #E89797;
+    background: #C62828;
 }
 
 </style>
@@ -149,7 +148,7 @@ body {
   <button class="btn blue" onclick="login()">Iniciar Sesión</button>
   <button class="btn green" onclick="register()">Registrar Usuario Nuevo</button>
 
-  <div id="msg" class="msg" style="color: #FFADAD;"></div>
+  <div id="msg" class="msg" style="color: #E53935;"></div>
 </div>
 
 
