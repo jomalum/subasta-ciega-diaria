@@ -1,64 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Login</title>
-<style>
-body {
-  background: #1e90ff;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: Arial;
-}
-.box {
-  background: white;
-  padding: 30px;
-  width: 320px;
-  border-radius: 12px;
-  text-align: center;
-}
-.input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-}
-.btn {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border: none;
-  color: white;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.blue { background: #007bff; }
-.green { background: #28a745; }
-.msg { margin-top: 8px; color: red; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido - Iniciar Sesión</title>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            /* Fondo degradado en tonos pastel */
+            background: linear-gradient(135deg, #a8dadc 0%, #fcd5ce 50%, #c4b9d3 100%); 
+            color: #333;
+            overflow: hidden; 
+        }
+
+        .login-container {
+            perspective: 1000px; 
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            /* Sombreado y profundidad */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 
+                        0 0 0 10px rgba(255, 255, 255, 0.6); 
+            text-align: center;
+            width: 350px; 
+            transition: transform 0.5s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: rotateY(2deg) scale(1.01); /* Pequeño efecto 3D al pasar el ratón */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2),
+                        0 0 0 12px rgba(255, 255, 255, 0.7);
+        }
+
+        h2 {
+            color: #6a5acd; /* Tono pastel violeta */
+            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            /* Se asegura de que los inputs se alineen al centro del contenedor */
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-group input {
+            width: 100%; /* Ocupa el 100% del ancho del card (menos padding) */
+            padding: 12px 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 1em;
+            color: #555;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none; 
+            /* Sombra interna para profundidad */
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); 
+        }
+
+        .input-group input:focus {
+            border-color: #8bbada; 
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(139, 186, 218, 0.5); 
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        }
+
+        .btn.primary {
+            background-color: #8bbada; /* Azul pastel */
+            color: white;
+        }
+
+        .btn.primary:hover {
+            background-color: #72a9cf; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn.secondary {
+            background-color: #b7e4c7; /* Verde pastel */
+            color: #333;
+        }
+
+        .btn.secondary:hover {
+            background-color: #9cd4a7; 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .msg {
+            color: #e74c3c; /* Rojo para el error */
+            margin-top: 15px;
+            font-size: 0.95em;
+            font-weight: 500;
+            min-height: 20px; /* Para mantener el espacio */
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="box">
-  <h2>Bienvenido</h2>
+    <div class="login-container">
+        <div class="card">
+            <h2>Bienvenido</h2>
+            
+            <div class="input-group">
+                <input id="email" type="text" placeholder="Correo Electrónico" value="JMITACCA@OUTLOOK.COM">
+            </div>
+            
+            <div class="input-group">
+                <input id="phone" type="text" placeholder="Número de Teléfono" value="993850393">
+            </div>
 
-  <input id="email" class="input" type="text" placeholder="EMAIL" 
-         oninput="this.value=this.value.toUpperCase()">
+            <button onclick="login()" class="btn primary">Iniciar Sesión</button>
+            <button onclick="register()" class="btn secondary">Registrar Usuario Nuevo</button>
 
-  <input id="phone" class="input" type="text" placeholder="CELULAR (9 DIGITOS)" maxlength="9"
-         oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+            <p id="msg" class="msg"></p>
+        </div>
+    </div>
 
-  <button class="btn blue" onclick="login()">Iniciar Sesión</button>
-  <button class="btn green" onclick="register()">Registrar Usuario Nuevo</button>
-
-  <div id="msg" class="msg"></div>
-</div>
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
 </body>
 </html>
 
