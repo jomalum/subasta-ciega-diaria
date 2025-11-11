@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<title>Página Principal</title>
+<style>
+/* Estilos Turquesa y Contraste */
+body {
+  background: linear-gradient(135deg, #00B8D4 0%, #4DD0E1 100%);
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: Arial;
+  padding-top: 50px;
+}
+.header {
+    width: 80%;
+    max-width: 900px;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    text-align: center;
+}
+.container {
+    display: flex;
+    width: 80%;
+    max-width: 900px;
+    gap: 20px;
+}
+.section {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.btn {
+  padding: 14px;
+  border: none;
+  color: white; 
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+  width: 100%;
+}
+.claim-btn { background: #43A047; margin-top: 15px; } /* Verde Fuerte */
+.claim-btn:hover:not(:disabled) { background: #388E3C; }
+.claim-btn:disabled { background: #BDBDBD; cursor: not-allowed; }
+
+/* Estilos de la Ventana Flotante (Modal) */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+  background-color: #F8F9FA;
+  margin: 10% auto;
+  padding: 30px;
+  border: 1px solid #DEDEDE;
+  width: 80%;
+  max-width: 450px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #00B8D4;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.input:disabled {
+    background-color: #E0F7FA; /* Color claro para campos deshabilitados */
+    color: #546E7A;
+}
+.save-btn { background: #00897B; } /* Turquesa Oscuro */
+.save-btn:hover { background: #00695C; }
+.error-msg { color: #E53935; margin-top: 10px; font-weight: bold;}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>🚀 Bienvenid@ a la Página Principal</h1>
+    <p>Usuario: <span id="user-email">Cargando...</span> | Monedas Erdna: <span id="erdna-balance">0</span></p>
+</div>
+
+<div class="container">
+    <div class="section">
+        <h2>Reclamar Monedas Diarias</h2>
+        <p>Gana **5 Erdna** por ingresar cada día.</p>
+        <p id="claim-status">Verificando estado...</p>
+        <button id="claim-button" class="btn claim-btn" onclick="tryClaim()">
+            Reclamar Erdna
+        </button>
+    </div>
+
+    <div class="section">
+        <h2>Sección 2</h2>
+        <p>Contenido futuro...</p>
+    </div>
+    <div class="section">
+        <h2>Sección 3</h2>
+        <p>Contenido futuro...</p>
+    </div>
+</div>
+
+<div id="personal-data-modal" class="modal">
+  <div class="modal-content">
+    <h2>Registro de Datos Personales</h2>
+    <p>Es la primera vez que reclamas. ¡Completa tu perfil!</p>
+
+    <input id="modal-email" class="input" type="text" placeholder="CORREO ELECTRÓNICO" disabled>
+    <input id="modal-phone" class="input" type="text" placeholder="N° DE CELULAR" disabled>
+
+    <input id="modal-names" class="input" type="text" placeholder="NOMBRES">
+    <input id="modal-paterno" class="input" type="text" placeholder="APELLIDO PATERNO">
+    <input id="modal-materno" class="input" type="text" placeholder="APELLIDO MATERNO">
+
+    <p id="modal-error" class="error-msg"></p>
+
+    <button class="btn save-btn" onclick="savePersonalData()">Guardar</button>
+  </div>
+</div>
+
+<?!= HtmlService.createTemplateFromFile('script').getRawContent(); ?>
+</body>
+</html>
