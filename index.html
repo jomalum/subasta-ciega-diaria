@@ -17,9 +17,9 @@ body {
   background: white;
   padding: 30px;
   width: 320px;
-  border-radius: 15px; /* Bordes más suaves */
+  border-radius: 15px;
   text-align: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra suave */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 .input {
   width: 100%;
@@ -67,8 +67,8 @@ body {
 }
 
 .modal-content {
-  background-color: #F8F9FA; /* Blanco muy claro */
-  margin: 10% auto;
+  background-color: #F8F9FA;
+  margin: 15% auto; /* Subí un poco el margen para centrarlo mejor */
   padding: 30px;
   border: 1px solid #DEDEDE;
   width: 80%;
@@ -82,25 +82,15 @@ body {
 .modal-footer {
     display: flex;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: 25px; /* Espacio extra después de los campos */
 }
 .modal-footer .btn {
-    width: 48%; /* Para que quepan dos botones */
+    width: 48%; 
 }
 
-/* Ocultamos el botón de cierre de la esquina ya que ahora se usan los botones de abajo */
+/* Ocultamos el botón de cierre de la esquina */
 .close-btn {
   display: none; 
-}
-
-/* Estilo para la previsualización de datos */
-#preview-data {
-    text-align: left;
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px dashed #A0CED9;
-    border-radius: 8px;
-    background-color: #EBF2FF;
 }
 
 </style>
@@ -126,17 +116,11 @@ body {
 
 <div id="modal-registro" class="modal">
   <div class="modal-content">
-    <span class="close-btn" onclick="closeModal()">&times;</span>
     <h3>Registro de Usuario Nuevo</h3>
     
-    <input id="reg-email" class="input" type="text" placeholder="EMAIL" oninput="this.value=this.value.toUpperCase()">
-    <input id="reg-phone" class="input" type="text" placeholder="CELULAR (9 DIGITOS)" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    <input id="reg-email" class="input" type="text" placeholder="CORREO ELECTRÓNICO" oninput="this.value=this.value.toUpperCase()">
+    <input id="reg-phone" class="input" type="text" placeholder="N° DE CELULAR (9 DÍGITOS)" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
     
-    <div id="preview-data">
-        <p><strong>Previsualización de datos:</strong></p>
-        <p id="preview-email">Correo Electrónico: </p>
-        <p id="preview-phone">N° de Celular: </p>
-    </div>
 
     <div class="modal-footer">
         <button class="btn green" onclick="submitRegistration()">Confirmar Registro</button>
