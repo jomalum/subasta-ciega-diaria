@@ -56,7 +56,7 @@ function submitRegistration() {
 
   // Simulación de registro exitoso
   messageBox.textContent = '✅ ¡Usuario registrado exitosamente! Ya puedes iniciar sesión con tu correo ' + email + '.';
-  messageBox.style.color = '#B5EAD7'; // Color pastel de éxito
+  messageBox.style.color = '#43A047'; // Color verde fuerte de éxito
   
   // Opcional: Copiar el email y celular al formulario de login
   document.getElementById('email').value = email;
@@ -74,16 +74,16 @@ function login() {
   // Validación de campos
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
-    messageBox.style.color = '#FFADAD'; // Color pastel de error
+    messageBox.style.color = '#E53935'; // Color rojo fuerte de error
     return;
   }
   
   // Lógica de autenticación SIMULADA
   if (email === 'TEST@TEST.COM' && phone === '123456789') { 
     messageBox.textContent = '✅ ¡Bienvenido! Iniciando sesión...';
-    messageBox.style.color = '#A0CED9'; // Color pastel de éxito de login
+    messageBox.style.color = '#00897B'; // Color turquesa oscuro de éxito de login
   } else {
     messageBox.textContent = '❌ Credenciales incorrectas o usuario no registrado.';
-    messageBox.style.color = '#FFADAD'; // Color pastel de error
+    messageBox.style.color = '#E53935'; // Color rojo fuerte de error
   }
 }
