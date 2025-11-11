@@ -2,6 +2,12 @@
 const modal = document.getElementById('modal-registro');
 const messageBox = document.getElementById('msg');
 
+// Obtener referencias a los campos de registro y previsualización
+const regEmailInput = document.getElementById('reg-email');
+const regPhoneInput = document.getElementById('reg-phone');
+const previewEmail = document.getElementById('preview-email');
+const previewPhone = document.getElementById('preview-phone');
+
 // --- Funciones del Modal de Registro ---
 
 /**
@@ -10,7 +16,11 @@ const messageBox = document.getElementById('msg');
 function register() {
   modal.style.display = "block";
   messageBox.textContent = ''; // Limpia el mensaje de la sección de login
-  messageBox.style.color = 'red'; // Restablece el color del mensaje (por si acaso)
+  
+  // Limpiar y resetear campos y previsualización al abrir
+  regEmailInput.value = '';
+  regPhoneInput.value = '';
+  updatePreview();
 }
 
 /**
@@ -20,43 +30,43 @@ function closeModal() {
   modal.style.display = "none";
 }
 
+// Escucha los cambios en los campos del modal para actualizar la previsualización
+regEmailInput.addEventListener('input', updatePreview);
+regPhoneInput.addEventListener('input', updatePreview);
+
 /**
- * Cierra el modal si el usuario hace clic fuera del contenido.
+ * Actualiza el texto de previsualización en el modal.
  */
-window.onclick = function(event) {
-  if (event.target === modal) {
-    closeModal();
-  }
+function updatePreview() {
+    const email = regEmailInput.value.trim();
+    const phone = regPhoneInput.value.trim();
+
+    previewEmail.textContent = 'Correo Electrónico: ' + (email || 'N/A');
+    previewPhone.textContent = 'N° de Celular: ' + (phone || 'N/A');
 }
 
 /**
- * Simula el proceso de registro y muestra un mensaje de éxito.
+ * Simula el proceso de registro y valida los datos.
  */
 function submitRegistration() {
-  const name = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const phone = document.getElementById('reg-phone').value.trim();
+  const email = regEmailInput.value.trim();
+  const phone = regPhoneInput.value.trim();
 
-  // Validación básica
-  if (name === '' || email === '' || phone.length !== 9 || !email.includes('@')) {
-    alert('❌ Por favor, rellena todos los campos de registro correctamente (Email válido y Celular de 9 dígitos).');
+  // Validación: Correo no vacío y contiene '@', Celular debe tener exactamente 9 dígitos
+  if (email === '' || !email.includes('@') || phone.length !== 9) {
+    alert('❌ Por favor, rellena los campos de registro correctamente:\n- El EMAIL debe ser válido.\n- El CELULAR debe tener 9 dígitos.');
     return;
   }
 
-  // Simulación de registro exitoso (Aquí iría tu código para guardar el usuario en una base de datos)
-  messageBox.textContent = '✅ ¡Usuario ' + name + ' registrado exitosamente! Ya puedes iniciar sesión.';
-  messageBox.style.color = '#28a745'; // Color verde para éxito
+  // Simulación de registro exitoso
+  messageBox.textContent = '✅ ¡Usuario registrado exitosamente! Ya puedes iniciar sesión con tu correo ' + email + '.';
+  messageBox.style.color = '#B5EAD7'; // Color pastel de éxito
   
-  // Opcional: Copiar el email y celular al formulario de login para comodidad del usuario
+  // Opcional: Copiar el email y celular al formulario de login
   document.getElementById('email').value = email;
   document.getElementById('phone').value = phone;
 
   closeModal(); // Cierra el modal tras el registro
-  
-  // Limpiar los campos del modal
-  document.getElementById('reg-name').value = '';
-  document.getElementById('reg-email').value = '';
-  document.getElementById('reg-phone').value = '';
 }
 
 // --- Función de Inicio de Sesión ---
@@ -71,19 +81,17 @@ function login() {
   // Validación de campos
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
-    messageBox.style.color = 'red';
+    messageBox.style.color = '#FFADAD'; // Color pastel de error
     return;
   }
   
   // Lógica de autenticación SIMULADA
-  // Puedes usar cualquier par EMAIL/CELULAR aquí para simular el éxito
-  if (email === 'ADMIN@TEST.COM' && phone === '123456789') { 
-    messageBox.textContent = '✅ ¡Bienvenido de nuevo, ' + email + '! Iniciando sesión...';
-    messageBox.style.color = '#007bff'; // Color azul para éxito de login
-    // En una aplicación real, aquí harías la redirección:
-    // setTimeout(() => { window.location.href = 'pagina_principal.html'; }, 1000);
+  // Si deseas una prueba exitosa, usa EMAIL=TEST@TEST.COM y CELULAR=123456789
+  if (email === 'TEST@TEST.COM' && phone === '123456789') { 
+    messageBox.textContent = '✅ ¡Bienvenido! Iniciando sesión...';
+    messageBox.style.color = '#A0CED9'; // Color pastel de éxito de login
   } else {
     messageBox.textContent = '❌ Credenciales incorrectas o usuario no registrado.';
-    messageBox.style.color = 'red';
+    messageBox.style.color = '#FFADAD'; // Color pastel de error
   }
 }
