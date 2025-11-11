@@ -1,7 +1,7 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 
-// Referencias de Login/Error
+// Referencias de Login/Error (Existen en index.html)
 const modal = document.getElementById('modal-registro');
 const messageBox = document.getElementById('msg');
 const regEmailInput = document.getElementById('reg-email');
@@ -9,9 +9,9 @@ const regPhoneInput = document.getElementById('reg-phone');
 const errorModal = document.getElementById('error-modal');
 const errorContent = document.getElementById('error-content');
 
-// Referencias de Main Page
-const personalDataModal = document.getElementById('personal-data-modal');
-const claimButton = document.getElementById('claim-button');
+// REFERENCIAS DE MAIN PAGE: Declaradas pero no inicializadas globalmente para evitar el crash.
+let personalDataModal;
+let claimButton;
 
 // Variable global para almacenar el email del usuario logeado
 let userEmail = ''; 
@@ -37,6 +37,7 @@ function redirectToMain(email) {
 if (window.location.search.includes('page=main')) {
     userEmail = localStorage.getItem('userEmail');
     if (userEmail) {
+        // Inicializar la página principal cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', initializeMainPage);
     } else {
         // Si no hay email, redirigir al login
@@ -48,6 +49,7 @@ if (window.location.search.includes('page=main')) {
 // ----------------------------------------------------------------------
 // --- LÓGICA DE LOGIN / REGISTRO (index.html) ---
 // ----------------------------------------------------------------------
+// Estas funciones están en el scope global y funcionarán si el script no se detiene.
 
 function register() {
   document.getElementById('modal-registro').style.display = "block";
@@ -89,7 +91,6 @@ async function login() {
     const result = await response.json();
     
     if (result.success) {
-      // ÉXITO: Redirigir a la página principal
       redirectToMain(result.userEmail); 
     } else {
       messageBox.textContent = '❌ ' + result.message;
@@ -154,6 +155,10 @@ async function submitRegistration() {
 // ----------------------------------------------------------------------
 
 async function initializeMainPage() {
+    // AHORA LAS REFERENCIAS A ELEMENTOS DE main.html SOLO SE HACEN AQUÍ
+    personalDataModal = document.getElementById('personal-data-modal');
+    claimButton = document.getElementById('claim-button');
+    
     document.getElementById('user-email').textContent = userEmail;
     await checkUserState();
 }
@@ -298,4 +303,3 @@ async function tryClaim() {
         claimButton.disabled = false;
     }
 }
-
