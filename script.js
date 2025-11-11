@@ -39,3 +39,4 @@ function sendRequest(action) {
     msg.innerHTML = "Error de conexión.";
   });
 }
+
