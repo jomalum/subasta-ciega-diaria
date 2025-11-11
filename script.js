@@ -13,46 +13,46 @@ function sendRequest(action) {
   const phone = document.getElementById("phone").value.trim();
   const msg = document.getElementById("msg");
 
-  // 1. Limpia el mensaje anterior
+  // Limpia el mensaje anterior
   msg.innerHTML = "";
 
-  // 2. Validación básica
+  // Validación básica
   if (!email || !phone) {
     msg.innerHTML = "Completa los campos.";
+    msg.style.color = '#e74c3c';
     return;
   }
 
-  // 3. Preparación de la data
+  // Preparación de la data
   const data = {
     action: action,
     email: email,
     phone: phone
   };
 
-  // 4. Solicitud Fetch a la API
+  // Solicitud Fetch a la API
   fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
   .then(r => {
-    // Maneja respuestas HTTP que no son 200 (aunque fetch no lo hace por defecto)
+    // Verifica si la respuesta HTTP es OK
     if (!r.ok) {
         throw new Error(`Error HTTP: ${r.status}`);
     }
     return r.json();
   })
   .then(res => {
-    // Muestra el mensaje de éxito o error devuelto por codigo.gs
+    // Muestra el mensaje devuelto por Google Apps Script
     msg.innerHTML = res.message;
-    // Añade color para diferenciar éxito/error
+    // Asigna color basado en si fue un éxito o un error de lógica
     msg.style.color = res.success ? '#28a745' : '#e74c3c'; 
   })
   .catch((error) => {
-    // ESTE BLOQUE SE EJECUTA CUANDO HAY FALLO DE RED/SERVIDOR (EL ERROR QUE TENÍAS)
+    // Bloque que captura el "Error de conexión" (el error que tenías)
     console.error("Error de conexión/red:", error);
     msg.innerHTML = "❌ Error de conexión. Verifica la API_URL o el estado del servidor.";
     msg.style.color = '#e74c3c';
   });
 }
-
