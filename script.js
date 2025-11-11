@@ -1,7 +1,7 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 
-// Referencias de MAIN PAGE: Declaradas globalmente para usar en initializeMainPage.
+// Referencias de MAIN PAGE: Declaradas globalmente pero sin inicializar para evitar crashes en index.html.
 let personalDataModal;
 let claimButton;
 
@@ -11,7 +11,6 @@ let userEmail = '';
 // --- Funciones de Utilidad ---
 
 function showErrorModal(message) {
-    // Obtenemos las referencias solo al llamar a la función
     const errorModal = document.getElementById('error-modal');
     const errorContent = document.getElementById('error-content');
     if (errorModal && errorContent) {
@@ -27,7 +26,6 @@ function closeErrorModal() {
     }
 }
 
-// Función de redirección
 function redirectToMain(email) {
     localStorage.setItem('userEmail', email); 
     window.location.href = `${WEB_APP_URL}?page=main`;
@@ -41,13 +39,13 @@ if (window.location.search.includes('page=main')) {
     } else {
         window.location.href = WEB_APP_URL; 
     }
-}
+} 
 
 
 // ----------------------------------------------------------------------
 // --- LÓGICA DE LOGIN / REGISTRO (index.html) ---
 // ----------------------------------------------------------------------
-// Las funciones ahora buscan sus elementos internamente, evitando crashes globales.
+// Las funciones son llamadas por addEventListener.
 
 function register() {
   const modal = document.getElementById('modal-registro');
@@ -82,7 +80,7 @@ async function login() {
   const phoneInput = document.getElementById('phone');
   const messageBox = document.getElementById('msg');
 
-  if (!emailInput || !phoneInput || !messageBox) return; // Validación de existencia
+  if (!emailInput || !phoneInput || !messageBox) return; 
     
   const email = emailInput.value.trim();
   const phone = phoneInput.value.trim();
@@ -126,7 +124,7 @@ async function submitRegistration() {
   const regEmailInput = document.getElementById('reg-email');
   const regPhoneInput = document.getElementById('reg-phone');
   const messageBox = document.getElementById('msg');
-  const confirmButton = document.querySelector('.modal-footer .green');
+  const confirmButton = document.getElementById('confirm-reg-btn');
   
   if (!regEmailInput || !regPhoneInput || !messageBox || !confirmButton) return;
 
@@ -174,6 +172,34 @@ async function submitRegistration() {
     confirmButton.disabled = false;
   }
 }
+
+
+// --- Lógica de Enlace de Eventos (Solo para la página de Login) ---
+if (!window.location.search.includes('page=main')) {
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const confirmRegBtn = document.getElementById('confirm-reg-btn');
+        const closeRegBtn = document.getElementById('close-reg-btn');
+        
+        // Enlazar las funciones a los botones de la página principal
+        if (loginBtn) {
+            loginBtn.addEventListener('click', login);
+        }
+        if (registerBtn) {
+            registerBtn.addEventListener('click', register);
+        }
+        
+        // Enlazar las funciones a los botones del modal de registro
+        if (confirmRegBtn) {
+            confirmRegBtn.addEventListener('click', submitRegistration);
+        }
+        if (closeRegBtn) {
+            closeRegBtn.addEventListener('click', closeModal);
+        }
+    });
+}
+// ----------------------------------------------------------------------
 
 
 // ----------------------------------------------------------------------
