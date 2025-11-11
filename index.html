@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login | Subasta Ciega Diaria</title>
+<title>Subasta Ciega | Login / Registro</title>
 <style>
   body {
     background: linear-gradient(135deg, #0078ff, #00c6ff);
@@ -37,12 +37,16 @@
     margin-top: 20px;
     border: none;
     border-radius: 6px;
-    background: #0078ff;
     color: white;
     font-size: 16px;
     cursor: pointer;
+    font-weight: bold;
   }
-  button:hover { background: #005fcc; }
+  .btn-login { background: #0078ff; }
+  .btn-login:hover { background: #005fcc; }
+  .btn-register { background: #28a745; }
+  .btn-register:hover { background: #218838; }
+
   .status {
     margin-top: 15px;
     padding: 8px;
@@ -56,12 +60,16 @@
 <body>
 
 <div class="box">
-  <h2>Iniciar Sesión</h2>
+  <h2>Bienvenido</h2>
 
   <input type="email" id="email" placeholder="Correo electrónico">
   <input type="text" id="wsp" placeholder="Número WhatsApp (solo dígitos)">
 
-  <button onclick="login()">Enviar Código</button>
+  <button class="btn-login" onclick="login()">Iniciar Sesión</button>
+
+  <hr style="margin-top:20px; margin-bottom:20px;">
+
+  <button class="btn-register" onclick="registrar()">Registrar Usuario Nuevo</button>
 
   <div id="status" class="status"></div>
 </div>
@@ -69,6 +77,9 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwQTHENsIOA2tLCuEmSfHAW8lucD7LSK4TwN75bM3nXjr4JNDKTxKSIfJL_AWtO7Pdjlw/exec";
 
+// =========================
+// INICIAR SESIÓN
+// =========================
 async function login() {
   const email = document.getElementById("email").value.trim();
   const wsp = document.getElementById("wsp").value.trim();
@@ -107,8 +118,49 @@ async function login() {
     status.className = "status error";
   }
 }
+
+// =========================
+// REGISTRAR USUARIO NUEVO
+// =========================
+async function registrar() {
+  const email = document.getElementById("email").value.trim();
+  const wsp = document.getElementById("wsp").value.trim();
+  const status = document.getElementById("status");
+
+  status.textContent = "Procesando registro...";
+  status.className = "status";
+
+  if (!email || !wsp) {
+    status.textContent = "Completa ambos campos.";
+    status.className = "status error";
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "start_login",  // misma acción, pero tu backend ya detecta si es nuevo
+        email: email,
+        wsp_number: wsp
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      status.textContent = "Usuario registrado con éxito. Se envió el código.";
+      status.className = "status success";
+    } else {
+      status.textContent = data.message;
+      status.className = "status error";
+    }
+  } catch {
+    status.textContent = "Error al conectar con el servidor.";
+    status.className = "status error";
+  }
+}
 </script>
 
 </body>
 </html>
-
