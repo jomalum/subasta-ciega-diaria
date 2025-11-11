@@ -356,3 +356,4 @@ async function tryClaim() {
         claimButton.disabled = false;
     }
 }
+
