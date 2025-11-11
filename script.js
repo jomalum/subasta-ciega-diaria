@@ -1,5 +1,5 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlzLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec";
 
 // Referencias de Login/Error
 const modal = document.getElementById('modal-registro');
@@ -33,7 +33,7 @@ function redirectToMain(email) {
     window.location.href = `${WEB_APP_URL}?page=main`;
 }
 
-// Función que se ejecuta al cargar main.html
+// Se ejecuta al cargar la página (determina si es login o main)
 if (window.location.search.includes('page=main')) {
     userEmail = localStorage.getItem('userEmail');
     if (userEmail) {
@@ -42,16 +42,25 @@ if (window.location.search.includes('page=main')) {
         // Si no hay email, redirigir al login
         window.location.href = WEB_APP_URL; 
     }
-} else {
-    // Código de login/registro (Se ejecuta en index.html)
-    // ... (Tus funciones register y closeModal anteriores van aquí) ...
 }
+
 
 // ----------------------------------------------------------------------
 // --- LÓGICA DE LOGIN / REGISTRO (index.html) ---
 // ----------------------------------------------------------------------
 
-// Funciones de Login y Registro modificadas para usar redirectToMain
+function register() {
+  document.getElementById('modal-registro').style.display = "block";
+  messageBox.textContent = '';
+  regEmailInput.value = '';
+  regPhoneInput.value = '';
+  closeErrorModal();
+}
+
+function closeModal() {
+  document.getElementById('modal-registro').style.display = "none";
+}
+
 async function login() {
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
@@ -92,7 +101,6 @@ async function login() {
   }
 }
 
-// Tu función submitRegistration va aquí
 async function submitRegistration() {
   const email = regEmailInput.value.trim();
   const phone = regPhoneInput.value.trim();
@@ -140,20 +148,6 @@ async function submitRegistration() {
   }
 }
 
-// Tu función register (de index.html)
-function register() {
-  document.getElementById('modal-registro').style.display = "block";
-  messageBox.textContent = '';
-  regEmailInput.value = '';
-  regPhoneInput.value = '';
-  closeErrorModal();
-}
-
-// Tu función closeModal (de index.html)
-function closeModal() {
-  document.getElementById('modal-registro').style.display = "none";
-}
-
 
 // ----------------------------------------------------------------------
 // --- LÓGICA DE PÁGINA PRINCIPAL (main.html) ---
@@ -178,6 +172,7 @@ async function checkUserState() {
         const result = await response.json();
 
         document.getElementById('erdna-balance').textContent = result.erdna || 0;
+        document.getElementById('modal-phone').value = result.phone || 'N/A'; // Rellena el celular
 
         if (result.needsRegistration) {
             // Mostrar modal de registro de datos personales
@@ -196,19 +191,28 @@ async function checkUserState() {
 }
 
 function updateClaimStatus(lastClaimDate) {
+    
+    if (!lastClaimDate || lastClaimDate === 'N/A') {
+        document.getElementById('claim-status').textContent = '¡Puedes reclamar tus 5 Erdna de hoy!';
+        claimButton.textContent = 'Reclamar Erdna';
+        claimButton.onclick = tryClaim; 
+        claimButton.disabled = false;
+        return;
+    }
+    
+    // Comparación solo de la fecha (DD/MM/YYYY)
     const today = new Date();
-    // Compara solo la fecha, ignorando la hora
-    const lastClaimDateOnly = lastClaimDate ? new Date(lastClaimDate).toDateString() : null;
-    const todayDateOnly = today.toDateString();
-
-    if (lastClaimDateOnly === todayDateOnly) {
+    const todayDateStr = today.toLocaleDateString("es-ES"); // Ej: 11/11/2025
+    const lastClaimDateOnly = lastClaimDate.split(' ')[0]; // Tomamos DD/MM/YYYY
+    
+    if (lastClaimDateOnly === todayDateStr) {
         document.getElementById('claim-status').textContent = `Monedas reclamadas hoy. Último reclamo: ${lastClaimDate}`;
         claimButton.textContent = 'Reclamado (Vuelve mañana)';
         claimButton.disabled = true;
     } else {
         document.getElementById('claim-status').textContent = '¡Puedes reclamar tus 5 Erdna de hoy!';
         claimButton.textContent = 'Reclamar Erdna';
-        claimButton.onclick = tryClaim; // Restablecer la función de reclamo
+        claimButton.onclick = tryClaim; 
         claimButton.disabled = false;
     }
 }
@@ -216,9 +220,8 @@ function updateClaimStatus(lastClaimDate) {
 function showPersonalDataModal() {
     // Llenar campos no editables
     document.getElementById('modal-email').value = userEmail;
-    // (Necesitas obtener el celular si solo tienes el email aquí, o pasarlo desde login)
-    // Por simplicidad, aquí usaremos un placeholder o lo dejaremos vacío si no lo pasamos
-    document.getElementById('modal-phone').value = 'PENDIENTE DE CARGA'; 
+    
+    // Abrir modal
     personalDataModal.style.display = 'block';
 }
 
@@ -286,7 +289,7 @@ async function tryClaim() {
             updateClaimStatus(result.lastClaim);
         } else {
             statusDiv.textContent = `❌ ${result.message}`;
-            updateClaimStatus(result.lastClaim); // Actualiza solo el estado del botón
+            updateClaimStatus(result.lastClaim); 
         }
     } catch (error) {
         statusDiv.textContent = 'Error de conexión al reclamar.';
@@ -295,4 +298,3 @@ async function tryClaim() {
         claimButton.disabled = false;
     }
 }
-
