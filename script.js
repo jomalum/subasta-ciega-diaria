@@ -1,139 +1,89 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso al Sistema</title>
-    
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            /* Fondo pastel degradado */
-            background: linear-gradient(135deg, #a8dadc 0%, #fcd5ce 50%, #c4b9d3 100%); 
-            color: #333;
-            overflow: hidden; 
-        }
+// Obtiene la referencia al modal y al cuadro de mensajes
+const modal = document.getElementById('modal-registro');
+const messageBox = document.getElementById('msg');
 
-        .container {
-            width: 350px;
-        }
+// --- Funciones del Modal de Registro ---
 
-        .card {
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 15px;
-            /* Sombreado y profundidad */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 0 0 10px rgba(255, 255, 255, 0.6); 
-            text-align: center;
-            transition: height 0.3s ease-in-out;
-        }
-        
-        h2 {
-            color: #6a5acd;
-            margin-bottom: 30px;
-            font-size: 2em;
-            font-weight: 600;
-        }
+/**
+ * Muestra la ventana emergente (modal) de registro.
+ */
+function register() {
+  modal.style.display = "block";
+  messageBox.textContent = ''; // Limpia el mensaje de la sección de login
+  messageBox.style.color = 'red'; // Restablece el color del mensaje (por si acaso)
+}
 
-        .input-group { margin-bottom: 20px; }
-        
-        .input {
-            width: 100%; 
-            padding: 12px 10px;
-            border: 1px solid #dcdcdc;
-            border-radius: 8px;
-            font-size: 1em;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); 
-            outline: none; 
-        }
+/**
+ * Oculta la ventana emergente (modal) de registro.
+ */
+function closeModal() {
+  modal.style.display = "none";
+}
 
-        .input:focus {
-            border-color: #8bbada; 
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(139, 186, 218, 0.5); 
-        }
+/**
+ * Cierra el modal si el usuario hace clic fuera del contenido.
+ */
+window.onclick = function(event) {
+  if (event.target === modal) {
+    closeModal();
+  }
+}
 
-        .btn {
-            width: 100%;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            font-weight: 600;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-        }
+/**
+ * Simula el proceso de registro y muestra un mensaje de éxito.
+ */
+function submitRegistration() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
 
-        .btn.primary { background-color: #8bbada; color: white; }
-        .btn.primary:hover { background-color: #72a9cf; transform: translateY(-2px); }
+  // Validación básica
+  if (name === '' || email === '' || phone.length !== 9 || !email.includes('@')) {
+    alert('❌ Por favor, rellena todos los campos de registro correctamente (Email válido y Celular de 9 dígitos).');
+    return;
+  }
 
-        /* Botón secundario para cambiar de vista */
-        .btn.switch { 
-            background: none; 
-            box-shadow: none; 
-            color: #6a5acd; 
-            font-size: 0.9em; 
-            margin-top: 20px;
-        }
-        .btn.switch:hover { color: #8bbada; transform: none; text-decoration: underline; }
+  // Simulación de registro exitoso (Aquí iría tu código para guardar el usuario en una base de datos)
+  messageBox.textContent = '✅ ¡Usuario ' + name + ' registrado exitosamente! Ya puedes iniciar sesión.';
+  messageBox.style.color = '#28a745'; // Color verde para éxito
+  
+  // Opcional: Copiar el email y celular al formulario de login para comodidad del usuario
+  document.getElementById('email').value = email;
+  document.getElementById('phone').value = phone;
 
-        .msg { color: #e74c3c; margin-top: 15px; font-size: 0.95em; min-height: 20px; }
-    </style>
-</head>
+  closeModal(); // Cierra el modal tras el registro
+  
+  // Limpiar los campos del modal
+  document.getElementById('reg-name').value = '';
+  document.getElementById('reg-email').value = '';
+  document.getElementById('reg-phone').value = '';
+}
 
-<body>
+// --- Función de Inicio de Sesión ---
 
-<div class="container">
-    
-    <div id="login-view" class="card">
-        <h2>Iniciar Sesión</h2>
-        
-        <div class="input-group">
-            <input id="login-email" class="input" type="text" placeholder="Correo Electrónico" 
-                   oninput="this.value=this.value.toUpperCase()">
-        </div>
-        
-        <div class="input-group">
-            <input id="login-phone" class="input" type="text" placeholder="Número de Teléfono" 
-                   maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        </div>
-
-        <button onclick="login()" class="btn primary">Iniciar Sesión</button>
-        
-        <button onclick="showRegisterView()" class="btn switch">¿No tienes cuenta? Regístrate aquí.</button>
-
-        <div id="login-msg" class="msg"></div>
-    </div>
-
-    <div id="register-view" class="card" style="display: none;">
-        <h2>Registrar Nuevo Usuario</h2>
-        
-        <div class="input-group">
-            <input id="register-email" class="input" type="text" placeholder="Correo Electrónico" 
-                   oninput="this.value=this.value.toUpperCase()">
-        </div>
-        
-        <div class="input-group">
-            <input id="register-phone" class="input" type="text" placeholder="Número de Teléfono" 
-                   maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-        </div>
-
-        <button onclick="register()" class="btn primary">Registrarme</button>
-        
-        <button onclick="showLoginView()" class="btn switch">Volver a Iniciar Sesión.</button>
-
-        <div id="register-msg" class="msg"></div>
-    </div>
-
-</div>
-
-<script src="script.js"></script>
-
-</body>
-</html>
+/**
+ * Simula la función de iniciar sesión.
+ */
+function login() {
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  
+  // Validación de campos
+  if (email === '' || phone.length !== 9) {
+    messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
+    messageBox.style.color = 'red';
+    return;
+  }
+  
+  // Lógica de autenticación SIMULADA
+  // Puedes usar cualquier par EMAIL/CELULAR aquí para simular el éxito
+  if (email === 'ADMIN@TEST.COM' && phone === '123456789') { 
+    messageBox.textContent = '✅ ¡Bienvenido de nuevo, ' + email + '! Iniciando sesión...';
+    messageBox.style.color = '#007bff'; // Color azul para éxito de login
+    // En una aplicación real, aquí harías la redirección:
+    // setTimeout(() => { window.location.href = 'pagina_principal.html'; }, 1000);
+  } else {
+    messageBox.textContent = '❌ Credenciales incorrectas o usuario no registrado.';
+    messageBox.style.color = 'red';
+  }
+}
