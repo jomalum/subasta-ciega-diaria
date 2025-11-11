@@ -1,4 +1,4 @@
-const url = "AQUI_TU_URL_DEL_APPS_SCRIPT"; // Reemplazar
+const url = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec"; // Reemplazar
 
 function toUpperEmail() {
     let email = document.getElementById("email");
@@ -54,3 +54,4 @@ function sendData(action) {
         console.log(err);
     });
 }
+
