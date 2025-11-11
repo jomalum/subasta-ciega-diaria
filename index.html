@@ -6,7 +6,8 @@
 <style>
 /* Colores Pasteles */
 body {
-  background: #A0C4FF; /* Azul Pastel Claro */
+  /* Degradado de Melón a un tono más claro/durazno */
+  background: linear-gradient(135deg, #FFDAB9 0%, #FFC1A0 100%); /* Degradado Melón */
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -25,7 +26,7 @@ body {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
-  border: 1px solid #DEDEDE;
+  border: 1px solid #F3A4A4; /* Tono más melón para el borde */
   border-radius: 8px;
   box-sizing: border-box;
 }
@@ -34,7 +35,8 @@ body {
   padding: 14px;
   margin: 8px 0;
   border: none;
-  color: white;
+  /* El texto de los botones ya es blanco, lo mantenemos SOLIDO */
+  color: white; 
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -53,7 +55,7 @@ body {
 .msg { margin-top: 15px; font-weight: bold; padding: 5px; }
 
 
-/* --- Estilos para la Ventana Emergente (Modal) --- */
+/* --- Estilos para los Modals --- */
 .modal {
   display: none;
   position: fixed;
@@ -92,14 +94,14 @@ body {
 }
 
 
-/* --- Nuevo CSS para el Modal de Error --- */
+/* --- CSS para el Modal de Error --- */
 #error-modal {
-  display: none; /* Oculto por defecto */
+  display: none;
   position: fixed;
-  z-index: 2000; /* Más alto que el modal principal */
+  z-index: 2000;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%); /* Centrado perfecto */
+  transform: translate(-50%, -50%);
   width: 90%;
   max-width: 350px;
   padding: 25px;
@@ -107,13 +109,13 @@ body {
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.5);
   text-align: center;
-  border-left: 8px solid #FFADAD; /* Barra de error pastel */
+  border-left: 8px solid #FFADAD; 
 }
 #error-content {
     color: #333;
     font-size: 14px;
     margin-bottom: 15px;
-    white-space: pre-line; /* Permite saltos de línea (\n) */
+    white-space: pre-line;
 }
 #error-modal h4 {
     color: #E89797;
