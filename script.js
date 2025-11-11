@@ -1,5 +1,4 @@
-
-const API_URL = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec"; // <-- reemplazar
+const API_URL = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec"; // ← reemplazar
 
 function register() {
   sendRequest("register_user");
@@ -21,7 +20,7 @@ function sendRequest(action) {
     return;
   }
 
-  const payload = {
+  const data = {
     action: action,
     email: email,
     phone: phone
@@ -29,11 +28,12 @@ function sendRequest(action) {
 
   fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(payload)
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
   })
-  .then(res => res.json())
-  .then(data => {
-    msg.innerHTML = data.message;
+  .then(r => r.json())
+  .then(res => {
+    msg.innerHTML = res.message;
   })
   .catch(() => {
     msg.innerHTML = "Error de conexión.";
