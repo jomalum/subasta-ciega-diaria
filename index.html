@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-  <style>
-    body {
-      background: #1e90ff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: Arial;
-    }
-    .box {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      width: 320px;
-      text-align: center;
-    }
-    .input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-size: 16px;
-    }
-    .blue { background: #007bff; }
-    .green { background: #28a745; }
-    .msg { margin-top: 10px; color: red; }
-  </style>
+<meta charset="UTF-8">
+<title>Login</title>
+<style>
+body {
+  background: #1e90ff;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial;
+}
+.box {
+  background: white;
+  padding: 30px;
+  width: 320px;
+  border-radius: 12px;
+  text-align: center;
+}
+.input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+}
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.blue { background: #007bff; }
+.green { background: #28a745; }
+.msg { margin-top: 8px; color: red; }
+</style>
 </head>
 
 <body>
@@ -45,12 +45,13 @@
 <div class="box">
   <h2>Bienvenido</h2>
 
-  <input type="text" id="email" class="input" placeholder="EMAIL" oninput="this.value=this.value.toUpperCase()">
+  <input id="email" class="input" type="text" placeholder="EMAIL" 
+         oninput="this.value=this.value.toUpperCase()">
 
-  <input type="text" id="phone" class="input" placeholder="CELULAR" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+  <input id="phone" class="input" type="text" placeholder="CELULAR (9 DIGITOS)" maxlength="9"
+         oninput="this.value=this.value.replace(/[^0-9]/g,'')">
 
   <button class="btn blue" onclick="login()">Iniciar Sesión</button>
-  <hr>
   <button class="btn green" onclick="register()">Registrar Usuario Nuevo</button>
 
   <div id="msg" class="msg"></div>
