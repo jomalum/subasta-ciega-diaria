@@ -1,52 +1,139 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec"; // ← reemplazar; // ¡REEMPLAZAR ESTA URL con la de tu despliegue final!
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Sistema</title>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            /* Fondo pastel degradado */
+            background: linear-gradient(135deg, #a8dadc 0%, #fcd5ce 50%, #c4b9d3 100%); 
+            color: #333;
+            overflow: hidden; 
+        }
 
-function register() {
-  sendRequest("register_user");
-}
+        .container {
+            width: 350px;
+        }
 
-function login() {
-  sendRequest("login_user");
-}
+        .card {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            /* Sombreado y profundidad */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 0 0 10px rgba(255, 255, 255, 0.6); 
+            text-align: center;
+            transition: height 0.3s ease-in-out;
+        }
+        
+        h2 {
+            color: #6a5acd;
+            margin-bottom: 30px;
+            font-size: 2em;
+            font-weight: 600;
+        }
 
-function sendRequest(action) {
-  // Nota: Usa document.getElementById porque los IDs son los mismos en ambas páginas
-  const email = document.getElementById("email").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const msg = document.getElementById("msg");
+        .input-group { margin-bottom: 20px; }
+        
+        .input {
+            width: 100%; 
+            padding: 12px 10px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 1em;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08); 
+            outline: none; 
+        }
 
-  msg.innerHTML = "";
+        .input:focus {
+            border-color: #8bbada; 
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(139, 186, 218, 0.5); 
+        }
 
-  if (!email || !phone) {
-    msg.innerHTML = "Completa los campos.";
-    msg.style.color = '#e74c3c';
-    return;
-  }
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        }
 
-  const data = {
-    action: action,
-    email: email,
-    phone: phone
-  };
+        .btn.primary { background-color: #8bbada; color: white; }
+        .btn.primary:hover { background-color: #72a9cf; transform: translateY(-2px); }
 
-  fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(r => {
-    if (!r.ok) {
-        throw new Error(`Error HTTP: ${r.status}`);
-    }
-    return r.json();
-  })
-  .then(res => {
-    msg.innerHTML = res.message;
-    msg.style.color = res.success ? '#28a745' : '#e74c3c'; 
-  })
-  .catch((error) => {
-    console.error("Error de conexión/red:", error);
-    msg.innerHTML = "❌ Error de conexión. Verifica la API_URL o el estado del servidor.";
-    msg.style.color = '#e74c3c';
-  });
-}
+        /* Botón secundario para cambiar de vista */
+        .btn.switch { 
+            background: none; 
+            box-shadow: none; 
+            color: #6a5acd; 
+            font-size: 0.9em; 
+            margin-top: 20px;
+        }
+        .btn.switch:hover { color: #8bbada; transform: none; text-decoration: underline; }
 
+        .msg { color: #e74c3c; margin-top: 15px; font-size: 0.95em; min-height: 20px; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    
+    <div id="login-view" class="card">
+        <h2>Iniciar Sesión</h2>
+        
+        <div class="input-group">
+            <input id="login-email" class="input" type="text" placeholder="Correo Electrónico" 
+                   oninput="this.value=this.value.toUpperCase()">
+        </div>
+        
+        <div class="input-group">
+            <input id="login-phone" class="input" type="text" placeholder="Número de Teléfono" 
+                   maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+
+        <button onclick="login()" class="btn primary">Iniciar Sesión</button>
+        
+        <button onclick="showRegisterView()" class="btn switch">¿No tienes cuenta? Regístrate aquí.</button>
+
+        <div id="login-msg" class="msg"></div>
+    </div>
+
+    <div id="register-view" class="card" style="display: none;">
+        <h2>Registrar Nuevo Usuario</h2>
+        
+        <div class="input-group">
+            <input id="register-email" class="input" type="text" placeholder="Correo Electrónico" 
+                   oninput="this.value=this.value.toUpperCase()">
+        </div>
+        
+        <div class="input-group">
+            <input id="register-phone" class="input" type="text" placeholder="Número de Teléfono" 
+                   maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+        </div>
+
+        <button onclick="register()" class="btn primary">Registrarme</button>
+        
+        <button onclick="showLoginView()" class="btn switch">Volver a Iniciar Sesión.</button>
+
+        <div id="register-msg" class="msg"></div>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
