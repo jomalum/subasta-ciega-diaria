@@ -1,90 +1,180 @@
-// ID de tu hoja de cálculo de Google
-const SHEET_ID = "1xQZhT8qLIoZhfibsfOSvNOQUBkIruoGkBAL86KEhd6Q"; 
-const SHEET_NAME = "USUARIOS"; 
-
-// Función principal para manejar peticiones web (GET)
-function doGet(e) {
-  return HtmlService.createTemplateFromFile('index').evaluate();
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+<style>
+/* Colores y Degradado Turquesa */
+body {
+  /* Degradado Turquesa: De un tono oscuro a uno más claro */
+  background: linear-gradient(135deg, #00B8D4 0%, #4DD0E1 100%); /* Degradado Turquesa */
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial;
+}
+.box {
+  background: white;
+  padding: 30px;
+  width: 320px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #00B8D4; /* Borde turquesa */
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+.btn {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border: none;
+  color: white; 
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
 }
 
-// Función para manejar peticiones POST (registro y login)
-function doPost(e) {
-  const params = e.parameter;
-  const action = params.action;
-  
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-  
-  if (!sheet) {
-     return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Error del servidor: Hoja no encontrada." }))
-        .setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  if (action === 'register') {
-    return handleRegister(params, sheet);
-  } else if (action === 'login') {
-    return handleLogin(params, sheet);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Acción no válida." }))
-    .setMimeType(ContentService.MimeType.JSON);
+/* Colores de ALTO CONTRASTE para botones */
+.blue { background: #00897B; } /* Turquesa Oscuro (Teal) para Iniciar Sesión */
+.blue:hover { background: #00695C; }
+.green { background: #43A047; } /* Verde Fuerte para Registrar */
+.green:hover { background: #388E3C; }
+.red { background: #E53935; } /* Rojo Fuerte para Volver/Error */
+.red:hover { background: #C62828; }
+
+.msg { margin-top: 15px; font-weight: bold; padding: 5px; }
+
+
+/* --- Estilos para los Modals --- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #F8F9FA;
+  margin: 15% auto;
+  padding: 30px;
+  border: 1px solid #DEDEDE;
+  width: 80%;
+  max-width: 450px;
+  border-radius: 15px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+.modal-footer .btn {
+    width: 48%; 
+}
+.close-btn {
+  display: none; 
 }
 
 
-// --- Lógica de Registro ---
-function handleRegister(params, sheet) {
-  // CLAVE: Convertir a MAYÚSCULAS al guardar
-  const email = params.email.toUpperCase(); 
-  const phone = params.phone;
-  
-  const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) { 
-    if (data[i][0] === email || data[i][1] == phone) { // Note: Usamos == para el teléfono por si es texto/número
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: false, 
-        message: "El CORREO ELECTRÓNICO o N° DE CELULAR ya está registrado." 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-  }
-  
-  // 2. Si no existe, registrar el nuevo usuario
-  const newRow = [
-    email,
-    phone,
-    new Date().toLocaleDateString("es-ES") + " " + new Date().toLocaleTimeString("es-ES"),
-    "ACTIVO"
-  ];
-  sheet.appendRow(newRow);
-  
-  return ContentService.createTextOutput(JSON.stringify({ 
-    success: true, 
-    message: "Usuario registrado exitosamente." 
-  })).setMimeType(ContentService.MimeType.JSON);
+/* --- CSS para el Modal de Error --- */
+#error-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 350px;
+  padding: 25px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  text-align: center;
+  border-left: 8px solid #E53935; 
+}
+#error-content {
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 15px;
+    white-space: pre-line;
+}
+#error-modal h4 {
+    color: #E53935;
+    margin-top: 0;
+    font-size: 18px;
+}
+#error-modal .btn {
+    background: #E53935;
+    width: 100px;
+    padding: 10px;
+    font-weight: normal;
+}
+#error-modal .btn:hover {
+    background: #C62828;
 }
 
+</style>
+</head>
 
-// --- Lógica de Inicio de Sesión ---
-function handleLogin(params, sheet) {
-  // CLAVE: Convertir a MAYÚSCULAS al buscar
-  const email = params.email.toUpperCase(); 
-  const phone = params.phone;
-  
-  const data = sheet.getDataRange().getValues();
-  
-  // Buscar las credenciales en la base de datos
-  for (let i = 1; i < data.length; i++) {
-    // data[i][0] es CORREO, data[i][1] es CELULAR
-    if (data[i][0] === email && data[i][1] == phone) { 
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: true, 
-        message: "Inicio de sesión exitoso." 
-      })).setMimeType(ContentService.MimeType.JSON);
-    }
-  }
-  
-  // Si no encuentra coincidencia
-  return ContentService.createTextOutput(JSON.stringify({ 
-    success: false, 
-    message: "Credenciales inválidas. Correo o celular incorrectos." 
-  })).setMimeType(ContentService.MimeType.JSON);
-}
+<body>
+
+<div class="box">
+  <h2>Bienvenido</h2>
+
+  <input id="email" class="input" type="text" placeholder="EMAIL" 
+         oninput="this.value=this.value.toUpperCase()">
+
+  <input id="phone" class="input" type="text" placeholder="CELULAR (9 DIGITOS)" maxlength="9"
+         oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+
+  <button class="btn blue" onclick="login()">Iniciar Sesión</button>
+  <button class="btn green" onclick="register()">Registrar Usuario Nuevo</button>
+
+  <div id="msg" class="msg" style="color: #E53935;"></div>
+</div>
+
+
+<div id="modal-registro" class="modal">
+  <div class="modal-content">
+    <h3>Registro de Usuario Nuevo</h3>
+    
+    <input id="reg-email" class="input" type="text" placeholder="CORREO ELECTRÓNICO" oninput="this.value=this.value.toUpperCase()">
+    <input id="reg-phone" class="input" type="text" placeholder="N° DE CELULAR (9 DÍGITOS)" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+    
+
+    <div class="modal-footer">
+        <button class="btn green" onclick="submitRegistration()">Confirmar Registro</button>
+        <button class="btn red" onclick="closeModal()">Volver</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="error-modal">
+    <h4>❌ Error de Validación</h4>
+    <div id="error-content"></div>
+    <button class="btn" onclick="closeErrorModal()">Aceptar</button>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
