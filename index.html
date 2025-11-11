@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<base target="_top">
 <meta charset="UTF-8">
 <title>Login</title>
 <style>
@@ -88,10 +89,6 @@ body {
 .modal-footer .btn {
     width: 48%; 
 }
-.close-btn {
-  display: none; 
-}
-
 
 /* --- CSS para el Modal de Error --- */
 #error-modal {
@@ -174,7 +171,7 @@ body {
     <button class="btn" onclick="closeErrorModal()">Aceptar</button>
 </div>
 
-<script src="script.js"></script>
+<?!= HtmlService.createTemplateFromFile('script').getRawContent(); ?>
 
 </body>
 </html>
