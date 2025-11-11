@@ -1,57 +1,41 @@
-const url = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec"; // Reemplazar
 
-function toUpperEmail() {
-    let email = document.getElementById("email");
-    email.value = email.value.toUpperCase();
-}
+const API_URL = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlqLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec"; // <-- reemplazar
 
-function validatePhone() {
-    let phone = document.getElementById("phone");
-    phone.value = phone.value.replace(/\D/g, ""); // solo números
-
-    if (phone.value.length > 9) phone.value = phone.value.slice(0,9);
+function register() {
+  sendRequest("register_user");
 }
 
 function login() {
-    sendData("login");
+  sendRequest("login_user");
 }
 
-function register() {
-    sendData("register");
+function sendRequest(action) {
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const msg = document.getElementById("msg");
+
+  msg.innerHTML = "";
+
+  if (!email || !phone) {
+    msg.innerHTML = "Completa los campos.";
+    return;
+  }
+
+  const payload = {
+    action: action,
+    email: email,
+    phone: phone
+  };
+
+  fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    msg.innerHTML = data.message;
+  })
+  .catch(() => {
+    msg.innerHTML = "Error de conexión.";
+  });
 }
-
-function sendData(action) {
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-
-    if (email === "" || phone === "") {
-        document.getElementById("msg").innerText = "Completa todos los campos.";
-        return;
-    }
-
-    if (phone.length !== 9) {
-        document.getElementById("msg").innerText = "Número inválido (9 dígitos).";
-        return;
-    }
-
-    document.getElementById("msg").innerText = "Procesando...";
-
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            action: action,
-            email: email,
-            phone: phone
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById("msg").innerText = data.message;
-    })
-    .catch(err => {
-        document.getElementById("msg").innerText = "Error de conexión.";
-        console.log(err);
-    });
-}
-
