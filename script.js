@@ -49,3 +49,4 @@ function sendRequest(action) {
     msg.style.color = '#e74c3c';
   });
 }
+
