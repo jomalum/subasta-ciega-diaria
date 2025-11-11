@@ -1,376 +1,56 @@
-// ============================
-// CONFIGURACIÓN DE LA API
-// ============================
-const API_URL = 'https://script.google.com/macros/s/AKfycbwQTHENsIOA2tLCuEmSfHAW8lucD7LSK4TwN75bM3nXjr4JNDKTxKSIfJL_AWtO7Pdjlw/exec';
+const url = "AQUI_TU_URL_DEL_APPS_SCRIPT"; // Reemplazar
 
-let currentEmail = null;
-let currentWsp = null;
-let currentFullUserData = {}; // Para guardar datos del usuario
-const SESSION_EXPIRATION_MINUTES = 60; // Duración de la sesión: 1 hora
-
-// ============================
-// GESTIÓN DE SESIÓN Y PERSISTENCIA 
-// ============================
-
-function saveSession(user) {
-    const expiration = new Date();
-    expiration.setTime(expiration.getTime() + (SESSION_EXPIRATION_MINUTES * 60 * 1000));
-    
-    const sessionData = {
-        email: currentEmail,
-        wsp: currentWsp,
-        user: user,
-        expires: expiration.toISOString()
-    };
-    localStorage.setItem('userSession', JSON.stringify(sessionData));
+function toUpperEmail() {
+    let email = document.getElementById("email");
+    email.value = email.value.toUpperCase();
 }
 
-function loadSession() {
-    const sessionStr = localStorage.getItem('userSession');
-    if (!sessionStr) return false;
-    
-    const sessionData = JSON.parse(sessionStr);
-    const now = new Date();
-    const expiration = new Date(sessionData.expires);
-    
-    if (now > expiration) {
-        clearSession(false); // Sesión expirada, limpiar sin recargar
-        return false; 
+function validatePhone() {
+    let phone = document.getElementById("phone");
+    phone.value = phone.value.replace(/\D/g, ""); // solo números
+
+    if (phone.value.length > 9) phone.value = phone.value.slice(0,9);
+}
+
+function login() {
+    sendData("login");
+}
+
+function register() {
+    sendData("register");
+}
+
+function sendData(action) {
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+
+    if (email === "" || phone === "") {
+        document.getElementById("msg").innerText = "Completa todos los campos.";
+        return;
     }
 
-    currentEmail = sessionData.email;
-    currentWsp = sessionData.wsp;
-    currentFullUserData = sessionData.user;
-    
-    showDashboard(sessionData.user); // Carga el dashboard con los datos persistentes
-    
-    return true; 
-}
-
-function clearSession(reload = true) {
-    localStorage.removeItem('userSession');
-    currentEmail = null;
-    currentWsp = null;
-    currentFullUserData = {};
-    if (reload) {
-        location.reload(); 
+    if (phone.length !== 9) {
+        document.getElementById("msg").innerText = "Número inválido (9 dígitos).";
+        return;
     }
-}
 
-// ============================
-// FUNCIONES DE VISTAS
-// ============================
-function showLoginSection(event) {
-  if (event) event.preventDefault();
-  document.getElementById('register-section').classList.add('hidden');
-  document.getElementById('login-section').classList.remove('hidden');
-  document.getElementById('dashboard-section').classList.add('hidden'); 
-  closeModal();
-}
+    document.getElementById("msg").innerText = "Procesando...";
 
-function showRegisterSection(event) {
-  if (event) event.preventDefault();
-  document.getElementById('login-section').classList.add('hidden');
-  document.getElementById('register-section').classList.remove('hidden');
-  closeModal();
-}
-
-function openModal() {
-  document.getElementById('data-completion-modal').style.display = 'block';
-}
-
-function closeModal() {
-  document.getElementById('data-completion-modal').style.display = 'none';
-}
-
-
-// ============================
-// FUNCIONES DE LOGIN Y REGISTRO
-// ============================
-
-async function startLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const wsp = document.getElementById('login-wsp').value.trim();
-  const status = document.getElementById('login-status');
-  status.className = 'status';
-  status.textContent = 'Verificando credenciales...';
-  
-  if (!/^\d{9}$/.test(wsp)) {
-    status.className = 'status error';
-    status.textContent = 'Número de WhatsApp debe tener exactamente 9 dígitos.';
-    return;
-  }
-
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'login_user',
-        email: email,
-        wsp_number: wsp
-      })
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            action: action,
+            email: email,
+            phone: phone
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("msg").innerText = data.message;
+    })
+    .catch(err => {
+        document.getElementById("msg").innerText = "Error de conexión.";
+        console.log(err);
     });
-    const data = await res.json();
-
-    if (data.success) {
-      currentEmail = email;
-      currentWsp = wsp; 
-      currentFullUserData = data.user; 
-      status.className = 'status success';
-      status.textContent = data.message;
-      
-      saveSession(data.user); // GUARDA LA SESIÓN
-      
-      document.getElementById('login-section').classList.add('hidden');
-      showDashboard(data.user); 
-    } else {
-      status.className = 'status error';
-      status.textContent = data.message;
-    }
-  } catch (err) {
-    status.className = 'status error';
-    status.textContent = 'Error de conexión al iniciar sesión. Verifica la URL del Apps Script.';
-  }
 }
-
-async function startRegister() {
-  const email = document.getElementById('register-email').value.trim();
-  const wsp = document.getElementById('register-wsp').value.trim();
-  const status = document.getElementById('register-status');
-  status.className = 'status';
-  status.textContent = 'Registrando usuario...';
-
-  if (!/^\d{9}$/.test(wsp)) {
-    status.className = 'status error';
-    status.textContent = 'Número de WhatsApp debe tener exactamente 9 dígitos.';
-    return;
-  }
-  
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'register_new_user',
-        email: email,
-        wsp_number: wsp
-      })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      status.className = 'status success';
-      status.textContent = data.message;
-      
-      showLoginSection();
-      document.getElementById('login-email').value = email;
-      document.getElementById('login-wsp').value = wsp;
-      
-    } else {
-      status.className = 'status error';
-      status.textContent = data.message;
-    }
-  } catch (err) {
-    status.className = 'status error';
-    status.textContent = 'Error de conexión al registrar usuario. Verifica la URL del Apps Script.';
-  }
-}
-
-
-// ============================
-// DASHBOARD Y CRÉDITOS DIARIOS
-// ============================
-
-function showDashboard(user) {
-  document.getElementById('login-section').classList.add('hidden');
-  document.getElementById('register-section').classList.add('hidden');
-  closeModal(); 
-  
-  document.getElementById('dashboard-section').classList.remove('hidden');
-  document.getElementById('offer-section').classList.remove('hidden');
-  document.getElementById('prize-section').classList.remove('hidden');
-
-  const claimButton = document.getElementById('claim-credits-button');
-  const hasFullName = user.nombre1 && user.nombre1.trim() !== '';
-
-  document.getElementById('user-display-name').textContent = user.nombre1 ? user.nombre1.toUpperCase() : 'USUARIO';
-  document.getElementById('user-email').textContent = currentEmail;
-  document.getElementById('user-credits').textContent = user.puntos; // ID CORRECTO
-  document.getElementById('user-fichas').textContent = user.fichas;
-  document.getElementById('user-streak').textContent = user.diasRacha;
-  
-  // Lógica del botón de reclamar
-  if (!hasFullName) {
-    claimButton.textContent = '➡️ COMPLETA TUS DATOS';
-  } else {
-    claimButton.textContent = '✅ RECOGER CRÉDITOS DEL DÍA';
-  }
-}
-
-async function claimDailyCredits() {
-  const user = currentFullUserData;
-  
-  // Si ya tiene datos, procede a reclamar directamente
-  if (user.nombre1 && user.nombre1.trim() !== '') {
-    await submitFullUserDataAndClaim(true); // onlyClaim = true
-    return;
-  }
-  
-  // Si no tiene datos, muestra el modal y precarga la info
-  document.getElementById('modal-email').value = currentEmail;
-  document.getElementById('modal-wsp').value = currentWsp || user.wspNumber;
-  document.getElementById('modal-nombre1').value = user.nombre1 || '';
-  document.getElementById('modal-nombre2').value = user.nombre2 || '';
-  document.getElementById('modal-apellidoPaterno').value = user.apellidoPaterno || '';
-  document.getElementById('modal-apellidoMaterno').value = user.apellidoMaterno || '';
-
-  openModal();
-  document.getElementById('modal-status').classList.add('hidden'); 
-}
-
-async function submitFullUserDataAndClaim(onlyClaim = false) {
-  const status = document.getElementById('modal-status') || document.getElementById('dashboard-status');
-  const claimButton = document.getElementById('claim-credits-button');
-
-  status.className = 'status';
-  status.classList.remove('hidden');
-  status.textContent = onlyClaim ? 'Reclamando créditos...' : 'Guardando datos y reclamando créditos...';
-
-  const data = {
-    email: currentEmail,
-    only_claim: onlyClaim,
-    nombre1: onlyClaim ? currentFullUserData.nombre1 : document.getElementById('modal-nombre1').value.trim(),
-    nombre2: onlyClaim ? currentFullUserData.nombre2 : document.getElementById('modal-nombre2').value.trim(),
-    apellidoPaterno: onlyClaim ? currentFullUserData.apellidoPaterno : document.getElementById('modal-apellidoPaterno').value.trim(),
-    apellidoMaterno: onlyClaim ? currentFullUserData.apellidoMaterno : document.getElementById('modal-apellidoMaterno').value.trim(),
-  };
-
-  if (!onlyClaim && (!data.nombre1 || !data.apellidoPaterno || !data.apellidoMaterno)) {
-    status.className = 'status error';
-    status.textContent = 'Error: Primer Nombre, Apellido Paterno y Apellido Materno son obligatorios.';
-    return;
-  }
-  
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'submit_full_data_and_claim',
-        ...data 
-      })
-    });
-    const result = await res.json();
-
-    if (result.success) {
-      status.className = 'status success';
-      status.textContent = result.message;
-      
-      if (result.user) {
-        // Esto refresca la UI y MUESTRA el nuevo saldo de créditos
-        showDashboard(result.user); 
-        
-        // Actualizar datos locales
-        Object.assign(currentFullUserData, result.user);
-        currentFullUserData.nombre1 = data.nombre1;
-        currentFullUserData.nombre2 = data.nombre2;
-        currentFullUserData.apellidoPaterno = data.apellidoPaterno;
-        currentFullUserData.apellidoMaterno = data.apellidoMaterno;
-
-        saveSession(currentFullUserData); // GUARDA LA SESIÓN ACTUALIZADA
-        
-        // Si se llenaron los datos por primera vez, actualizamos el botón.
-        if (!onlyClaim) {
-           claimButton.textContent = '✅ RECOGER CRÉDITOS DEL DÍA';
-           // **CORRECCIÓN**: Removido el cierre automático del modal para que el usuario pueda ver el mensaje.
-        }
-      }
-      
-    } else {
-      status.className = 'status error';
-      status.textContent = result.message;
-    }
-  } catch (err) {
-    status.className = 'status error';
-    status.textContent = 'Error de conexión al enviar datos y reclamar puntos.';
-  }
-}
-
-// ============================
-// OFERTAS Y PREMIOS
-// ============================
-
-async function submitOffer() {
-  const value = document.getElementById('offer-value').value;
-  const type = document.getElementById('currency-type').value;
-  const status = document.getElementById('offer-status');
-  status.className = 'status';
-  status.textContent = 'Enviando oferta...';
-
-  if (!currentEmail) {
-    status.className = 'status error';
-    status.textContent = 'Error: No se ha iniciado sesión.';
-    return;
-  }
-
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        action: 'submit_offer',
-        email: currentEmail,
-        offer_value: value,
-        currency_type: type
-      })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      status.className = 'status success';
-      status.textContent = data.message;
-      document.getElementById('user-credits').textContent = data.new_points; // ID CORRECTO
-      document.getElementById('user-fichas').textContent = data.new_fichas;
-    } else {
-      status.className = 'status error';
-      status.textContent = data.message;
-    }
-  } catch (err) {
-    status.className = 'status error';
-    status.textContent = 'Error de conexión al enviar oferta.';
-  }
-}
-
-async function loadCurrentPrize() {
-  const status = document.getElementById('prize-status');
-  status.className = 'status';
-  status.textContent = 'Cargando premio...';
-
-  try {
-    const res = await fetch(`${API_URL}?action=get_current_prize`);
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('prize-name').textContent = data.prize.nombre;
-      document.getElementById('prize-value').textContent = data.prize.valor;
-      document.getElementById('prize-winner').textContent = data.prize.ganador;
-      status.className = 'status success';
-      status.textContent = 'Premio cargado correctamente.';
-    } else {
-      status.className = 'status error';
-      status.textContent = data.message;
-    }
-  } catch (err) {
-    status.className = 'status error';
-    status.textContent = 'Error al obtener el premio actual.';
-  }
-}
-
-// ============================
-// INICIALIZACIÓN
-// ============================
-
-function init() {
-    // Si loadSession() devuelve true, la sesión fue cargada y el dashboard está visible.
-    if (!loadSession()) {
-        showLoginSection(); // Si no hay sesión activa o expiró, muestra el login.
-    }
-}
-
-init();
