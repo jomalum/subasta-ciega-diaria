@@ -1,15 +1,11 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec"; // URL de ejemplo, reemplácela
 
-// Referencias de MAIN PAGE: Declaradas globalmente pero sin inicializar para evitar crashes en index.html.
 let personalDataModal;
 let claimButton;
-
-// Variable global para almacenar el email del usuario logeado
 let userEmail = ''; 
 
 // --- Funciones de Utilidad ---
-
 function showErrorModal(message) {
     const errorModal = document.getElementById('error-modal');
     const errorContent = document.getElementById('error-content');
@@ -31,21 +27,9 @@ function redirectToMain(email) {
     window.location.href = `${WEB_APP_URL}?page=main`;
 }
 
-// Se ejecuta al cargar la página (determina si es login o main)
-if (window.location.search.includes('page=main')) {
-    userEmail = localStorage.getItem('userEmail');
-    if (userEmail) {
-        document.addEventListener('DOMContentLoaded', initializeMainPage);
-    } else {
-        window.location.href = WEB_APP_URL; 
-    }
-} 
-
-
 // ----------------------------------------------------------------------
-// --- LÓGICA DE LOGIN / REGISTRO (index.html) ---
+// --- CÓDIGO DE ENLACE Y LÓGICA DE LOGIN (index.html) ---
 // ----------------------------------------------------------------------
-// Las funciones son llamadas por addEventListener.
 
 function register() {
   const modal = document.getElementById('modal-registro');
@@ -173,8 +157,7 @@ async function submitRegistration() {
   }
 }
 
-
-// --- Lógica de Enlace de Eventos (Solo para la página de Login) ---
+// --- Enlace de Eventos (Se ejecuta solo en index.html) ---
 if (!window.location.search.includes('page=main')) {
     document.addEventListener('DOMContentLoaded', function() {
         const loginBtn = document.getElementById('login-btn');
@@ -182,15 +165,13 @@ if (!window.location.search.includes('page=main')) {
         const confirmRegBtn = document.getElementById('confirm-reg-btn');
         const closeRegBtn = document.getElementById('close-reg-btn');
         
-        // Enlazar las funciones a los botones de la página principal
+        // Enlazar las funciones a los botones
         if (loginBtn) {
             loginBtn.addEventListener('click', login);
         }
         if (registerBtn) {
             registerBtn.addEventListener('click', register);
         }
-        
-        // Enlazar las funciones a los botones del modal de registro
         if (confirmRegBtn) {
             confirmRegBtn.addEventListener('click', submitRegistration);
         }
@@ -205,9 +186,18 @@ if (!window.location.search.includes('page=main')) {
 // ----------------------------------------------------------------------
 // --- LÓGICA DE PÁGINA PRINCIPAL (main.html) ---
 // ----------------------------------------------------------------------
+// Esta lógica solo se inicializa si la URL incluye "?page=main"
+
+if (window.location.search.includes('page=main')) {
+    userEmail = localStorage.getItem('userEmail');
+    if (userEmail) {
+        document.addEventListener('DOMContentLoaded', initializeMainPage);
+    } else {
+        window.location.href = WEB_APP_URL; 
+    }
+} 
 
 async function initializeMainPage() {
-    // AHORA LAS REFERENCIAS A ELEMENTOS DE main.html SOLO SE HACEN AQUÍ
     personalDataModal = document.getElementById('personal-data-modal');
     claimButton = document.getElementById('claim-button');
     
@@ -231,7 +221,7 @@ async function checkUserState() {
         const result = await response.json();
 
         document.getElementById('erdna-balance').textContent = result.erdna || 0;
-        document.getElementById('modal-phone').value = result.phone || 'N/A'; // Rellena el celular
+        document.getElementById('modal-phone').value = result.phone || 'N/A'; 
 
         if (result.needsRegistration) {
             claimButton.textContent = 'Completar Datos Personales';
@@ -356,4 +346,3 @@ async function tryClaim() {
         claimButton.disabled = false;
     }
 }
-
