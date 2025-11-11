@@ -1,61 +1,71 @@
-// Obtiene la referencia al modal y al cuadro de mensajes
+// Obtiene referencias
 const modal = document.getElementById('modal-registro');
 const messageBox = document.getElementById('msg');
-
-// Obtener referencias a los campos de registro
 const regEmailInput = document.getElementById('reg-email');
 const regPhoneInput = document.getElementById('reg-phone');
 
-// --- Funciones del Modal de Registro ---
+// Referencias del nuevo modal de error
+const errorModal = document.getElementById('error-modal');
+const errorContent = document.getElementById('error-content');
+
+// --- Funciones del Modal de Error Personalizado ---
 
 /**
- * Muestra la ventana emergente (modal) de registro.
+ * Muestra el modal de error con el mensaje especificado.
+ * @param {string} message - El mensaje de error a mostrar.
  */
-function register() {
-  modal.style.display = "block";
-  messageBox.textContent = ''; // Limpia el mensaje de la sección de login
-  
-  // Limpiar campos al abrir
-  regEmailInput.value = '';
-  regPhoneInput.value = '';
+function showErrorModal(message) {
+    errorContent.textContent = message;
+    errorModal.style.display = 'block';
 }
 
 /**
- * Oculta la ventana emergente (modal) de registro.
+ * Oculta el modal de error.
  */
+function closeErrorModal() {
+    errorModal.style.display = 'none';
+}
+
+
+// --- Funciones del Modal de Registro ---
+
+function register() {
+  modal.style.display = "block";
+  messageBox.textContent = '';
+  regEmailInput.value = '';
+  regPhoneInput.value = '';
+  closeErrorModal(); // Asegura que el modal de error esté oculto
+}
+
 function closeModal() {
   modal.style.display = "none";
 }
 
-/**
- * Simula el proceso de registro y valida los datos.
- */
 function submitRegistration() {
   const email = regEmailInput.value.trim();
   const phone = regPhoneInput.value.trim();
 
-  // Validación: Correo no vacío y contiene '@', Celular debe tener exactamente 9 dígitos
+  // Mensaje de error multilínea para el nuevo modal
+  const validationErrorMsg = 'Por favor, rellena los campos de registro correctamente:\n\n- El CORREO ELECTRÓNICO debe ser válido (ej. A@B.COM).\n- El N° DE CELULAR debe tener 9 dígitos.';
+
+  // Validación
   if (email === '' || !email.includes('@') || phone.length !== 9) {
-    alert('❌ Por favor, rellena los campos de registro correctamente:\n- El CORREO ELECTRÓNICO debe ser válido.\n- El N° DE CELULAR debe tener 9 dígitos.');
+    showErrorModal(validationErrorMsg); // Muestra el modal de error personalizado
     return;
   }
 
   // Simulación de registro exitoso
   messageBox.textContent = '✅ ¡Usuario registrado exitosamente! Ya puedes iniciar sesión con tu correo ' + email + '.';
-  messageBox.style.color = '#B5EAD7'; // Color pastel de éxito
+  messageBox.style.color = '#B5EAD7';
   
-  // Opcional: Copiar el email y celular al formulario de login
   document.getElementById('email').value = email;
   document.getElementById('phone').value = phone;
 
-  closeModal(); // Cierra el modal tras el registro
+  closeModal(); 
 }
 
 // --- Función de Inicio de Sesión ---
 
-/**
- * Simula la función de iniciar sesión.
- */
 function login() {
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
@@ -63,17 +73,16 @@ function login() {
   // Validación de campos
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
-    messageBox.style.color = '#FFADAD'; // Color pastel de error
+    messageBox.style.color = '#FFADAD';
     return;
   }
   
   // Lógica de autenticación SIMULADA
-  // Usa EMAIL=TEST@TEST.COM y CELULAR=123456789 para probar un inicio de sesión exitoso
   if (email === 'TEST@TEST.COM' && phone === '123456789') { 
     messageBox.textContent = '✅ ¡Bienvenido! Iniciando sesión...';
-    messageBox.style.color = '#A0CED9'; // Color pastel de éxito de login
+    messageBox.style.color = '#A0CED9';
   } else {
     messageBox.textContent = '❌ Credenciales incorrectas o usuario no registrado.';
-    messageBox.style.color = '#FFADAD'; // Color pastel de error
+    messageBox.style.color = '#FFADAD';
   }
 }
