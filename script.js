@@ -1,15 +1,7 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 
-// Referencias de Login/Error (Existen en index.html)
-const modal = document.getElementById('modal-registro');
-const messageBox = document.getElementById('msg');
-const regEmailInput = document.getElementById('reg-email');
-const regPhoneInput = document.getElementById('reg-phone');
-const errorModal = document.getElementById('error-modal');
-const errorContent = document.getElementById('error-content');
-
-// REFERENCIAS DE MAIN PAGE: Declaradas pero no inicializadas globalmente para evitar el crash.
+// Referencias de MAIN PAGE: Declaradas globalmente para usar en initializeMainPage.
 let personalDataModal;
 let claimButton;
 
@@ -19,17 +11,25 @@ let userEmail = '';
 // --- Funciones de Utilidad ---
 
 function showErrorModal(message) {
-    errorContent.textContent = message;
-    errorModal.style.display = 'block';
+    // Obtenemos las referencias solo al llamar a la función
+    const errorModal = document.getElementById('error-modal');
+    const errorContent = document.getElementById('error-content');
+    if (errorModal && errorContent) {
+        errorContent.textContent = message;
+        errorModal.style.display = 'block';
+    }
 }
 
 function closeErrorModal() {
-    errorModal.style.display = 'none';
+    const errorModal = document.getElementById('error-modal');
+    if (errorModal) {
+        errorModal.style.display = 'none';
+    }
 }
 
 // Función de redirección
 function redirectToMain(email) {
-    localStorage.setItem('userEmail', email); // Guarda el email para usarlo en main.html
+    localStorage.setItem('userEmail', email); 
     window.location.href = `${WEB_APP_URL}?page=main`;
 }
 
@@ -37,10 +37,8 @@ function redirectToMain(email) {
 if (window.location.search.includes('page=main')) {
     userEmail = localStorage.getItem('userEmail');
     if (userEmail) {
-        // Inicializar la página principal cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', initializeMainPage);
     } else {
-        // Si no hay email, redirigir al login
         window.location.href = WEB_APP_URL; 
     }
 }
@@ -49,23 +47,45 @@ if (window.location.search.includes('page=main')) {
 // ----------------------------------------------------------------------
 // --- LÓGICA DE LOGIN / REGISTRO (index.html) ---
 // ----------------------------------------------------------------------
-// Estas funciones están en el scope global y funcionarán si el script no se detiene.
+// Las funciones ahora buscan sus elementos internamente, evitando crashes globales.
 
 function register() {
-  document.getElementById('modal-registro').style.display = "block";
-  messageBox.textContent = '';
-  regEmailInput.value = '';
-  regPhoneInput.value = '';
+  const modal = document.getElementById('modal-registro');
+  const messageBox = document.getElementById('msg');
+  const regEmailInput = document.getElementById('reg-email');
+  const regPhoneInput = document.getElementById('reg-phone');
+    
+  if (modal) {
+      modal.style.display = "block";
+  }
+  if (messageBox) {
+      messageBox.textContent = '';
+  }
+  if (regEmailInput) {
+      regEmailInput.value = '';
+  }
+  if (regPhoneInput) {
+      regPhoneInput.value = '';
+  }
   closeErrorModal();
 }
 
 function closeModal() {
-  document.getElementById('modal-registro').style.display = "none";
+  const modal = document.getElementById('modal-registro');
+  if (modal) {
+      modal.style.display = "none";
+  }
 }
 
 async function login() {
-  const email = document.getElementById('email').value.trim();
-  const phone = document.getElementById('phone').value.trim();
+  const emailInput = document.getElementById('email');
+  const phoneInput = document.getElementById('phone');
+  const messageBox = document.getElementById('msg');
+
+  if (!emailInput || !phoneInput || !messageBox) return; // Validación de existencia
+    
+  const email = emailInput.value.trim();
+  const phone = phoneInput.value.trim();
   
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
@@ -103,6 +123,13 @@ async function login() {
 }
 
 async function submitRegistration() {
+  const regEmailInput = document.getElementById('reg-email');
+  const regPhoneInput = document.getElementById('reg-phone');
+  const messageBox = document.getElementById('msg');
+  const confirmButton = document.querySelector('.modal-footer .green');
+  
+  if (!regEmailInput || !regPhoneInput || !messageBox || !confirmButton) return;
+
   const email = regEmailInput.value.trim();
   const phone = regPhoneInput.value.trim();
 
@@ -118,7 +145,6 @@ async function submitRegistration() {
   formData.append('email', email);
   formData.append('phone', phone);
   
-  const confirmButton = document.querySelector('.modal-footer .green');
   confirmButton.textContent = 'Registrando...';
   confirmButton.disabled = true;
 
@@ -169,6 +195,8 @@ async function checkUserState() {
     formData.append('email', userEmail);
     
     const statusDiv = document.getElementById('claim-status');
+    if (!statusDiv || !claimButton) return;
+    
     statusDiv.textContent = 'Verificando...';
     claimButton.disabled = true;
 
@@ -180,13 +208,11 @@ async function checkUserState() {
         document.getElementById('modal-phone').value = result.phone || 'N/A'; // Rellena el celular
 
         if (result.needsRegistration) {
-            // Mostrar modal de registro de datos personales
             claimButton.textContent = 'Completar Datos Personales';
             claimButton.onclick = showPersonalDataModal;
             claimButton.disabled = false;
             statusDiv.textContent = '¡Completa tus datos para empezar a ganar Erdna!';
         } else {
-            // Usuario ya tiene datos, verificar reclamo diario
             updateClaimStatus(result.lastClaimDate);
         }
     } catch (error) {
@@ -196,6 +222,7 @@ async function checkUserState() {
 }
 
 function updateClaimStatus(lastClaimDate) {
+    if (!claimButton) return;
     
     if (!lastClaimDate || lastClaimDate === 'N/A') {
         document.getElementById('claim-status').textContent = '¡Puedes reclamar tus 5 Erdna de hoy!';
@@ -205,10 +232,9 @@ function updateClaimStatus(lastClaimDate) {
         return;
     }
     
-    // Comparación solo de la fecha (DD/MM/YYYY)
     const today = new Date();
-    const todayDateStr = today.toLocaleDateString("es-ES"); // Ej: 11/11/2025
-    const lastClaimDateOnly = lastClaimDate.split(' ')[0]; // Tomamos DD/MM/YYYY
+    const todayDateStr = today.toLocaleDateString("es-ES"); 
+    const lastClaimDateOnly = lastClaimDate.split(' ')[0]; 
     
     if (lastClaimDateOnly === todayDateStr) {
         document.getElementById('claim-status').textContent = `Monedas reclamadas hoy. Último reclamo: ${lastClaimDate}`;
@@ -223,10 +249,8 @@ function updateClaimStatus(lastClaimDate) {
 }
 
 function showPersonalDataModal() {
-    // Llenar campos no editables
+    if (!personalDataModal) return;
     document.getElementById('modal-email').value = userEmail;
-    
-    // Abrir modal
     personalDataModal.style.display = 'block';
 }
 
@@ -236,6 +260,8 @@ async function savePersonalData() {
     const materno = document.getElementById('modal-materno').value.trim();
     
     const errorMsgDiv = document.getElementById('modal-error');
+    if (!personalDataModal || !errorMsgDiv) return;
+
     errorMsgDiv.textContent = '';
 
     if (names === '' || paterno === '' || materno === '') {
@@ -259,8 +285,8 @@ async function savePersonalData() {
         const result = await response.json();
         
         if (result.success) {
-            personalDataModal.style.display = 'none'; // Cerrar modal
-            await checkUserState(); // Refrescar el estado para activar el botón de reclamo
+            personalDataModal.style.display = 'none'; 
+            await checkUserState(); 
         } else {
             errorMsgDiv.textContent = 'Error al guardar: ' + result.message;
         }
@@ -275,6 +301,7 @@ async function savePersonalData() {
 
 
 async function tryClaim() {
+    if (!claimButton) return;
     claimButton.textContent = 'Reclamando...';
     claimButton.disabled = true;
     
