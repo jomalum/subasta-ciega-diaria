@@ -1,5 +1,5 @@
 // **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlzLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 
 // Referencias de Login/Error
 const modal = document.getElementById('modal-registro');
@@ -298,3 +298,4 @@ async function tryClaim() {
         claimButton.disabled = false;
     }
 }
+
