@@ -1,3 +1,6 @@
+// **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZC-jyT42Un1bGmd83PlzLTdEWKlRTKk_BdvXlSDcLeZL-jfAD8ni-M49h-Mw1Tjmn/exec";
+
 // Obtiene referencias
 const modal = document.getElementById('modal-registro');
 const messageBox = document.getElementById('msg');
@@ -10,80 +13,128 @@ const errorContent = document.getElementById('error-content');
 
 // --- Funciones del Modal de Error Personalizado ---
 
-/**
- * Muestra el modal de error con el mensaje especificado.
- * @param {string} message - El mensaje de error a mostrar.
- */
 function showErrorModal(message) {
     errorContent.textContent = message;
     errorModal.style.display = 'block';
 }
 
-/**
- * Oculta el modal de error.
- */
 function closeErrorModal() {
     errorModal.style.display = 'none';
 }
 
 
-// --- Funciones del Modal de Registro ---
+// --- Funciones del Modal de Registro (UI) ---
 
 function register() {
   modal.style.display = "block";
   messageBox.textContent = '';
   regEmailInput.value = '';
   regPhoneInput.value = '';
-  closeErrorModal(); // Asegura que el modal de error esté oculto
+  closeErrorModal();
 }
 
 function closeModal() {
   modal.style.display = "none";
 }
 
-function submitRegistration() {
+
+// --- Lógica de Registro (Conexión con Google Sheets) ---
+
+async function submitRegistration() {
   const email = regEmailInput.value.trim();
   const phone = regPhoneInput.value.trim();
 
-  // Mensaje de error multilínea para el nuevo modal
+  // Validación local (antes de enviar al servidor)
   const validationErrorMsg = 'Por favor, rellena los campos de registro correctamente:\n\n- El CORREO ELECTRÓNICO debe ser válido (ej. A@B.COM).\n- El N° DE CELULAR debe tener 9 dígitos.';
 
-  // Validación
   if (email === '' || !email.includes('@') || phone.length !== 9) {
-    showErrorModal(validationErrorMsg); // Muestra el modal de error personalizado
+    showErrorModal(validationErrorMsg);
     return;
   }
-
-  // Simulación de registro exitoso
-  messageBox.textContent = '✅ ¡Usuario registrado exitosamente! Ya puedes iniciar sesión con tu correo ' + email + '.';
-  messageBox.style.color = '#43A047'; // Color verde fuerte de éxito
   
-  // Opcional: Copiar el email y celular al formulario de login
-  document.getElementById('email').value = email;
-  document.getElementById('phone').value = phone;
+  // Datos a enviar a Google Apps Script
+  const formData = new FormData();
+  formData.append('action', 'register');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  
+  // Deshabilitar botón para evitar envíos múltiples
+  const confirmButton = document.querySelector('.modal-footer .green');
+  confirmButton.textContent = 'Registrando...';
+  confirmButton.disabled = true;
 
-  closeModal(); 
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      messageBox.textContent = '✅ ' + result.message + ' Ya puedes iniciar sesión.';
+      messageBox.style.color = '#43A047'; // Verde de éxito
+      
+      // Llenar campos de login y cerrar modal
+      document.getElementById('email').value = email;
+      document.getElementById('phone').value = phone;
+      closeModal();
+    } else {
+      // Mostrar error que viene del servidor (ej. usuario ya existe)
+      showErrorModal('❌ Error de Registro:\n\n' + result.message);
+    }
+  } catch (error) {
+    showErrorModal('❌ Error de Conexión: No se pudo conectar con el servidor.');
+    console.error('Error:', error);
+  } finally {
+    confirmButton.textContent = 'Confirmar Registro';
+    confirmButton.disabled = false;
+  }
 }
 
-// --- Función de Inicio de Sesión ---
+// --- Lógica de Login (Conexión con Google Sheets) ---
 
-function login() {
+async function login() {
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
   
-  // Validación de campos
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
-    messageBox.style.color = '#E53935'; // Color rojo fuerte de error
+    messageBox.style.color = '#E53935'; // Rojo de error
     return;
   }
   
-  // Lógica de autenticación SIMULADA
-  if (email === 'TEST@TEST.COM' && phone === '123456789') { 
-    messageBox.textContent = '✅ ¡Bienvenido! Iniciando sesión...';
-    messageBox.style.color = '#00897B'; // Color turquesa oscuro de éxito de login
-  } else {
-    messageBox.textContent = '❌ Credenciales incorrectas o usuario no registrado.';
-    messageBox.style.color = '#E53935'; // Color rojo fuerte de error
+  // Datos a enviar a Google Apps Script
+  const formData = new FormData();
+  formData.append('action', 'login');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  
+  messageBox.textContent = 'Iniciando sesión...';
+  messageBox.style.color = '#00897B';
+
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      messageBox.textContent = '✅ ' + result.message + ' Bienvenido!';
+      messageBox.style.color = '#00897B'; // Turquesa de éxito
+      // Aquí iría la redirección a la página principal
+      // window.location.href = 'pagina_principal.html';
+    } else {
+      messageBox.textContent = '❌ ' + result.message;
+      messageBox.style.color = '#E53935'; // Rojo de error
+    }
+  } catch (error) {
+    messageBox.textContent = '❌ Error de Conexión: No se pudo conectar con el servidor.';
+    messageBox.style.color = '#E53935';
+    console.error('Error:', error);
   }
 }
