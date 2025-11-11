@@ -1,90 +1,143 @@
-// ID de tu hoja de cálculo de Google
-const SHEET_ID = "1xQZhT8qLIoZhfibsfOSvNOQUBkIruoGkBAL86KEhd6Q"; 
-const SHEET_NAME = "USUARIOS"; 
+// **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 
-// Función principal para manejar peticiones web (GET)
-function doGet(e) {
-  return HtmlService.createTemplateFromFile('index').evaluate();
+// Obtiene referencias
+const modal = document.getElementById('modal-registro');
+const messageBox = document.getElementById('msg');
+const regEmailInput = document.getElementById('reg-email');
+const regPhoneInput = document.getElementById('reg-phone');
+
+// Referencias del nuevo modal de error
+const errorModal = document.getElementById('error-modal');
+const errorContent = document.getElementById('error-content');
+
+// --- Funciones del Modal de Error Personalizado ---
+
+function showErrorModal(message) {
+    errorContent.textContent = message;
+    errorModal.style.display = 'block';
 }
 
-// Función para manejar peticiones POST (registro y login)
-function doPost(e) {
-  const params = e.parameter;
-  const action = params.action;
-  
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = ss.getSheetByName(SHEET_NAME);
-  
-  if (!sheet) {
-     return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Error del servidor: Hoja no encontrada." }))
-        .setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  if (action === 'register') {
-    return handleRegister(params, sheet);
-  } else if (action === 'login') {
-    return handleLogin(params, sheet);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Acción no válida." }))
-    .setMimeType(ContentService.MimeType.JSON);
+function closeErrorModal() {
+    errorModal.style.display = 'none';
 }
 
 
-// --- Lógica de Registro ---
-function handleRegister(params, sheet) {
-  // CLAVE: Convertir a MAYÚSCULAS al guardar
-  const email = params.email.toUpperCase(); 
-  const phone = params.phone;
+// --- Funciones del Modal de Registro (UI) ---
+
+function register() {
+  modal.style.display = "block";
+  messageBox.textContent = '';
+  regEmailInput.value = '';
+  regPhoneInput.value = '';
+  closeErrorModal();
+}
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
+
+// --- Lógica de Registro (Conexión con Google Sheets) ---
+
+async function submitRegistration() {
+  const email = regEmailInput.value.trim();
+  const phone = regPhoneInput.value.trim();
+
+  // Validación local (antes de enviar al servidor)
+  const validationErrorMsg = 'Por favor, rellena los campos de registro correctamente:\n\n- El CORREO ELECTRÓNICO debe ser válido (ej. A@B.COM).\n- El N° DE CELULAR debe tener 9 dígitos.';
+
+  if (email === '' || !email.includes('@') || phone.length !== 9) {
+    showErrorModal(validationErrorMsg);
+    return;
+  }
   
-  const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) { 
-    if (data[i][0] === email || data[i][1] == phone) { // Note: Usamos == para el teléfono por si es texto/número
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: false, 
-        message: "El CORREO ELECTRÓNICO o N° DE CELULAR ya está registrado." 
-      })).setMimeType(ContentService.MimeType.JSON);
+  // Datos a enviar a Google Apps Script
+  const formData = new FormData();
+  formData.append('action', 'register');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  
+  // Deshabilitar botón para evitar envíos múltiples
+  const confirmButton = document.querySelector('.modal-footer .green');
+  confirmButton.textContent = 'Registrando...';
+  confirmButton.disabled = true;
+
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      messageBox.textContent = '✅ ' + result.message + ' Ya puedes iniciar sesión.';
+      messageBox.style.color = '#43A047'; // Verde de éxito
+      
+      // Llenar campos de login y cerrar modal
+      document.getElementById('email').value = email;
+      document.getElementById('phone').value = phone;
+      closeModal();
+    } else {
+      // Mostrar error que viene del servidor (ej. usuario ya existe)
+      showErrorModal('❌ Error de Registro:\n\n' + result.message);
     }
+  } catch (error) {
+    showErrorModal('❌ Error de Conexión: No se pudo conectar con el servidor.');
+    console.error('Error:', error);
+  } finally {
+    confirmButton.textContent = 'Confirmar Registro';
+    confirmButton.disabled = false;
   }
-  
-  // 2. Si no existe, registrar el nuevo usuario
-  const newRow = [
-    email,
-    phone,
-    new Date().toLocaleDateString("es-ES") + " " + new Date().toLocaleTimeString("es-ES"),
-    "ACTIVO"
-  ];
-  sheet.appendRow(newRow);
-  
-  return ContentService.createTextOutput(JSON.stringify({ 
-    success: true, 
-    message: "Usuario registrado exitosamente." 
-  })).setMimeType(ContentService.MimeType.JSON);
 }
 
+// --- Lógica de Login (Conexión con Google Sheets) ---
 
-// --- Lógica de Inicio de Sesión ---
-function handleLogin(params, sheet) {
-  // CLAVE: Convertir a MAYÚSCULAS al buscar
-  const email = params.email.toUpperCase(); 
-  const phone = params.phone;
+async function login() {
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
   
-  const data = sheet.getDataRange().getValues();
+  if (email === '' || phone.length !== 9) {
+    messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
+    messageBox.style.color = '#E53935'; // Rojo de error
+    return;
+  }
   
-  // Buscar las credenciales en la base de datos
-  for (let i = 1; i < data.length; i++) {
-    // data[i][0] es CORREO, data[i][1] es CELULAR
-    if (data[i][0] === email && data[i][1] == phone) { 
-      return ContentService.createTextOutput(JSON.stringify({ 
-        success: true, 
-        message: "Inicio de sesión exitoso." 
-      })).setMimeType(ContentService.MimeType.JSON);
+  // Datos a enviar a Google Apps Script
+  const formData = new FormData();
+  formData.append('action', 'login');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  
+  messageBox.textContent = 'Iniciando sesión...';
+  messageBox.style.color = '#00897B';
+
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: formData,
+      redirect: 'follow'
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      messageBox.textContent = '✅ ' + result.message + ' Bienvenido!';
+      messageBox.style.color = '#00897B'; // Turquesa de éxito
+      // Aquí iría la redirección a la página principal
+      // window.location.href = 'pagina_principal.html';
+    } else {
+      messageBox.textContent = '❌ ' + result.message;
+      messageBox.style.color = '#E53935'; // Rojo de error
     }
+  } catch (error) {
+    messageBox.textContent = '❌ Error de Conexión: No se pudo conectar con el servidor.';
+    messageBox.style.color = '#E53935';
+    console.error('Error:', error);
   }
-  
-  // Si no encuentra coincidencia
-  return ContentService.createTextOutput(JSON.stringify({ 
-    success: false, 
-    message: "Credenciales inválidas. Correo o celular incorrectos." 
-  })).setMimeType(ContentService.MimeType.JSON);
 }
+
+
+
