@@ -22,7 +22,6 @@ function closeErrorModal() {
     errorModal.style.display = 'none';
 }
 
-
 // --- Funciones del Modal de Registro (UI) ---
 
 function register() {
@@ -36,7 +35,6 @@ function register() {
 function closeModal() {
   modal.style.display = "none";
 }
-
 
 // --- Lógica de Registro (Conexión con Google Sheets) ---
 
@@ -52,10 +50,11 @@ async function submitRegistration() {
   }
   
   // Datos a enviar a Google Apps Script
-  const formData = new FormData();
-  formData.append('action', 'register');
-  formData.append('email', email);
-  formData.append('phone', phone);
+  const payload = {
+    action: 'register',
+    email: email,
+    phone: phone
+  };
   
   // Deshabilitar botón para evitar envíos múltiples
   const confirmButton = document.querySelector('.modal-footer .green');
@@ -65,9 +64,12 @@ async function submitRegistration() {
   try {
     const response = await fetch(WEB_APP_URL, {
       method: 'POST',
-      body: formData,
-      redirect: 'follow'
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
     });
+    
     const result = await response.json();
     
     if (result.success) {
@@ -104,31 +106,37 @@ async function login() {
   }
   
   // Datos a enviar a Google Apps Script
-  const formData = new FormData();
-  formData.append('action', 'login');
-  formData.append('email', email);
-  formData.append('phone', phone);
+  const payload = {
+    action: 'login',
+    email: email,
+    phone: phone
+  };
   
   messageBox.textContent = 'Iniciando sesión...';
   messageBox.style.color = '#00897B';
+  
   try {
     const response = await fetch(WEB_APP_URL, {
       method: 'POST',
-      body: formData,
-      redirect: 'follow'
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload)
     });
+    
     const result = await response.json();
     
     if (result.success) {
       messageBox.textContent = '✅ ' + result.message + ' Bienvenido!';
       messageBox.style.color = '#00897B'; // Turquesa de éxito
       
-      // ****** CÓDIGO DE REDIRECCIÓN A LA PÁGINA PRINCIPAL ******
-      google.script.run.withSuccessHandler(function(url) {
-          window.top.location.href = url;
-      }).getWebAppUrlForMainPage();
-      // ************************************************************
-
+      // Redirección a la página principal
+      if (result.redirectUrl) {
+        window.top.location.href = result.redirectUrl;
+      } else {
+        // Fallback si no hay URL de redirección
+        window.top.location.href = WEB_APP_URL + '?page=main';
+      }
     } else {
       messageBox.textContent = '❌ ' + result.message;
       messageBox.style.color = '#E53935';
