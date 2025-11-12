@@ -99,10 +99,10 @@ button:disabled {
     <h2 id="userName">Bienvenido</h2>
   </div>
   <div class="balance">
-    Endra 💠 <span id="saldo">0</span>
+    Erdna 💠 <span id="saldo">0</span>
   </div>
   <div>
-    <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
+    <button id="btnReclamar" onclick="reclamarErdna()">Reclamar Erdna del día</button>
     <div id="timer" class="timer"></div>
   </div>
   <div>
@@ -200,7 +200,7 @@ async function obtenerSaldoYRestriccion() {
 }
 
 // Abrir modal o reclamar directo
-function reclamarEndra() {
+function reclamarErdna() {
   if (datosGuardados) confirmarReclamo();
   else modal.style.display = 'flex';
 }
@@ -252,7 +252,7 @@ async function confirmarReclamo() {
 
 // Modal éxito
 function mostrarModalExito(monto, saldo) {
-  document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
+  document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Erdna</b>.<br>Tu saldo total es de <b>${saldo} Erdna</b>.`;
   modalExito.style.display = 'flex';
 }
 function cerrarModalExito() { modalExito.style.display = 'none'; }
