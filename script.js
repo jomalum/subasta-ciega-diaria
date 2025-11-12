@@ -1,30 +1,38 @@
-// **IMPORTANTE: REEMPLAZA ESTA URL CON LA URL DE TU PROYECTO DE APPS SCRIPT**
+// =========================================================
+// CONFIGURACIÓN GLOBAL
+// =========================================================
+
+// ⚠️ IMPORTANTE: Reemplaza esta URL con la URL de tu proyecto desplegado
+// en Google Apps Script (tipo "Aplicación web").
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 
-// Obtiene referencias
+// =========================================================
+// REFERENCIAS DEL DOM
+// =========================================================
 const modal = document.getElementById('modal-registro');
 const messageBox = document.getElementById('msg');
 const regEmailInput = document.getElementById('reg-email');
 const regPhoneInput = document.getElementById('reg-phone');
 
-// Referencias del nuevo modal de error
+// Modal de error
 const errorModal = document.getElementById('error-modal');
 const errorContent = document.getElementById('error-content');
 
-// --- Funciones del Modal de Error Personalizado ---
-
+// =========================================================
+// FUNCIONES DE MODALES DE ERROR
+// =========================================================
 function showErrorModal(message) {
-    errorContent.textContent = message;
-    errorModal.style.display = 'block';
+  errorContent.textContent = message;
+  errorModal.style.display = 'block';
 }
 
 function closeErrorModal() {
-    errorModal.style.display = 'none';
+  errorModal.style.display = 'none';
 }
 
-
-// --- Funciones del Modal de Registro (UI) ---
-
+// =========================================================
+// FUNCIONES DE MODAL DE REGISTRO
+// =========================================================
 function register() {
   modal.style.display = "block";
   messageBox.textContent = '';
@@ -37,28 +45,25 @@ function closeModal() {
   modal.style.display = "none";
 }
 
-
-// --- Lógica de Registro (Conexión con Google Sheets) ---
-
+// =========================================================
+// REGISTRO DE NUEVO USUARIO
+// =========================================================
 async function submitRegistration() {
   const email = regEmailInput.value.trim();
   const phone = regPhoneInput.value.trim();
 
-  // Validación local (antes de enviar al servidor)
   const validationErrorMsg = 'Por favor, rellena los campos de registro correctamente:\n\n- El CORREO ELECTRÓNICO debe ser válido (ej. A@B.COM).\n- El N° DE CELULAR debe tener 9 dígitos.';
 
   if (email === '' || !email.includes('@') || phone.length !== 9) {
     showErrorModal(validationErrorMsg);
     return;
   }
-  
-  // Datos a enviar a Google Apps Script
+
   const formData = new FormData();
   formData.append('action', 'register');
   formData.append('email', email);
   formData.append('phone', phone);
-  
-  // Deshabilitar botón para evitar envíos múltiples
+
   const confirmButton = document.querySelector('.modal-footer .green');
   confirmButton.textContent = 'Registrando...';
   confirmButton.disabled = true;
@@ -71,17 +76,14 @@ async function submitRegistration() {
     });
 
     const result = await response.json();
-    
+
     if (result.success) {
       messageBox.textContent = '✅ ' + result.message + ' Ya puedes iniciar sesión.';
-      messageBox.style.color = '#43A047'; // Verde de éxito
-      
-      // Llenar campos de login y cerrar modal
+      messageBox.style.color = '#43A047'; // Verde éxito
       document.getElementById('email').value = email;
       document.getElementById('phone').value = phone;
       closeModal();
     } else {
-      // Mostrar error que viene del servidor (ej. usuario ya existe)
       showErrorModal('❌ Error de Registro:\n\n' + result.message);
     }
   } catch (error) {
@@ -93,24 +95,24 @@ async function submitRegistration() {
   }
 }
 
-// --- Lógica de Login (Conexión con Google Sheets) ---
-
+// =========================================================
+// INICIO DE SESIÓN
+// =========================================================
 async function login() {
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
-  
+
   if (email === '' || phone.length !== 9) {
     messageBox.textContent = '❌ Por favor, ingresa un EMAIL y un CELULAR de 9 dígitos.';
-    messageBox.style.color = '#E53935'; // Rojo de error
+    messageBox.style.color = '#E53935';
     return;
   }
-  
-  // Datos a enviar a Google Apps Script
+
   const formData = new FormData();
   formData.append('action', 'login');
   formData.append('email', email);
   formData.append('phone', phone);
-  
+
   messageBox.textContent = 'Iniciando sesión...';
   messageBox.style.color = '#00897B';
 
@@ -122,21 +124,23 @@ async function login() {
     });
 
     const result = await response.json();
-    
+
     if (result.success) {
       messageBox.textContent = '✅ ' + result.message + ' Bienvenido!';
-      messageBox.style.color = '#00897B'; // Turquesa de éxito
-      // Aquí iría la redirección a la página principal
-      // window.location.href = 'pagina_principal.html';
+      messageBox.style.color = '#00897B';
+
+      // 🔁 Redirección con parámetros
+      const query = `?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
+      window.location.href = 'principal.html' + query;
+
     } else {
       messageBox.textContent = '❌ ' + result.message;
-      messageBox.style.color = '#E53935'; // Rojo de error
+      messageBox.style.color = '#E53935';
     }
+
   } catch (error) {
     messageBox.textContent = '❌ Error de Conexión: No se pudo conectar con el servidor.';
     messageBox.style.color = '#E53935';
     console.error('Error:', error);
   }
 }
-
-
