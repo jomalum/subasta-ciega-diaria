@@ -131,7 +131,7 @@ async function login() {
 
       // 🔁 Redirección con parámetros
       const query = `?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
-      window.location.href = 'principal.html' + query;
+      window.location.href = window.location.origin + '/subasta-ciega-diaria/principal.html' + query;
 
     } else {
       messageBox.textContent = '❌ ' + result.message;
@@ -144,3 +144,4 @@ async function login() {
     console.error('Error:', error);
   }
 }
+
