@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Página Principal</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #00B8D4, #4DD0E1);
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+.header {
+  background: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.header h2 {
+  margin: 0;
+  color: #00897B;
+}
+.balance {
+  font-weight: bold;
+  color: #004D40;
+}
+button {
+  background: #00897B;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover {
+  background: #00695C;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+.modal-content h3 {
+  color: #00897B;
+  margin-top: 0;
+}
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #00B8D4;
+  border-radius: 6px;
+}
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+.modal-footer button {
+  width: 48%;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h2 id="userName">Bienvenido</h2>
+  <div class="balance">
+    Endra 💠 <span id="saldo">0</span>
+  </div>
+  <button onclick="abrirModal()">Reclamar Endra del día</button>
+</div>
+
+<!-- Modal de Reclamo -->
+<div class="modal" id="modalReclamo">
+  <div class="modal-content">
+    <h3>Reclamar Endra del Día</h3>
+    <input id="nombre" placeholder="Nombres">
+    <input id="apellidoP" placeholder="Apellido Paterno">
+    <input id="apellidoM" placeholder="Apellido Materno">
+    <input id="correo" disabled>
+    <input id="celular" disabled>
+
+    <div class="modal-footer">
+      <button onclick="confirmarReclamo()">Confirmar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const modal = document.getElementById('modalReclamo');
+const urlParams = new URLSearchParams(window.location.search);
+const email = urlParams.get('email');
+const phone = urlParams.get('phone');
+
+document.getElementById('correo').value = email || '';
+document.getElementById('celular').value = phone || '';
+
+function abrirModal() {
+  modal.style.display = 'flex';
+}
+function cerrarModal() {
+  modal.style.display = 'none';
+}
+
+// Simula la obtención del nombre del usuario
+function obtenerPrimerNombre(correo) {
+  const nombre = correo.split('@')[0]; // antes del @
+  return nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+}
+
+document.getElementById('userName').textContent = obtenerPrimerNombre(email || 'Usuario');
+
+// En el futuro aquí se conectará con tu backend para guardar el reclamo
+function confirmarReclamo() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const aP = document.getElementById('apellidoP').value.trim();
+  const aM = document.getElementById('apellidoM').value.trim();
+  
+  if (!nombre || !aP || !aM) {
+    alert('Por favor, completa todos los campos.');
+    return;
+  }
+
+  alert(`✅ Reclamo registrado para ${nombre} ${aP} ${aM}.`);
+  cerrarModal();
+}
+</script>
+
+</body>
+</html>
