@@ -15,6 +15,8 @@
             font-family: Arial;
             color: #333;
             flex-direction: column;
+            margin: 0;
+            padding: 0;
         }
         .panel {
             background: white;
@@ -57,9 +59,9 @@
 
 <script>
     function logout() {
-        // Redirige al usuario de vuelta a la página principal de login (index.html)
-        // Usamos ScriptApp.getService().getUrl() que apunta a doGet (que sirve index.html por defecto)
-        window.top.location.href = '<?= ScriptApp.getService().getUrl() ?>';
+        // Redirige al usuario de vuelta a la página principal de login
+        const webAppUrl = '<?= ScriptApp.getService().getUrl() ?>';
+        window.top.location.href = webAppUrl;
     }
 </script>
 
