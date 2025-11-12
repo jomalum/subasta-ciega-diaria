@@ -49,25 +49,22 @@ async function submitRegistration() {
     return;
   }
   
-  // Datos a enviar a Google Apps Script
-  const payload = {
-    action: 'register',
-    email: email,
-    phone: phone
-  };
+  // Datos a enviar a Google Apps Script (USANDO FORMDATA COMO ORIGINAL)
+  const formData = new FormData();
+  formData.append('action', 'register');
+  formData.append('email', email);
+  formData.append('phone', phone);
   
   // Deshabilitar botón para evitar envíos múltiples
   const confirmButton = document.querySelector('.modal-footer .green');
+  const originalText = confirmButton.textContent;
   confirmButton.textContent = 'Registrando...';
   confirmButton.disabled = true;
 
   try {
     const response = await fetch(WEB_APP_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
+      body: formData
     });
     
     const result = await response.json();
@@ -85,10 +82,10 @@ async function submitRegistration() {
       showErrorModal('❌ Error de Registro:\n\n' + result.message);
     }
   } catch (error) {
-    showErrorModal('❌ Error de Conexión: No se pudo conectar con el servidor.');
+    showErrorModal('❌ Error de Conexión: No se pudo conectar con el servidor.\n\nVerifica:\n1. Tu conexión a internet\n2. Que la URL de WEB_APP_URL sea correcta\n3. Que la aplicación esté desplegada');
     console.error('Error:', error);
   } finally {
-    confirmButton.textContent = 'Confirmar Registro';
+    confirmButton.textContent = originalText;
     confirmButton.disabled = false;
   }
 }
@@ -105,12 +102,11 @@ async function login() {
     return;
   }
   
-  // Datos a enviar a Google Apps Script
-  const payload = {
-    action: 'login',
-    email: email,
-    phone: phone
-  };
+  // Datos a enviar a Google Apps Script (USANDO FORMDATA COMO ORIGINAL)
+  const formData = new FormData();
+  formData.append('action', 'login');
+  formData.append('email', email);
+  formData.append('phone', phone);
   
   messageBox.textContent = 'Iniciando sesión...';
   messageBox.style.color = '#00897B';
@@ -118,33 +114,35 @@ async function login() {
   try {
     const response = await fetch(WEB_APP_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
+      body: formData
     });
     
     const result = await response.json();
     
     if (result.success) {
-      messageBox.textContent = '✅ ' + result.message + ' Bienvenido!';
-      messageBox.style.color = '#00897B'; // Turquesa de éxito
+      messageBox.textContent = '✅ ' + result.message + ' Redirigiendo...';
+      messageBox.style.color = '#00897B';
       
-      // Redirección a la página principal
-      if (result.redirectUrl) {
-        window.top.location.href = result.redirectUrl;
-      } else {
-        // Fallback si no hay URL de redirección
-        window.top.location.href = WEB_APP_URL + '?page=main';
-      }
+      // Redirección usando google.script.run
+      google.script.run
+        .withSuccessHandler(function(url) {
+          window.top.location.href = url;
+        })
+        .withFailureHandler(function(error) {
+          messageBox.textContent = '❌ Error al redirigir: ' + error;
+          messageBox.style.color = '#E53935';
+        })
+        .getMainPageUrl();
+        
     } else {
       messageBox.textContent = '❌ ' + result.message;
       messageBox.style.color = '#E53935';
     }
   } catch (error) {
-    messageBox.textContent = '❌ Error de Conexión: No se pudo conectar con el servidor.';
+    messageBox.textContent = '❌ Error de Conexión: No se pudo conectar con el servidor. Verifica tu conexión a internet.';
     messageBox.style.color = '#E53935';
     console.error('Error:', error);
   }
 }
+
 
