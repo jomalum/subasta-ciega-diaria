@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Página Principal</title>
 <style>
 body {
@@ -17,22 +18,32 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 .header-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
+  min-width: 150px;
 }
 .header h2 {
   margin: 0;
   color: #00897B;
   font-weight: bold;
+  font-size: 1.4rem;
+  word-break: break-word;
 }
 .balance {
   font-weight: bold;
   color: #004D40;
-  font-size: 18px;
+  font-size: 1rem;
+  text-align: center;
+  margin: 5px 0;
+}
+.header > div:last-child {
+  margin-top: 5px;
 }
 button {
   background: #00897B;
@@ -61,7 +72,7 @@ button:disabled {
   font-weight: bold;
 }
 
-/* modal genérico */
+/* === MODALES === */
 .modal {
   display: none;
   position: fixed;
@@ -70,6 +81,7 @@ button:disabled {
   background: rgba(0,0,0,0.5);
   justify-content: center;
   align-items: center;
+  animation: fadeIn 0.3s ease;
 }
 .modal-content {
   background: white;
@@ -78,6 +90,7 @@ button:disabled {
   width: 90%;
   max-width: 420px;
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+  animation: slideUp 0.3s ease;
 }
 .modal-content h3, .modal-content h2 {
   color: #00897B;
@@ -107,21 +120,32 @@ button:disabled {
 #modalExito p { font-size: 16px; color: #004D40; }
 
 /* Modal cierre sesión */
-#modalCerrar .modal-content {
-  text-align: center;
-  border: 2px solid #FF7043;
+#modalCerrar .modal-content { text-align: center; border: 2px solid #FF7043; }
+#modalCerrar h2 { color: #D84315; }
+#modalCerrar .btn-confirmar { background: #E53935; }
+#modalCerrar .btn-cancelar { background: #00897B; }
+
+/* === ANIMACIONES === */
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
 }
-#modalCerrar h2 {
-  color: #D84315;
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
-#modalCerrar .modal-footer button {
-  width: 48%;
-}
-#modalCerrar .btn-confirmar {
-  background: #E53935;
-}
-#modalCerrar .btn-cancelar {
-  background: #00897B;
+
+/* === RESPONSIVE === */
+@media screen and (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .header h2 { font-size: 1.2rem; }
+  .balance { font-size: 0.95rem; }
+  button { padding: 10px; font-size: 0.9rem; margin-top: 8px; width: 100%; }
+  .modal-content { width: 95%; max-width: 340px; padding: 20px; }
+  input { font-size: 0.9rem; }
 }
 </style>
 </head>
@@ -145,7 +169,7 @@ button:disabled {
 
 <div id="msg"></div>
 
-<!-- Modal para registrar datos -->
+<!-- Modal datos -->
 <div class="modal" id="modalReclamo">
   <div class="modal-content">
     <h3>Completa tus datos</h3>
@@ -161,7 +185,7 @@ button:disabled {
   </div>
 </div>
 
-<!-- Modal Reclamo Exitoso -->
+<!-- Modal éxito -->
 <div class="modal" id="modalExito">
   <div class="modal-content">
     <h2>🎉 Reclamo Exitoso</h2>
@@ -170,11 +194,11 @@ button:disabled {
   </div>
 </div>
 
-<!-- Modal Confirmar Cierre -->
+<!-- Modal Cerrar sesión -->
 <div class="modal" id="modalCerrar">
   <div class="modal-content">
     <h2>¿Cerrar sesión?</h2>
-    <p>¿Estás seguro de que deseas salir? Podrás volver a ingresar cuando quieras.</p>
+    <p>¿Estás seguro de que deseas salir?<br>Tu progreso se mantiene guardado.</p>
     <div class="modal-footer">
       <button class="btn-cancelar" onclick="cerrarModalCerrar()">Cancelar</button>
       <button class="btn-confirmar" onclick="confirmarCerrarSesion()">Cerrar sesión</button>
@@ -183,6 +207,9 @@ button:disabled {
 </div>
 
 <script>
+// =========================================================
+// CONFIGURACIÓN
+// =========================================================
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 const modal = document.getElementById('modalReclamo');
 const modalExito = document.getElementById('modalExito');
@@ -206,10 +233,16 @@ let datosGuardados = false;
 let saldoActual = 0;
 let contadorInterval = null;
 
+// =========================================================
+// CARGA INICIAL
+// =========================================================
 window.onload = async () => {
   await obtenerSaldoYRestriccion();
 };
 
+// =========================================================
+// CONSULTAR SALDO Y RESTRICCIÓN
+// =========================================================
 async function obtenerSaldoYRestriccion() {
   try {
     const formData = new FormData();
@@ -243,6 +276,9 @@ async function obtenerSaldoYRestriccion() {
   }
 }
 
+// =========================================================
+// RECLAMO
+// =========================================================
 function reclamarEndra() {
   if (datosGuardados) confirmarReclamo();
   else modal.style.display = 'flex';
@@ -290,6 +326,9 @@ async function confirmarReclamo() {
   }
 }
 
+// =========================================================
+// MODALES
+// =========================================================
 function mostrarModalExito(monto, saldo) {
   document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
   modalExito.style.display = 'flex';
@@ -318,17 +357,30 @@ function desactivarBotonTemporalSegundos(segundos) {
   }, 1000);
 }
 
-/* 🔹 NUEVO: Modal de confirmación para cerrar sesión */
-function abrirModalCerrar() {
-  modalCerrar.style.display = 'flex';
-}
-function cerrarModalCerrar() {
-  modalCerrar.style.display = 'none';
-}
+// =========================================================
+// MODAL CIERRE DE SESIÓN
+// =========================================================
+function abrirModalCerrar() { modalCerrar.style.display = 'flex'; }
+function cerrarModalCerrar() { modalCerrar.style.display = 'none'; }
 function confirmarCerrarSesion() {
   modalCerrar.style.display = 'none';
   window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
 }
+
+// =========================================================
+// BLOQUEO DE INSPECCIÓN / F12 / CLICK DERECHO
+// =========================================================
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = function(e) {
+  if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") ||
+      (e.ctrlKey && e.shiftKey && e.key === "J") || 
+      (e.ctrlKey && e.key === "U") || 
+      (e.ctrlKey && e.key === "S")) {
+    e.preventDefault();
+    alert("🚫 Función bloqueada por seguridad.");
+    return false;
+  }
+};
 </script>
 </body>
 </html>
