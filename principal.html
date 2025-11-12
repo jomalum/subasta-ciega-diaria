@@ -183,15 +183,14 @@ document.getElementById('celular').value = phone || '';
 userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
 
 let datosGuardados = false;
-let siguienteReclamo = null;
 let saldoActual = 0;
 
-// ======= Cargar información del usuario al entrar =======
+// ======= Cargar información del usuario =======
 window.onload = async () => {
   await obtenerSaldoYRestriccion();
 };
 
-// ======= Obtener datos del usuario =======
+// ======= Obtener saldo actual y tiempo restante =======
 async function obtenerSaldoYRestriccion() {
   try {
     const formData = new FormData();
@@ -207,12 +206,13 @@ async function obtenerSaldoYRestriccion() {
       saldoActual = result.saldo;
       saldoSpan.textContent = saldoActual;
     }
-    if (result.waitHours && result.waitHours > 0) {
-      desactivarBotonTemporal(result.waitHours);
-    }
-    if (result.datosGuardados) datosGuardados = true;
 
-    // Si tiene nombres guardados, mostrarlos
+    // 🔹 Si hay tiempo restante, mantener contador
+    if (result.waitSeconds && result.waitSeconds > 0) {
+      desactivarBotonTemporal(result.waitSeconds / 3600);
+    }
+
+    if (result.datosGuardados) datosGuardados = true;
     if (result.nombresCompletos) {
       userNameEl.textContent = result.nombresCompletos.toUpperCase();
     }
@@ -222,17 +222,13 @@ async function obtenerSaldoYRestriccion() {
   }
 }
 
-// ======= Mostrar modal solo si no hay datos guardados =======
+// ======= Reclamar Endra =======
 function reclamarEndra() {
-  if (datosGuardados) {
-    confirmarReclamo(); // reclamo directo
-  } else {
-    modal.style.display = 'flex';
-  }
+  if (datosGuardados) confirmarReclamo();
+  else modal.style.display = 'flex';
 }
 function cerrarModal() { modal.style.display = 'none'; }
 
-// ======= Enviar reclamo =======
 async function confirmarReclamo() {
   const nombre = document.getElementById('nombre').value.trim().toUpperCase();
   const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
@@ -258,7 +254,6 @@ async function confirmarReclamo() {
     if (result.success) {
       saldoActual = result.saldo;
       saldoSpan.textContent = saldoActual;
-      msg.textContent = '';
       mostrarModalExito(result.monto || 10, result.saldo);
       datosGuardados = true;
       cerrarModal();
@@ -281,7 +276,7 @@ function mostrarModalExito(monto, saldo) {
 }
 function cerrarModalExito() { modalExito.style.display = 'none'; }
 
-// ======= Desactivar botón por X horas =======
+// ======= Desactivar botón y mostrar contador =======
 function desactivarBotonTemporal(horas) {
   btnReclamar.disabled = true;
   let restante = horas * 3600;
@@ -305,10 +300,4 @@ function desactivarBotonTemporal(horas) {
 
 // ======= Cerrar sesión =======
 function cerrarSesion() {
-  if (confirm("¿Deseas cerrar sesión?")) {
-    window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
-  }
-}
-</script>
-</body>
-</html>
+  if (confirm("¿
