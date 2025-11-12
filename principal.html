@@ -61,7 +61,7 @@ button:disabled {
   font-weight: bold;
 }
 
-/* --- Modal genérico --- */
+/* modal */
 .modal {
   display: none;
   position: fixed;
@@ -70,7 +70,6 @@ button:disabled {
   background: rgba(0,0,0,0.5);
   justify-content: center;
   align-items: center;
-  animation: fadeIn 0.3s ease;
 }
 .modal-content {
   background: white;
@@ -79,45 +78,20 @@ button:disabled {
   width: 90%;
   max-width: 420px;
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
-  animation: slideUp 0.3s ease;
 }
-.modal-content h3 {
-  color: #00897B;
-  margin-top: 0;
-  text-align: center;
-}
+.modal-content h3 { color:#00897B; margin-top:0; text-align:center;}
 .modal-content input {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border: 1px solid #00B8D4;
-  border-radius: 6px;
-  text-transform: uppercase;
-  box-sizing: border-box;
+  width:100%; padding:12px; margin:8px 0; border:1px solid #00B8D4; border-radius:6px; text-transform:uppercase; box-sizing:border-box;
 }
-.modal-footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-.modal-footer button { width: 48%; }
+.modal-footer { display:flex; justify-content:space-between; margin-top:15px;}
+.modal-footer button { width:48%; }
 
-/* --- Modal Reclamo Exitoso --- */
-#modalExito .modal-content {
-  text-align: center;
-  border: 2px solid #00BFA5;
-}
-#modalExito h2 {
-  color: #00796B;
-  margin-bottom: 10px;
-}
-#modalExito p {
-  font-size: 16px;
-  color: #004D40;
-}
+/* success modal */
+#modalExito .modal-content { text-align:center; border:2px solid #00BFA5;}
+#modalExito h2 { color:#00796B; margin-bottom:10px;}
+#modalExito p { font-size:16px; color:#004D40;}
 </style>
 </head>
-
 <body>
 
 <div class="header">
@@ -138,7 +112,7 @@ button:disabled {
 
 <div id="msg"></div>
 
-<!-- Modal para registrar datos -->
+<!-- modal: datos -->
 <div class="modal" id="modalReclamo">
   <div class="modal-content">
     <h3>Completa tus datos</h3>
@@ -154,7 +128,7 @@ button:disabled {
   </div>
 </div>
 
-<!-- Modal Reclamo Exitoso -->
+<!-- modal: exito -->
 <div class="modal" id="modalExito">
   <div class="modal-content">
     <h2>🎉 Reclamo Exitoso</h2>
@@ -184,13 +158,14 @@ userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
 
 let datosGuardados = false;
 let saldoActual = 0;
+let contadorInterval = null;
 
-// ======= Cargar información del usuario =======
+// Cargar info al entrar
 window.onload = async () => {
   await obtenerSaldoYRestriccion();
 };
 
-// ======= Obtener saldo actual y tiempo restante =======
+// Obtiene saldo y segundos restantes desde servidor
 async function obtenerSaldoYRestriccion() {
   try {
     const formData = new FormData();
@@ -202,14 +177,16 @@ async function obtenerSaldoYRestriccion() {
     const response = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
     const result = await response.json();
 
-    if (result.saldo) {
+    if (result.saldo !== undefined) {
       saldoActual = result.saldo;
       saldoSpan.textContent = saldoActual;
     }
 
-    // 🔹 Si hay tiempo restante, mantener contador
     if (result.waitSeconds && result.waitSeconds > 0) {
-      desactivarBotonTemporal(result.waitSeconds / 3600);
+      desactivarBotonTemporalSegundos(result.waitSeconds);
+    } else {
+      btnReclamar.disabled = false;
+      timerDiv.textContent = '';
     }
 
     if (result.datosGuardados) datosGuardados = true;
@@ -222,13 +199,14 @@ async function obtenerSaldoYRestriccion() {
   }
 }
 
-// ======= Reclamar Endra =======
+// Abrir modal o reclamar directo
 function reclamarEndra() {
   if (datosGuardados) confirmarReclamo();
   else modal.style.display = 'flex';
 }
 function cerrarModal() { modal.style.display = 'none'; }
 
+// Confirmar reclamo (envía al servidor)
 async function confirmarReclamo() {
   const nombre = document.getElementById('nombre').value.trim().toUpperCase();
   const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
@@ -257,10 +235,13 @@ async function confirmarReclamo() {
       mostrarModalExito(result.monto || 10, result.saldo);
       datosGuardados = true;
       cerrarModal();
-      desactivarBotonTemporal(5);
+      // servidor ya registró TS_MS; pedimos segundos restantes = 5 horas
+      desactivarBotonTemporalSegundos(5 * 3600);
     } else {
       msg.textContent = result.message;
       msg.style.color = '#E53935';
+      // si el servidor devolvió waitSeconds, activar el contador con ese valor:
+      if (result.waitSeconds) desactivarBotonTemporalSegundos(result.waitSeconds);
     }
   } catch (error) {
     msg.textContent = 'Error de conexión.';
@@ -269,21 +250,26 @@ async function confirmarReclamo() {
   }
 }
 
-// ======= Modal de éxito =======
+// Modal éxito
 function mostrarModalExito(monto, saldo) {
   document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
   modalExito.style.display = 'flex';
 }
 function cerrarModalExito() { modalExito.style.display = 'none'; }
 
-// ======= Desactivar botón y mostrar contador =======
-function desactivarBotonTemporal(horas) {
+// Desactiva botón y muestra contador (recibe segundos)
+function desactivarBotonTemporalSegundos(segundos) {
+  if (contadorInterval) {
+    clearInterval(contadorInterval);
+    contadorInterval = null;
+  }
+  let restante = Math.ceil(segundos);
   btnReclamar.disabled = true;
-  let restante = horas * 3600;
 
-  const intervalo = setInterval(() => {
+  contadorInterval = setInterval(() => {
     if (restante <= 0) {
-      clearInterval(intervalo);
+      clearInterval(contadorInterval);
+      contadorInterval = null;
       btnReclamar.disabled = false;
       timerDiv.textContent = '';
       msg.textContent = '🎉 Puedes reclamar de nuevo.';
@@ -298,10 +284,10 @@ function desactivarBotonTemporal(horas) {
   }, 1000);
 }
 
-// ======= Cerrar sesión =======
+// Cerrar sesión (redirige al index en GitHub Pages)
 function cerrarSesion() {
   if (confirm("¿Deseas cerrar sesión?")) {
-    // Al cerrar sesión, redirige al login sin borrar los tiempos
+    // Nota: no eliminamos nada del servidor; el TS_MS permanece en Sheets.
     window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
   }
 }
