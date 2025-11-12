@@ -5,13 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Página Principal</title>
 <style>
+/* ======== BASE ======== */
 body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #00B8D4, #4DD0E1);
   margin: 0;
   padding: 0;
   color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
 }
+.container {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* ======== HEADER ======== */
 .header {
   background: white;
   padding: 15px 30px;
@@ -20,30 +31,26 @@ body {
   align-items: center;
   flex-wrap: wrap;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-radius: 0 0 12px 12px;
 }
 .header-left {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex: 1;
-  min-width: 150px;
 }
 .header h2 {
   margin: 0;
   color: #00897B;
   font-weight: bold;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   word-break: break-word;
 }
 .balance {
   font-weight: bold;
   color: #004D40;
-  font-size: 1rem;
+  font-size: 1.1rem;
   text-align: center;
   margin: 5px 0;
-}
-.header > div:last-child {
-  margin-top: 5px;
 }
 button {
   background: #00897B;
@@ -72,7 +79,7 @@ button:disabled {
   font-weight: bold;
 }
 
-/* === MODALES === */
+/* ======== MODALES ======== */
 .modal {
   display: none;
   position: fixed;
@@ -125,7 +132,7 @@ button:disabled {
 #modalCerrar .btn-confirmar { background: #E53935; }
 #modalCerrar .btn-cancelar { background: #00897B; }
 
-/* === ANIMACIONES === */
+/* ======== ANIMACIONES ======== */
 @keyframes fadeIn {
   from { opacity: 0; } to { opacity: 1; }
 }
@@ -134,42 +141,48 @@ button:disabled {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* === RESPONSIVE === */
-@media screen and (max-width: 600px) {
+/* ======== RESPONSIVE ======== */
+@media screen and (max-width: 700px) {
   .header {
     flex-direction: column;
-    align-items: stretch;
     text-align: center;
+    padding: 15px;
   }
-  .header h2 { font-size: 1.2rem; }
-  .balance { font-size: 0.95rem; }
-  button { padding: 10px; font-size: 0.9rem; margin-top: 8px; width: 100%; }
+  .header h2 { font-size: 1.3rem; }
+  .balance { font-size: 1rem; margin-bottom: 10px; }
+  button {
+    padding: 10px;
+    font-size: 0.95rem;
+    width: 100%;
+    margin-top: 6px;
+  }
   .modal-content { width: 95%; max-width: 340px; padding: 20px; }
   input { font-size: 0.9rem; }
 }
 </style>
 </head>
 <body>
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h2 id="userName">Bienvenido</h2>
+    </div>
+    <div class="balance">
+      Endra 💠 <span id="saldo">0</span>
+    </div>
+    <div>
+      <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
+      <div id="timer" class="timer"></div>
+    </div>
+    <div>
+      <button onclick="abrirModalCerrar()">Cerrar sesión</button>
+    </div>
+  </div>
 
-<div class="header">
-  <div class="header-left">
-    <h2 id="userName">Bienvenido</h2>
-  </div>
-  <div class="balance">
-    Endra 💠 <span id="saldo">0</span>
-  </div>
-  <div>
-    <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
-    <div id="timer" class="timer"></div>
-  </div>
-  <div>
-    <button onclick="abrirModalCerrar()">Cerrar sesión</button>
-  </div>
+  <div id="msg"></div>
 </div>
 
-<div id="msg"></div>
-
-<!-- Modal datos -->
+<!-- Modales -->
 <div class="modal" id="modalReclamo">
   <div class="modal-content">
     <h3>Completa tus datos</h3>
@@ -185,7 +198,6 @@ button:disabled {
   </div>
 </div>
 
-<!-- Modal éxito -->
 <div class="modal" id="modalExito">
   <div class="modal-content">
     <h2>🎉 Reclamo Exitoso</h2>
@@ -194,7 +206,6 @@ button:disabled {
   </div>
 </div>
 
-<!-- Modal Cerrar sesión -->
 <div class="modal" id="modalCerrar">
   <div class="modal-content">
     <h2>¿Cerrar sesión?</h2>
@@ -207,9 +218,6 @@ button:disabled {
 </div>
 
 <script>
-// =========================================================
-// CONFIGURACIÓN
-// =========================================================
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 const modal = document.getElementById('modalReclamo');
 const modalExito = document.getElementById('modalExito');
@@ -226,74 +234,41 @@ const phone = urlParams.get('phone');
 
 document.getElementById('correo').value = email || '';
 document.getElementById('celular').value = phone || '';
-
 userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
 
 let datosGuardados = false;
 let saldoActual = 0;
 let contadorInterval = null;
 
-// =========================================================
-// CARGA INICIAL
-// =========================================================
-window.onload = async () => {
-  await obtenerSaldoYRestriccion();
-};
+// ======= Inicio =======
+window.onload = async () => { await obtenerSaldoYRestriccion(); };
 
-// =========================================================
-// CONSULTAR SALDO Y RESTRICCIÓN
-// =========================================================
 async function obtenerSaldoYRestriccion() {
+  const formData = new FormData();
+  formData.append('action', 'reclamo');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  formData.append('check', 'true');
   try {
-    const formData = new FormData();
-    formData.append('action', 'reclamo');
-    formData.append('email', email);
-    formData.append('phone', phone);
-    formData.append('check', 'true');
-
-    const response = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
-    const result = await response.json();
-
-    if (result.saldo !== undefined) {
-      saldoActual = result.saldo;
-      saldoSpan.textContent = saldoActual;
-    }
-
-    if (result.waitSeconds && result.waitSeconds > 0) {
-      desactivarBotonTemporalSegundos(result.waitSeconds);
-    } else {
-      btnReclamar.disabled = false;
-      timerDiv.textContent = '';
-    }
-
+    const r = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
+    const result = await r.json();
+    saldoActual = result.saldo || 0;
+    saldoSpan.textContent = saldoActual;
+    if (result.waitSeconds && result.waitSeconds > 0) desactivarBotonTemporalSegundos(result.waitSeconds);
+    else btnReclamar.disabled = false;
     if (result.datosGuardados) datosGuardados = true;
-    if (result.nombresCompletos) {
-      userNameEl.textContent = result.nombresCompletos.toUpperCase();
-    }
-
-  } catch (e) {
-    console.error(e);
-  }
+    if (result.nombresCompletos) userNameEl.textContent = result.nombresCompletos.toUpperCase();
+  } catch (e) { console.error(e); }
 }
 
-// =========================================================
-// RECLAMO
-// =========================================================
-function reclamarEndra() {
-  if (datosGuardados) confirmarReclamo();
-  else modal.style.display = 'flex';
-}
+function reclamarEndra() { if (datosGuardados) confirmarReclamo(); else modal.style.display = 'flex'; }
 function cerrarModal() { modal.style.display = 'none'; }
 
 async function confirmarReclamo() {
   const nombre = document.getElementById('nombre').value.trim().toUpperCase();
   const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
   const aM = document.getElementById('apellidoM').value.trim().toUpperCase();
-
-  if (!datosGuardados && (!nombre || !aP || !aM)) {
-    alert("Completa tus nombres y apellidos.");
-    return;
-  }
+  if (!datosGuardados && (!nombre || !aP || !aM)) return;
 
   const formData = new FormData();
   formData.append('action', 'reclamo');
@@ -306,7 +281,6 @@ async function confirmarReclamo() {
   try {
     const response = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
     const result = await response.json();
-
     if (result.success) {
       saldoActual = result.saldo;
       saldoSpan.textContent = saldoActual;
@@ -314,21 +288,10 @@ async function confirmarReclamo() {
       datosGuardados = true;
       cerrarModal();
       desactivarBotonTemporalSegundos(5 * 3600);
-    } else {
-      msg.textContent = result.message;
-      msg.style.color = '#E53935';
-      if (result.waitSeconds) desactivarBotonTemporalSegundos(result.waitSeconds);
     }
-  } catch (error) {
-    msg.textContent = 'Error de conexión.';
-    msg.style.color = '#E53935';
-    console.error(error);
-  }
+  } catch (error) { console.error(error); }
 }
 
-// =========================================================
-// MODALES
-// =========================================================
 function mostrarModalExito(monto, saldo) {
   document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
   modalExito.style.display = 'flex';
@@ -339,14 +302,11 @@ function desactivarBotonTemporalSegundos(segundos) {
   if (contadorInterval) clearInterval(contadorInterval);
   let restante = Math.ceil(segundos);
   btnReclamar.disabled = true;
-
   contadorInterval = setInterval(() => {
     if (restante <= 0) {
       clearInterval(contadorInterval);
       btnReclamar.disabled = false;
       timerDiv.textContent = '';
-      msg.textContent = '🎉 Puedes reclamar de nuevo.';
-      msg.style.color = '#00897B';
       return;
     }
     const h = Math.floor(restante / 3600);
@@ -357,9 +317,7 @@ function desactivarBotonTemporalSegundos(segundos) {
   }, 1000);
 }
 
-// =========================================================
-// MODAL CIERRE DE SESIÓN
-// =========================================================
+// ======= Cerrar sesión =======
 function abrirModalCerrar() { modalCerrar.style.display = 'flex'; }
 function cerrarModalCerrar() { modalCerrar.style.display = 'none'; }
 function confirmarCerrarSesion() {
@@ -367,18 +325,15 @@ function confirmarCerrarSesion() {
   window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
 }
 
-// =========================================================
-// BLOQUEO DE INSPECCIÓN / F12 / CLICK DERECHO
-// =========================================================
+// ======= BLOQUEOS =======
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.onkeydown = function(e) {
-  if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") ||
-      (e.ctrlKey && e.shiftKey && e.key === "J") || 
-      (e.ctrlKey && e.key === "U") || 
-      (e.ctrlKey && e.key === "S")) {
-    e.preventDefault();
-    alert("🚫 Función bloqueada por seguridad.");
-    return false;
+  // F12, Ctrl+Shift+I/J, Ctrl+U, Ctrl+S
+  if (e.keyCode === 123 ||
+     (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+     (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83))) {
+      e.preventDefault();
+      return false;
   }
 };
 </script>
