@@ -300,4 +300,11 @@ function desactivarBotonTemporal(horas) {
 
 // ======= Cerrar sesión =======
 function cerrarSesion() {
-  if (confirm("¿
+  if (confirm("¿Deseas cerrar sesión?")) {
+    // Al cerrar sesión, redirige al login sin borrar los tiempos
+    window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
+  }
+}
+</script>
+</body>
+</html>
