@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <title>Panel de Operaciones</title>
+    <style>
+        body {
+            /* Degradado de fondo */
+            background: linear-gradient(135deg, #00B8D4 0%, #4DD0E1 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial;
+            color: #333;
+            flex-direction: column;
+        }
+        .panel {
+            background: white;
+            padding: 40px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        h2 {
+            color: #00897B;
+            margin-bottom: 25px;
+        }
+        .btn-logout {
+            background: #E53935;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-logout:hover {
+            background: #C62828;
+        }
+    </style>
+</head>
+<body>
+
+<div class="panel">
+    <h2>✅ Bienvenido al Panel de Operaciones</h2>
+    <p>¡Has iniciado sesión exitosamente!</p>
+    <p>Aquí es donde iría toda la lógica y la interfaz para las operaciones que deseas realizar.</p>
+    
+    <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+</div>
+
+<script>
+    function logout() {
+        // Redirige al usuario de vuelta a la página principal de login (index.html)
+        // Usamos ScriptApp.getService().getUrl() que apunta a doGet (que sirve index.html por defecto)
+        window.top.location.href = '<?= ScriptApp.getService().getUrl() ?>';
+    }
+</script>
+
+</body>
+</html>
