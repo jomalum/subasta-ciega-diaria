@@ -1,302 +1,198 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Página Principal</title>
-<style>
-/* ======== BASE ======== */
-body {
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(135deg, #00B8D4, #4DD0E1);
-  margin: 0;
-  padding: 0;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-}
-.container {
-  width: 100%;
-  max-width: 1100px;
+// =========================================================
+// CONFIGURACIÓN GLOBAL
+// =========================================================
+const SS_ID = 'TU_ID_DE_HOJA_DE_CALCULO'; // 🔹 Reemplaza con el ID real de tu hoja
+const HOJA_USUARIOS = 'Usuarios';
+const HOJA_OFERTAS = 'Ofertas';
+const TIEMPO_ESPERA_HORAS = 5;
+const MONEDAS_RECLAMO = 10;
+
+// =========================================================
+// FUNCIÓN PRINCIPAL DE ENTRADA (API)
+// =========================================================
+function doPost(e) {
+  const params = e.parameter;
+  const action = params.action;
+
+  if (action === 'login') return handleLogin(params);
+  else if (action === 'reclamo') return handleReclamo(params);
+  else if (action === 'oferta') return handleOferta(params);
+  else if (action === 'listarOfertas') return handleListarOfertas();
+  else return ContentService.createTextOutput(JSON.stringify({ success: false, error: 'Acción no válida' }));
 }
 
-/* ======== HEADER ======== */
-.header {
-  background: white;
-  padding: 15px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  border-radius: 0 0 12px 12px;
-}
-.header h2 {
-  margin: 0;
-  color: #00897B;
-  font-weight: bold;
-  font-size: 1.6rem;
-  word-break: break-word;
-}
-.balance {
-  font-weight: bold;
-  color: #004D40;
-  font-size: 1.1rem;
-  text-align: center;
-  margin: 5px 0;
-}
-button {
-  background: #00897B;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s ease;
-}
-button:hover { background: #00695C; }
-button:disabled {
-  background: #B0BEC5;
-  cursor: not-allowed;
-}
-.timer {
-  margin-top: 8px;
-  color: #004D40;
-  font-size: 14px;
-  font-weight: bold;
-}
-#msg {
-  text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
-}
+// =========================================================
+// FUNCIÓN LOGIN
+// =========================================================
+function handleLogin(params) {
+  const email = params.email?.trim();
+  const phone = params.phone?.trim();
 
-/* ======== SUBASTA ======== */
-#subasta {
-  width: 95%;
-  max-width: 950px;
-  background: rgba(255,255,255,0.9);
-  margin: 40px auto;
-  border-radius: 14px;
-  padding: 25px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-}
-#subasta h2 {
-  text-align: center;
-  color: #00897B;
-  margin-top: 0;
-  font-size: 1.8rem;
-}
-#subasta-contenido {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 40px;
-  flex-wrap: wrap;
-}
-#producto {
-  max-width: 400px;
-  text-align: center;
-}
-#producto img {
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-}
-#producto h3 {
-  color: #004D40;
-  margin-top: 10px;
-}
-#ofertas {
-  flex: 1;
-  max-width: 400px;
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-}
-#ofertas th {
-  background: #E0F2F1;
-  color: #004D40;
-  padding: 8px;
-}
-#ofertas td {
-  padding: 8px;
-  border-bottom: 1px solid #E0E0E0;
-}
-#ofertas input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #00B8D4;
-  border-radius: 6px;
-  margin-top: 5px;
-}
-#oferta-msg {
-  text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-/* ======== RESPONSIVE ======== */
-@media screen and (max-width: 700px) {
-  .header {
-    flex-direction: column;
-    text-align: center;
-    padding: 15px;
+  if (!email || !phone) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Datos incompletos" }));
   }
-  .header h2 { font-size: 1.3rem; }
-  button {
-    padding: 10px;
-    font-size: 0.95rem;
-    width: 100%;
-    margin-top: 6px;
+
+  const ss = SpreadsheetApp.openById(SS_ID);
+  const sh = ss.getSheetByName(HOJA_USUARIOS);
+  const data = sh.getDataRange().getValues();
+  const header = data.shift();
+
+  const idxEmail = header.indexOf("Email");
+  const idxPhone = header.indexOf("Celular");
+  const idxNombre = header.indexOf("Nombres");
+  const idxSaldo = header.indexOf("Saldo");
+
+  let usuario = data.find(r => r[idxEmail] === email && r[idxPhone] === phone);
+  if (!usuario) {
+    sh.appendRow([new Date(), '', '', '', email, phone, 0, '', '']);
+    usuario = [new Date(), '', '', '', email, phone, 0];
   }
-  #ofertas { max-width: 100%; }
-  #producto { max-width: 100%; }
+
+  const saldo = usuario[idxSaldo] || 0;
+  const nombre = usuario[idxNombre] || '';
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ success: true, nombre, saldo })
+  ).setMimeType(ContentService.MimeType.JSON);
 }
-</style>
-</head>
-<body>
-<div class="container">
-  <div class="header">
-    <h2 id="userName">Bienvenido</h2>
-    <div class="balance">Endra 💠 <span id="saldo">0</span></div>
-    <div>
-      <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
-      <div id="timer" class="timer"></div>
-    </div>
-    <div><button onclick="abrirModalCerrar()">Cerrar sesión</button></div>
-  </div>
 
-  <div id="msg"></div>
+// =========================================================
+// FUNCIÓN RECLAMO DE ENDRA
+// =========================================================
+function handleReclamo(params) {
+  const email = params.email?.trim();
+  const phone = params.phone?.trim();
+  const nombre = params.nombres?.trim() || '';
+  const aP = params.apellidoP?.trim() || '';
+  const aM = params.apellidoM?.trim() || '';
+  const check = params.check || 'false';
 
-  <!-- 🔹 SECCIÓN DE SUBASTA -->
-  <section id="subasta">
-    <h2>🔹 Subasta del Día</h2>
-    <div id="subasta-contenido">
-      <div id="producto">
-        <img id="producto-img" src="https://via.placeholder.com/400x250.png?text=Producto+en+Subasta" alt="Producto">
-        <h3 id="producto-titulo">Reloj Inteligente “Endra Fit”</h3>
-      </div>
-      <div id="ofertas">
-        <h4 style="text-align:center; color:#00897B;">🏆 Top 5 Ofertas</h4>
-        <table style="width:100%; border-collapse:collapse;">
-          <thead>
-            <tr><th>Usuario</th><th>Oferta (Endra)</th></tr>
-          </thead>
-          <tbody id="ofertas-body"><tr><td colspan="2" style="text-align:center;">Sin ofertas aún</td></tr></tbody>
-        </table>
-        <div style="margin-top:20px;">
-          <label for="montoOferta" style="color:#004D40;">Tu oferta (Endra):</label>
-          <input type="number" id="montoOferta" min="1">
-          <button onclick="ofrecerEndra()" style="width:100%; margin-top:10px;">Ofrecer</button>
-          <p id="oferta-msg"></p>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
+  const ss = SpreadsheetApp.openById(SS_ID);
+  const sh = ss.getSheetByName(HOJA_USUARIOS);
+  const data = sh.getDataRange().getValues();
+  const header = data.shift();
 
-<!-- 🔹 MODALES (no modificados) -->
-<div class="modal" id="modalReclamo">
-  <div class="modal-content">
-    <h3>Completa tus datos</h3>
-    <input id="nombre" placeholder="NOMBRES">
-    <input id="apellidoP" placeholder="APELLIDO PATERNO">
-    <input id="apellidoM" placeholder="APELLIDO MATERNO">
-    <input id="correo" disabled>
-    <input id="celular" disabled>
-    <div class="modal-footer">
-      <button onclick="confirmarReclamo()">Confirmar</button>
-      <button onclick="cerrarModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
+  const idxEmail = header.indexOf("Email");
+  const idxPhone = header.indexOf("Celular");
+  const idxSaldo = header.indexOf("Saldo");
+  const idxLast = header.indexOf("Ultimo Reclamo");
+  const idxNombre = header.indexOf("Nombres");
+  const idxApP = header.indexOf("Apellido Paterno");
+  const idxApM = header.indexOf("Apellido Materno");
 
-<div class="modal" id="modalExito">
-  <div class="modal-content">
-    <h2>🎉 Reclamo Exitoso</h2>
-    <p id="textoExito"></p>
-    <button onclick="cerrarModalExito()">Cerrar</button>
-  </div>
-</div>
+  let rowIndex = data.findIndex(r => r[idxEmail] === email && r[idxPhone] === phone);
+  if (rowIndex === -1) return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Usuario no encontrado" }));
 
-<div class="modal" id="modalCerrar">
-  <div class="modal-content">
-    <h2>¿Cerrar sesión?</h2>
-    <p>¿Estás seguro de que deseas salir?<br>Tu progreso se mantiene guardado.</p>
-    <div class="modal-footer">
-      <button class="btn-cancelar" onclick="cerrarModalCerrar()">Cancelar</button>
-      <button class="btn-confirmar" onclick="confirmarCerrarSesion()">Cerrar sesión</button>
-    </div>
-  </div>
-</div>
+  const row = rowIndex + 2; // Compensar encabezado
+  const saldo = Number(sh.getRange(row, idxSaldo + 1).getValue() || 0);
+  const last = sh.getRange(row, idxLast + 1).getValue();
+  const now = new Date();
 
-<script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
-const saldoSpan = document.getElementById('saldo');
-const userNameEl = document.getElementById('userName');
-const ofertasBody = document.getElementById('ofertas-body');
-const ofertaMsg = document.getElementById('oferta-msg');
-const montoInput = document.getElementById('montoOferta');
-
-let saldoActual = 0;
-let ofertas = [];
-
-// ============ NUEVO SISTEMA SUBASTA CON GOOGLE SHEETS ============
-async function cargarOfertas() {
-  const formData = new FormData();
-  formData.append('action', 'listarOfertas');
-  const r = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
-  const result = await r.json();
-  if (result.success) {
-    ofertas = result.ofertas;
-    actualizarTablaOfertas();
+  // Si es solo verificación inicial (no reclamo)
+  if (check === 'true') {
+    let waitSeconds = 0;
+    if (last && now - last < TIEMPO_ESPERA_HORAS * 3600000) {
+      waitSeconds = Math.floor((TIEMPO_ESPERA_HORAS * 3600000 - (now - last)) / 1000);
+    }
+    const nombresCompletos = [sh.getRange(row, idxNombre + 1).getValue(),
+                              sh.getRange(row, idxApP + 1).getValue(),
+                              sh.getRange(row, idxApM + 1).getValue()].filter(Boolean).join(' ');
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      saldo,
+      waitSeconds,
+      datosGuardados: !!nombresCompletos,
+      nombresCompletos
+    }));
   }
+
+  // Verifica tiempo de espera
+  if (last && now - last < TIEMPO_ESPERA_HORAS * 3600000) {
+    const falta = Math.floor((TIEMPO_ESPERA_HORAS * 3600000 - (now - last)) / 1000);
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      message: "Debes esperar aún",
+      waitSeconds: falta
+    }));
+  }
+
+  // Guarda datos personales si no existen
+  if (nombre && !sh.getRange(row, idxNombre + 1).getValue()) {
+    sh.getRange(row, idxNombre + 1).setValue(nombre);
+    sh.getRange(row, idxApP + 1).setValue(aP);
+    sh.getRange(row, idxApM + 1).setValue(aM);
+  }
+
+  // Suma monedas
+  const nuevoSaldo = saldo + MONEDAS_RECLAMO;
+  sh.getRange(row, idxSaldo + 1).setValue(nuevoSaldo);
+  sh.getRange(row, idxLast + 1).setValue(now);
+
+  const nombresCompletos = [nombre, aP, aM].filter(Boolean).join(' ');
+
+  return ContentService.createTextOutput(JSON.stringify({
+    success: true,
+    message: "Reclamo exitoso",
+    monto: MONEDAS_RECLAMO,
+    saldo: nuevoSaldo,
+    nombresCompletos
+  }));
 }
-async function ofrecerEndra() {
-  const monto = parseInt(montoInput.value);
-  if (isNaN(monto) || monto <= 0) return;
-  if (monto > saldoActual) {
-    ofertaMsg.textContent = "⚠️ Saldo insuficiente.";
-    ofertaMsg.style.color = "#E53935";
-    return;
-  }
-  saldoActual -= monto;
-  saldoSpan.textContent = saldoActual;
-  const usuario = userNameEl.textContent || "Usuario";
 
-  const formData = new FormData();
-  formData.append('action', 'oferta');
-  formData.append('usuario', usuario);
-  formData.append('monto', monto);
-  const r = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
-  const result = await r.json();
-  if (result.success) {
-    ofertaMsg.textContent = "✅ Oferta registrada correctamente.";
-    ofertaMsg.style.color = "#00897B";
-    montoInput.value = '';
-    cargarOfertas();
+// =========================================================
+// SUBASTA GLOBAL
+// =========================================================
+function handleOferta(params) {
+  const ss = SpreadsheetApp.openById(SS_ID);
+  const sh = ss.getSheetByName(HOJA_OFERTAS);
+
+  const usuario = params.get('usuario');
+  const monto = Number(params.get('monto'));
+
+  if (!usuario || !monto) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false }));
   }
+
+  // Guardamos la oferta
+  sh.appendRow([new Date(), usuario, monto]);
+
+  // También podemos descontar saldo en hoja Usuarios
+  descontarSaldo(usuario, monto);
+
+  return ContentService.createTextOutput(JSON.stringify({ success: true }));
 }
-function actualizarTablaOfertas() {
-  ofertasBody.innerHTML = '';
-  if (ofertas.length === 0) {
-    ofertasBody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Sin ofertas aún</td></tr>`;
-    return;
-  }
-  ofertas.forEach(o=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${o.usuario}</td><td style="text-align:right;">${o.monto}</td>`;
-    ofertasBody.appendChild(tr);
-  });
+
+function handleListarOfertas() {
+  const ss = SpreadsheetApp.openById(SS_ID);
+  const sh = ss.getSheetByName(HOJA_OFERTAS);
+  const data = sh.getDataRange().getValues();
+  data.shift();
+
+  const ofertas = data.map(r => ({ usuario: r[1], monto: Number(r[2]) }));
+  ofertas.sort((a, b) => b.monto - a.monto);
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ success: true, ofertas: ofertas.slice(0, 5) })
+  );
 }
-window.onload = () => {
-  cargarOfertas();
-};
-</script>
-</body>
-</html>
+
+// =========================================================
+// DESCONTAR SALDO AL OFERTAR
+// =========================================================
+function descontarSaldo(nombreUsuario, monto) {
+  const ss = SpreadsheetApp.openById(SS_ID);
+  const sh = ss.getSheetByName(HOJA_USUARIOS);
+  const data = sh.getDataRange().getValues();
+  const header = data.shift();
+
+  const idxNombre = header.indexOf("Nombres");
+  const idxSaldo = header.indexOf("Saldo");
+
+  const i = data.findIndex(r => (r[idxNombre] || '').toString().toUpperCase() === nombreUsuario.toUpperCase());
+  if (i === -1) return;
+
+  const row = i + 2;
+  const saldoActual = Number(sh.getRange(row, idxSaldo + 1).getValue() || 0);
+  const nuevoSaldo = Math.max(0, saldoActual - monto);
+  sh.getRange(row, idxSaldo + 1).setValue(nuevoSaldo);
+}
