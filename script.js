@@ -49,7 +49,7 @@ async function submitRegistration() {
     return;
   }
   
-  // Datos a enviar a Google Apps Script (USANDO FORMDATA COMO ORIGINAL)
+  // Datos a enviar a Google Apps Script (USANDO FORMDATA)
   const formData = new FormData();
   formData.append('action', 'register');
   formData.append('email', email);
@@ -102,7 +102,7 @@ async function login() {
     return;
   }
   
-  // Datos a enviar a Google Apps Script (USANDO FORMDATA COMO ORIGINAL)
+  // Datos a enviar a Google Apps Script (USANDO FORMDATA)
   const formData = new FormData();
   formData.append('action', 'login');
   formData.append('email', email);
