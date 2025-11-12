@@ -19,6 +19,11 @@ body {
   align-items: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .header h2 {
   margin: 0;
   color: #00897B;
@@ -44,8 +49,19 @@ button:disabled {
   background: #B0BEC5;
   cursor: not-allowed;
 }
+.timer {
+  margin-top: 8px;
+  color: #004D40;
+  font-size: 14px;
+  font-weight: bold;
+}
+#msg {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
 
-/* --- Modal --- */
+/* --- Modal genérico --- */
 .modal {
   display: none;
   position: fixed;
@@ -85,16 +101,19 @@ button:disabled {
   margin-top: 15px;
 }
 .modal-footer button { width: 48%; }
-#msg {
+
+/* --- Modal Reclamo Exitoso --- */
+#modalExito .modal-content {
   text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
+  border: 2px solid #00BFA5;
 }
-.timer {
-  margin-top: 8px;
+#modalExito h2 {
+  color: #00796B;
+  margin-bottom: 10px;
+}
+#modalExito p {
+  font-size: 16px;
   color: #004D40;
-  font-size: 14px;
-  font-weight: bold;
 }
 </style>
 </head>
@@ -102,7 +121,9 @@ button:disabled {
 <body>
 
 <div class="header">
-  <h2 id="userName">Bienvenido</h2>
+  <div class="header-left">
+    <h2 id="userName">Bienvenido</h2>
+  </div>
   <div class="balance">
     Endra 💠 <span id="saldo">0</span>
   </div>
@@ -110,11 +131,14 @@ button:disabled {
     <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
     <div id="timer" class="timer"></div>
   </div>
+  <div>
+    <button onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
 </div>
 
 <div id="msg"></div>
 
-<!-- Modal -->
+<!-- Modal para registrar datos -->
 <div class="modal" id="modalReclamo">
   <div class="modal-content">
     <h3>Completa tus datos</h3>
@@ -130,13 +154,24 @@ button:disabled {
   </div>
 </div>
 
+<!-- Modal Reclamo Exitoso -->
+<div class="modal" id="modalExito">
+  <div class="modal-content">
+    <h2>🎉 Reclamo Exitoso</h2>
+    <p id="textoExito"></p>
+    <button onclick="cerrarModalExito()">Cerrar</button>
+  </div>
+</div>
+
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 const modal = document.getElementById('modalReclamo');
-const btnReclamar = document.getElementById('btnReclamar');
+const modalExito = document.getElementById('modalExito');
 const saldoSpan = document.getElementById('saldo');
 const timerDiv = document.getElementById('timer');
 const msg = document.getElementById('msg');
+const userNameEl = document.getElementById('userName');
+const btnReclamar = document.getElementById('btnReclamar');
 
 const urlParams = new URLSearchParams(window.location.search);
 const email = urlParams.get('email');
@@ -145,7 +180,7 @@ const phone = urlParams.get('phone');
 document.getElementById('correo').value = email || '';
 document.getElementById('celular').value = phone || '';
 
-document.getElementById('userName').textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
+userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
 
 let datosGuardados = false;
 let siguienteReclamo = null;
@@ -156,11 +191,11 @@ window.onload = async () => {
   await obtenerSaldoYRestriccion();
 };
 
-// ======= Obtiene saldo actual y estado de reclamo =======
+// ======= Obtener datos del usuario =======
 async function obtenerSaldoYRestriccion() {
   try {
     const formData = new FormData();
-    formData.append('action', 'reclamo'); // usamos la misma acción, pero sin registrar
+    formData.append('action', 'reclamo');
     formData.append('email', email);
     formData.append('phone', phone);
     formData.append('check', 'true');
@@ -172,19 +207,22 @@ async function obtenerSaldoYRestriccion() {
       saldoActual = result.saldo;
       saldoSpan.textContent = saldoActual;
     }
-
     if (result.waitHours && result.waitHours > 0) {
-      siguienteReclamo = new Date(Date.now() + result.waitHours * 3600000);
       desactivarBotonTemporal(result.waitHours);
     }
-
     if (result.datosGuardados) datosGuardados = true;
+
+    // Si tiene nombres guardados, mostrarlos
+    if (result.nombresCompletos) {
+      userNameEl.textContent = result.nombresCompletos.toUpperCase();
+    }
+
   } catch (e) {
     console.error(e);
   }
 }
 
-// ======= Muestra modal solo si no hay datos guardados =======
+// ======= Mostrar modal solo si no hay datos guardados =======
 function reclamarEndra() {
   if (datosGuardados) {
     confirmarReclamo(); // reclamo directo
@@ -192,7 +230,6 @@ function reclamarEndra() {
     modal.style.display = 'flex';
   }
 }
-
 function cerrarModal() { modal.style.display = 'none'; }
 
 // ======= Enviar reclamo =======
@@ -219,10 +256,10 @@ async function confirmarReclamo() {
     const result = await response.json();
 
     if (result.success) {
-      msg.textContent = `✅ ${result.message} | Saldo total: ${result.saldo} Endra.`;
-      msg.style.color = '#00897B';
-      saldoSpan.textContent = result.saldo;
       saldoActual = result.saldo;
+      saldoSpan.textContent = saldoActual;
+      msg.textContent = '';
+      mostrarModalExito(result.monto || 10, result.saldo);
       datosGuardados = true;
       cerrarModal();
       desactivarBotonTemporal(5);
@@ -230,7 +267,6 @@ async function confirmarReclamo() {
       msg.textContent = result.message;
       msg.style.color = '#E53935';
     }
-
   } catch (error) {
     msg.textContent = 'Error de conexión.';
     msg.style.color = '#E53935';
@@ -238,7 +274,14 @@ async function confirmarReclamo() {
   }
 }
 
-// ======= Desactiva botón por X horas con contador =======
+// ======= Modal de éxito =======
+function mostrarModalExito(monto, saldo) {
+  document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
+  modalExito.style.display = 'flex';
+}
+function cerrarModalExito() { modalExito.style.display = 'none'; }
+
+// ======= Desactivar botón por X horas =======
 function desactivarBotonTemporal(horas) {
   btnReclamar.disabled = true;
   let restante = horas * 3600;
@@ -258,6 +301,13 @@ function desactivarBotonTemporal(horas) {
     timerDiv.textContent = `⏳ Próximo reclamo en ${h}h ${m}m ${s}s`;
     restante--;
   }, 1000);
+}
+
+// ======= Cerrar sesión =======
+function cerrarSesion() {
+  if (confirm("¿Deseas cerrar sesión?")) {
+    window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
+  }
 }
 </script>
 </body>
