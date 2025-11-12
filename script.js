@@ -123,7 +123,7 @@ async function login() {
       messageBox.textContent = '✅ ' + result.message + ' Bienvenido!';
       messageBox.style.color = '#00897B'; // Turquesa de éxito
       
-      // ****** CÓDIGO DE REDIRECCIÓN AÑADIDO/MODIFICADO AQUÍ ******
+      // ****** CÓDIGO DE REDIRECCIÓN A LA PÁGINA PRINCIPAL ******
       google.script.run.withSuccessHandler(function(url) {
           window.top.location.href = url;
       }).getWebAppUrlForMainPage();
@@ -138,4 +138,4 @@ async function login() {
     messageBox.style.color = '#E53935';
     console.error('Error:', error);
   }
-} // <-- LLAVE DE CIERRE CORRECTA DE LA FUNCIÓN login()
+}
