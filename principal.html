@@ -61,7 +61,7 @@ button:disabled {
   font-weight: bold;
 }
 
-/* modal */
+/* modal genérico */
 .modal {
   display: none;
   position: fixed;
@@ -79,17 +79,50 @@ button:disabled {
   max-width: 420px;
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
 }
-.modal-content h3 { color:#00897B; margin-top:0; text-align:center;}
-.modal-content input {
-  width:100%; padding:12px; margin:8px 0; border:1px solid #00B8D4; border-radius:6px; text-transform:uppercase; box-sizing:border-box;
+.modal-content h3, .modal-content h2 {
+  color: #00897B;
+  margin-top: 0;
+  text-align: center;
 }
-.modal-footer { display:flex; justify-content:space-between; margin-top:15px;}
-.modal-footer button { width:48%; }
+.modal-content p { text-align: center; color: #004D40; }
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #00B8D4;
+  border-radius: 6px;
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+.modal-footer button { width: 48%; }
 
-/* success modal */
-#modalExito .modal-content { text-align:center; border:2px solid #00BFA5;}
-#modalExito h2 { color:#00796B; margin-bottom:10px;}
-#modalExito p { font-size:16px; color:#004D40;}
+/* Modal éxito */
+#modalExito .modal-content { text-align: center; border: 2px solid #00BFA5; }
+#modalExito h2 { color: #00796B; margin-bottom: 10px; }
+#modalExito p { font-size: 16px; color: #004D40; }
+
+/* Modal cierre sesión */
+#modalCerrar .modal-content {
+  text-align: center;
+  border: 2px solid #FF7043;
+}
+#modalCerrar h2 {
+  color: #D84315;
+}
+#modalCerrar .modal-footer button {
+  width: 48%;
+}
+#modalCerrar .btn-confirmar {
+  background: #E53935;
+}
+#modalCerrar .btn-cancelar {
+  background: #00897B;
+}
 </style>
 </head>
 <body>
@@ -99,20 +132,20 @@ button:disabled {
     <h2 id="userName">Bienvenido</h2>
   </div>
   <div class="balance">
-    Erdna 💠 <span id="saldo">0</span>
+    Endra 💠 <span id="saldo">0</span>
   </div>
   <div>
-    <button id="btnReclamar" onclick="reclamarErdna()">Reclamar Erdna del día</button>
+    <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
     <div id="timer" class="timer"></div>
   </div>
   <div>
-    <button onclick="cerrarSesion()">Cerrar sesión</button>
+    <button onclick="abrirModalCerrar()">Cerrar sesión</button>
   </div>
 </div>
 
 <div id="msg"></div>
 
-<!-- modal: datos -->
+<!-- Modal para registrar datos -->
 <div class="modal" id="modalReclamo">
   <div class="modal-content">
     <h3>Completa tus datos</h3>
@@ -128,7 +161,7 @@ button:disabled {
   </div>
 </div>
 
-<!-- modal: exito -->
+<!-- Modal Reclamo Exitoso -->
 <div class="modal" id="modalExito">
   <div class="modal-content">
     <h2>🎉 Reclamo Exitoso</h2>
@@ -137,10 +170,23 @@ button:disabled {
   </div>
 </div>
 
+<!-- Modal Confirmar Cierre -->
+<div class="modal" id="modalCerrar">
+  <div class="modal-content">
+    <h2>¿Cerrar sesión?</h2>
+    <p>¿Estás seguro de que deseas salir? Podrás volver a ingresar cuando quieras.</p>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="cerrarModalCerrar()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarCerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 const modal = document.getElementById('modalReclamo');
 const modalExito = document.getElementById('modalExito');
+const modalCerrar = document.getElementById('modalCerrar');
 const saldoSpan = document.getElementById('saldo');
 const timerDiv = document.getElementById('timer');
 const msg = document.getElementById('msg');
@@ -160,12 +206,10 @@ let datosGuardados = false;
 let saldoActual = 0;
 let contadorInterval = null;
 
-// Cargar info al entrar
 window.onload = async () => {
   await obtenerSaldoYRestriccion();
 };
 
-// Obtiene saldo y segundos restantes desde servidor
 async function obtenerSaldoYRestriccion() {
   try {
     const formData = new FormData();
@@ -199,14 +243,12 @@ async function obtenerSaldoYRestriccion() {
   }
 }
 
-// Abrir modal o reclamar directo
-function reclamarErdna() {
+function reclamarEndra() {
   if (datosGuardados) confirmarReclamo();
   else modal.style.display = 'flex';
 }
 function cerrarModal() { modal.style.display = 'none'; }
 
-// Confirmar reclamo (envía al servidor)
 async function confirmarReclamo() {
   const nombre = document.getElementById('nombre').value.trim().toUpperCase();
   const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
@@ -235,12 +277,10 @@ async function confirmarReclamo() {
       mostrarModalExito(result.monto || 10, result.saldo);
       datosGuardados = true;
       cerrarModal();
-      // servidor ya registró TS_MS; pedimos segundos restantes = 5 horas
       desactivarBotonTemporalSegundos(5 * 3600);
     } else {
       msg.textContent = result.message;
       msg.style.color = '#E53935';
-      // si el servidor devolvió waitSeconds, activar el contador con ese valor:
       if (result.waitSeconds) desactivarBotonTemporalSegundos(result.waitSeconds);
     }
   } catch (error) {
@@ -250,26 +290,20 @@ async function confirmarReclamo() {
   }
 }
 
-// Modal éxito
 function mostrarModalExito(monto, saldo) {
-  document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Erdna</b>.<br>Tu saldo total es de <b>${saldo} Erdna</b>.`;
+  document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
   modalExito.style.display = 'flex';
 }
 function cerrarModalExito() { modalExito.style.display = 'none'; }
 
-// Desactiva botón y muestra contador (recibe segundos)
 function desactivarBotonTemporalSegundos(segundos) {
-  if (contadorInterval) {
-    clearInterval(contadorInterval);
-    contadorInterval = null;
-  }
+  if (contadorInterval) clearInterval(contadorInterval);
   let restante = Math.ceil(segundos);
   btnReclamar.disabled = true;
 
   contadorInterval = setInterval(() => {
     if (restante <= 0) {
       clearInterval(contadorInterval);
-      contadorInterval = null;
       btnReclamar.disabled = false;
       timerDiv.textContent = '';
       msg.textContent = '🎉 Puedes reclamar de nuevo.';
@@ -284,12 +318,16 @@ function desactivarBotonTemporalSegundos(segundos) {
   }, 1000);
 }
 
-// Cerrar sesión (redirige al index en GitHub Pages)
-function cerrarSesion() {
-  if (confirm("¿Deseas cerrar sesión?")) {
-    // Nota: no eliminamos nada del servidor; el TS_MS permanece en Sheets.
-    window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
-  }
+/* 🔹 NUEVO: Modal de confirmación para cerrar sesión */
+function abrirModalCerrar() {
+  modalCerrar.style.display = 'flex';
+}
+function cerrarModalCerrar() {
+  modalCerrar.style.display = 'none';
+}
+function confirmarCerrarSesion() {
+  modalCerrar.style.display = 'none';
+  window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
 }
 </script>
 </body>
