@@ -13,80 +13,57 @@
     --bg-grad: linear-gradient(135deg, #00B8D4, #4DD0E1);
   }
   html,body{height:100%; margin:0; font-family:"Segoe UI",sans-serif; background:var(--bg-grad); color:#222;}
-  .page{min-height:100%; display:flex; flex-direction:column; align-items:center;
-  padding:18px 12px 40px;}
+  .page{min-height:100%; display:flex; flex-direction:column; align-items:center; padding:18px 12px 40px;}
 
   .container{width:100%; max-width:1100px;}
 
   /* ---------- Header ---------- */
   .header{
-    background:#fff; border-radius:12px;
-  padding:14px 18px;
+    background:#fff; border-radius:12px; padding:14px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     box-shadow:0 4px 14px rgba(0,0,0,.12);
     flex-wrap:wrap;
   }
   .header-left{display:flex; align-items:center; gap:12px; min-width:0;}
-  #userName{margin:0; color:var(--verde);
-  font-weight:700; font-size:1.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  #userName{margin:0; color:var(--verde); font-weight:700; font-size:1.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .balance{font-weight:700; color:var(--verde-osc); font-size:1rem; text-align:center;}
   .actions{display:flex; gap:10px; align-items:center;}
-  button{background:var(--verde); color:#fff; border:0; padding:10px 14px;
-  border-radius:8px; cursor:pointer; font-weight:700;}
+  button{background:var(--verde); color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:700;}
   button:disabled{background:#B0BEC5; cursor:not-allowed;}
   .timer{font-size:0.9rem; color:var(--verde-osc); margin-top:4px; text-align:center;}
-  #msg{margin-top:10px; text-align:center;
-  font-weight:700;}
+  #msg{margin-top:10px; text-align:center; font-weight:700;}
 
   /* ---------- Subasta ---------- */
   #subasta{
     width:100%; max-width:950px; margin:28px auto 0; background:rgba(255,255,255,0.95);
-    border-radius:12px; padding:22px;
-  box-shadow:0 6px 18px rgba(0,0,0,.12);
+    border-radius:12px; padding:22px; box-shadow:0 6px 18px rgba(0,0,0,.12);
   }
   #subasta h2{margin:0 0 12px; text-align:center; color:var(--verde); font-size:1.5rem;}
-  #subasta-contenido{display:flex; gap:32px; justify-content:center; align-items:flex-start;
-  flex-wrap:wrap;}
+  #subasta-contenido{display:flex; gap:32px; justify-content:center; align-items:flex-start; flex-wrap:wrap;}
   #producto{width:100%; max-width:420px; text-align:center;}
-  /* 👈 CAMBIO: Tama\u00f1o fijo y escalado de imagen */
-  #producto img{
-    width:300px; /* Ancho fijo predeterminado */
-    height:300px; /* Alto fijo predeterminado */
-    object-fit: contain; /* Para que la imagen entera sea visible sin recortar */
-    border-radius:12px; 
-    box-shadow:0 4px 12px rgba(0,0,0,.12);
-    margin: 0 auto; /* Centrar imagen */
-    display: block; /* Necesario para que margin: auto funcione */
-  }
-  #producto h3{color:var(--verde-osc);
-  margin:10px 0 0;}
+  #producto img{width:100%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.12);}
+  #producto h3{color:var(--verde-osc); margin:10px 0 0;}
   #ofertas{flex:1; min-width:260px; max-width:420px; background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);}
-  #ofertas h4{margin:0 0 8px; text-align:center;
-  color:var(--verde);}
+  #ofertas h4{margin:0 0 8px; text-align:center; color:var(--verde);}
   table{width:100%; border-collapse:collapse; font-size:0.95rem;}
   th{background:#E0F2F1; color:var(--verde-osc); padding:8px; text-align:left;}
   td{padding:8px; border-bottom:1px solid #eee;}
-  .input-full{width:100%; padding:10px; margin-top:8px; border-radius:8px;
-  border:1px solid var(--turq);}
+  .input-full{width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid var(--turq);}
   .btn-full{width:100%; margin-top:10px; padding:10px;}
   #oferta-msg{margin-top:8px; text-align:center; font-weight:700;}
 
   /* ---------- Modales ---------- */
-  .modal{display:none; position:fixed;
-  inset:0; background:rgba(0,0,0,0.45); z-index:9998; justify-content:center; align-items:center;}
+  .modal{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9998; justify-content:center; align-items:center;}
   .modal.show{display:flex;}
-  .modal-content{background:#fff; border-radius:12px; padding:20px; width:92%; max-width:420px;
-  box-shadow:0 8px 24px rgba(0,0,0,.25);}
+  .modal-content{background:#fff; border-radius:12px; padding:20px; width:92%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,.25);}
   .modal-content h3,.modal-content h2{color:var(--verde); margin:0 0 10px; text-align:center;}
-  .modal-footer{display:flex; gap:10px;
-  margin-top:12px;}
+  .modal-footer{display:flex; gap:10px; margin-top:12px;}
   .modal-footer button{flex:1;}
 
   /* ---------- Responsive ---------- */
   @media (max-width:720px){
     .header{padding:12px;}
-    #subasta{padding:16px;
-  margin:18px 0;}
+    #subasta{padding:16px; margin:18px 0;}
     #subasta-contenido{gap:14px;}
   }
 </style>
@@ -95,6 +72,7 @@
   <div class="page">
     <div class="container">
 
+      <!-- Header -->
       <div class="header" id="headerMain">
         <div class="header-left">
           <h2 id="userName">USUARIO</h2>
@@ -103,8 +81,7 @@
         <div style="display:flex;flex-direction:column;align-items:center;">
           <div class="balance">Endra 💠 <span id="saldo">0</span></div>
           <div id="timer" class="timer"></div>
-      
-    </div>
+        </div>
 
         <div class="actions">
           <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra</button>
@@ -114,14 +91,14 @@
 
       <div id="msg"></div>
 
+      <!-- Subasta -->
       <section id="subasta" aria-label="Subasta del día">
         <h2>🔹 Subasta del Día</h2>
         <div id="subasta-contenido">
-    
           
      <div id="producto">
 
-            <img id="producto-img" src="https://drive.google.com/uc?export=view&id=1S2B7XYCK8ki66GSbdNIzS6n2qdaiS9YG" alt="Producto en subasta">
+            <img id="producto-img" src="https://m.media-amazon.com/images/I/61C33mQWG2L.jpg" alt="Producto en subasta">
 
             <h3 id="producto-titulo">Reloj Inteligente “Endra Fit”</h3>
 
@@ -129,16 +106,14 @@
           
           <div id="ofertas">
             <h4>🏆 Top 5 Ofertas</h4>
-         
-       <table aria-label="Tabla de ofertas">
+            <table aria-label="Tabla de ofertas">
               <thead><tr><th>Usuario</th><th style="text-align:right">Oferta (Endra)</th></tr></thead>
               <tbody id="ofertas-body"><tr><td colspan="2" style="text-align:center;padding:12px;">Sin ofertas aún</td></tr></tbody>
             </table>
 
             <div style="margin-top:12px;">
               <label for="montoOferta" style="color:var(--verde-osc);font-weight:700">Tu oferta (Endra):</label>
-              <input id="montoOferta" 
-  class="input-full" type="number" min="1" placeholder="Ingresa cantidad">
+              <input id="montoOferta" class="input-full" type="number" min="1" placeholder="Ingresa cantidad">
               <button class="btn-full" onclick="ofrecerEndra()">Ofrecer</button>
               <p id="oferta-msg"></p>
             </div>
@@ -149,10 +124,10 @@
     </div>
   </div>
 
+  <!-- Modal: Registro Reclamo -->
   <div class="modal" id="modalReclamo" role="dialog" aria-modal="true">
     <div class="modal-content">
-      
-  <h3>Completa tus datos</h3>
+      <h3>Completa tus datos</h3>
       <input id="nombre" class="input-full" placeholder="NOMBRES" />
       <input id="apellidoP" class="input-full" placeholder="APELLIDO PATERNO" />
       <input id="apellidoM" class="input-full" placeholder="APELLIDO MATERNO" />
@@ -165,8 +140,8 @@
     </div>
   </div>
 
-  <div class="modal" 
-  id="modalExito" role="dialog" aria-modal="true">
+  <!-- Modal: Éxito -->
+  <div class="modal" id="modalExito" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2>🎉 Reclamo Exitoso</h2>
       <p id="textoExito" style="text-align:center;color:var(--verde-osc);font-weight:700"></p>
@@ -174,14 +149,14 @@
     </div>
   </div>
 
+  <!-- Modal: Cerrar sesión -->
   <div class="modal" id="modalCerrar" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2>¿Cerrar sesión?</h2>
       <p style="text-align:center;color:var(--verde-osc)">¿Estás seguro que deseas salir?</p>
       <div class="modal-footer">
         <button onclick="cerrarModalCerrar()" style="background:#00897B">Cancelar</button>
-        <button onclick="confirmarCerrarSesion()" style="background:#E53935">Cerrar 
-  sesión</button>
+        <button onclick="confirmarCerrarSesion()" style="background:#E53935">Cerrar sesión</button>
       </div>
     </div>
   </div>
@@ -189,6 +164,7 @@
 <script>
 /* ----------------- Config ----------------- */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
+
 /* Elements */
 const saldoSpan = document.getElementById('saldo');
 const userNameEl = document.getElementById('userName');
@@ -207,9 +183,11 @@ const celularInput = document.getElementById('celular');
 const ofertasBody = document.getElementById('ofertas-body');
 const ofertaMsg = document.getElementById('oferta-msg');
 const montoInput = document.getElementById('montoOferta');
+
 let saldoActual = 0;
 let datosGuardados = false;
 let contadorInterval = null;
+
 /* Read URL params (email, phone) */
 const urlParams = new URLSearchParams(window.location.search);
 const email = urlParams.get('email') || '';
@@ -225,32 +203,33 @@ window.addEventListener('load', () => {
   obtenerSaldoYRestriccion();
   cargarOfertas();
 });
+
 /* ---------- Obtener saldo y tiempo restante del servidor ---------- */
 async function obtenerSaldoYRestriccion(){
   try{
     const fd = new FormData();
-  fd.append('action','reclamo');
+    fd.append('action','reclamo');
     fd.append('email', email);
     fd.append('phone', phone);
     fd.append('check', 'true');
 
     const res = await fetch(WEB_APP_URL, { method:'POST', body: fd });
-  const data = await res.json();
+    const data = await res.json();
 
     if (data && data.success) {
       saldoActual = Number(data.saldo || 0);
-  saldoSpan.textContent = saldoActual;
+      saldoSpan.textContent = saldoActual;
       datosGuardados = !!data.datosGuardados;
       if (data.nombresCompletos) userNameEl.textContent = data.nombresCompletos.toUpperCase();
-  if (data.waitSeconds && data.waitSeconds > 0) {
+      if (data.waitSeconds && data.waitSeconds > 0) {
         desactivarBotonTemporalSegundos(data.waitSeconds);
-  } else {
+      } else {
         btnReclamar.disabled = false;
-  }
+      }
     } else {
       // En caso la API devuelva success=false (no encontrado), permitimos que el usuario vea el botón (pero backend controla)
       btnReclamar.disabled = false;
-  }
+    }
   }catch(err){
     console.error('Error al obtener saldo:',err);
     btnReclamar.disabled = false;
@@ -264,24 +243,24 @@ function reclamarEndra(){
     confirmarReclamo();
   } else {
     // Rellenar campos correo/celular visibles y abrir modal
-    correoInput.value = email ||
-  '';
+    correoInput.value = email || '';
     celularInput.value = phone || '';
     modalReclamo.classList.add('show');
     modalReclamo.style.display = 'flex';
   }
 }
-function cerrarModal(){ modalReclamo.classList.remove('show'); modalReclamo.style.display='none';
-  }
-/* ---------- Confirmar reclamo: env\u00eda nombres (si existen) y procesa reclamo ---------- */
+function cerrarModal(){ modalReclamo.classList.remove('show'); modalReclamo.style.display='none'; }
+
+/* ---------- Confirmar reclamo: envía nombres (si existen) y procesa reclamo ---------- */
 async function confirmarReclamo(){
   // Si datos no guardados, requerir nombres
   const nombre = document.getElementById('nombre').value.trim().toUpperCase();
   const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
   const aM = document.getElementById('apellidoM').value.trim().toUpperCase();
+
   if (!datosGuardados && (!nombre || !aP || !aM)) {
     alert('Completa tus nombres y apellidos');
-  return;
+    return;
   }
 
   try{
@@ -294,146 +273,119 @@ async function confirmarReclamo(){
     fd.append('apellidoM', aM);
 
     const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
-  const data = await res.json();
+    const data = await res.json();
 
-  if (data && data.success) {
+    if (data && data.success) {
       saldoActual = Number(data.saldo || saldoActual);
       saldoSpan.textContent = saldoActual;
       datosGuardados = true;
       cerrarModal();
-  mostrarModalExito(data.monto || 10, data.saldo);
-      // desactivar bot\u00f3n por 5 horas (servidor ya guard\u00f3 TS_MS, pero ponemos contador fix)
+      mostrarModalExito(data.monto || 10, data.saldo);
+      // desactivar botón por 5 horas (servidor ya guardó TS_MS, pero ponemos contador fix)
       desactivarBotonTemporalSegundos(5 * 3600);
-  } else {
+    } else {
       // Si mensaje de servidor indica tiempo restante, mostrar en msg y activar contador con waitSeconds si existe
       msg.style.color = '#E53935';
-  msg.textContent = data && data.message ? data.message : 'No se pudo procesar reclamo';
+      msg.textContent = data && data.message ? data.message : 'No se pudo procesar reclamo';
       if (data && data.waitSeconds) desactivarBotonTemporalSegundos(data.waitSeconds);
-  }
+    }
   }catch(err){
     console.error('Error confirmarReclamo',err);
     msg.style.color = '#E53935';
-    msg.textContent = 'Error de conexi\u00f3n.';
+    msg.textContent = 'Error de conexión.';
   }
 }
 
-/* ---------- Modal \u00e9xito ---------- */
+/* ---------- Modal éxito ---------- */
 function mostrarModalExito(monto, saldo){
   const texto = document.getElementById('textoExito');
   texto.innerHTML = `Has ganado <b>${monto}</b> Endra.<br>Saldo total: <b>${saldo}</b> Endra.`;
-  modalExito.classList.add('show');
-  modalExito.style.display='flex';
+  modalExito.classList.add('show'); modalExito.style.display='flex';
 }
-function cerrarModalExito(){
-  modalExito.classList.remove('show');
-  modalExito.style.display='none';
-  obtenerSaldoYRestriccion(); // Recargar saldo por si el reclamo cambi\u00f3 los datos
-}
+function cerrarModalExito(){ modalExito.classList.remove('show'); modalExito.style.display='none'; }
 
-/* ---------- Desactivar bot\u00f3n y mostrar contador (segundos) ---------- */
-function desactivarBotonTemporalSegundos(segundos) {
+/* ---------- Desactivar botón y mostrar contador (segundos) ---------- */
+function desactivarBotonTemporalSegundos(segundos){
+  // Limpia intervalos previos
+  if (contadorInterval) { clearInterval(contadorInterval); contadorInterval = null; }
+  let restante = Math.ceil(Number(segundos) || 0);
+  if (restante <= 0) { btnReclamar.disabled = false; timerDiv.textContent=''; return; }
   btnReclamar.disabled = true;
-  clearInterval(contadorInterval);
-
-  let segundosRestantes = segundos;
-
-  function actualizarContador() {
-    if (segundosRestantes <= 0) {
-      clearInterval(contadorInterval);
-      timerDiv.textContent = 'Listo para reclamar!';
-      btnReclamar.disabled = false;
+  updateTimerText(restante);
+  contadorInterval = setInterval(()=>{
+    restante--;
+    if (restante <= 0) {
+      clearInterval(contadorInterval); contadorInterval=null;
+      btnReclamar.disabled = false; timerDiv.textContent=''; msg.textContent='🎉 Puedes reclamar de nuevo.';
+      msg.style.color = 'var(--verde-osc)';
       return;
     }
-
-    const horas = Math.floor(segundosRestantes / 3600);
-    const minutos = Math.floor((segundosRestantes % 3600) / 60);
-    const segs = segundosRestantes % 60;
-
-    const h = String(horas).padStart(2, '0');
-    const m = String(minutos).padStart(2, '0');
-    const s = String(segs).padStart(2, '0');
-
-    timerDiv.textContent = `Disponible en: ${h}:${m}:${s}`;
-    segundosRestantes--;
-  }
-
-  actualizarContador();
-  contadorInterval = setInterval(actualizarContador, 1000);
+    updateTimerText(restante);
+  },1000);
+}
+function updateTimerText(seg){
+  const h = Math.floor(seg/3600);
+  const m = Math.floor((seg%3600)/60);
+  const s = Math.floor(seg%60);
+  timerDiv.textContent = `⏳ Próximo reclamo en ${h}h ${m}m ${s}s`;
 }
 
-
-/* ---------- Cerrar sesi\u00f3n ---------- */
-function abrirModalCerrar(){
-  modalCerrar.classList.add('show');
-  modalCerrar.style.display = 'flex';
-}
-function cerrarModalCerrar(){
-  modalCerrar.classList.remove('show');
-  modalCerrar.style.display = 'none';
-}
+/* ---------- Cerrar sesión modal ---------- */
+function abrirModalCerrar(){ modalCerrar.classList.add('show'); modalCerrar.style.display='flex'; }
+function cerrarModalCerrar(){ modalCerrar.classList.remove('show'); modalCerrar.style.display='none'; }
 function confirmarCerrarSesion(){
   cerrarModalCerrar();
   // Redirigir al index (ajusta la ruta si la tienes en otra carpeta)
   window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
 }
 
-
 /* ================== SUBASTA ================== */
-
 /* Carga top5 desde servidor (Sheets) */
 async function cargarOfertas(){
   try{
-    const fd = new FormData();
-  fd.append('action','listarOfertas');
+    const fd = new FormData(); fd.append('action','listarOfertas');
     const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
     const data = await res.json();
     if (data && data.success) {
       renderOfertas(data.ofertas || []);
-  }
+    }
   }catch(err){
     console.error('Error cargarOfertas',err);
   }
 }
-
 function renderOfertas(ofertas){
   ofertasBody.innerHTML = '';
   if (!ofertas || ofertas.length===0){
-    ofertasBody.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:12px;">Sin ofertas a\u00fan</td></tr>`;
+    ofertasBody.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:12px;">Sin ofertas aún</td></tr>`;
     return;
   }
   ofertas.forEach(o=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="max-width:220px; overflow:hidden; text-overflow:ellipsis;">${o.usuario}</td> <td style="text-align:right">${o.monto}</td>`;
+    tr.innerHTML = `<td style="max-width:220px; overflow:hidden; text-overflow:ellipsis;">${o.usuario}</td>
+                    <td style="text-align:right">${o.monto}</td>`;
     ofertasBody.appendChild(tr);
   });
 }
 
-/* Enviar oferta al servidor */
+/* Ofertar: valida saldo local y envía al servidor */
 async function ofrecerEndra(){
-  ofertaMsg.textContent = '';
-  const monto = Number(montoInput.value);
-
-  if (isNaN(monto) || monto <= 0) {
-    ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = 'Ingresa un monto de oferta v\u00e1lido (mayor a 0).';
-    return;
-  }
-
+  const monto = parseInt(montoInput.value,10);
+  if (!monto || monto <= 0) return;
   if (monto > saldoActual) {
     ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = `Tu saldo (${saldoActual} Endra) es insuficiente.`;
+    ofertaMsg.textContent = '⚠️ Saldo insuficiente.';
     return;
   }
 
-  // Descontar saldo localmente
-  saldoActual -= monto;
+  // Resta localmente (interfaz inmediata)
+  saldoActual = Math.max(0, saldoActual - monto);
   saldoSpan.textContent = saldoActual;
 
   // Enviar oferta al servidor
   try{
     const fd = new FormData();
     fd.append('action','oferta');
-    // enviamos usuario en may\u00fascula para consistencia
+    // enviamos usuario en mayúscula para consistencia
     const usuario = userNameEl.textContent ? userNameEl.textContent.toUpperCase() : 'USUARIO';
     fd.append('usuario', usuario);
     fd.append('monto', monto);
@@ -449,19 +401,23 @@ async function ofrecerEndra(){
     } else {
       ofertaMsg.style.color = '#E53935';
       ofertaMsg.textContent = (data && data.message) ? data.message : 'Error al registrar oferta.';
-      // si falla, revertir saldo local para evitar p\u00e9rdida visual
-      // (mejor pedir recarga del saldo desde servidor, pero revertimos aqu\u00ed)
+      // si falla, revertir saldo local para evitar pérdida visual
+      // (mejor pedir recarga del saldo desde servidor, pero revertimos aquí)
       // recargar saldo desde servidor:
       obtenerSaldoYRestriccion();
     }
   }catch(err){
     console.error('Error ofrecerEndra',err);
     ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = 'Error de conexi\u00f3n.';
+    ofertaMsg.textContent = 'Error de conexión.';
     obtenerSaldoYRestriccion();
   }
 }
 
+/* Opcional: refrescar ofertas cada X segundos (15s) para ver cambios sin recargar */
+let refrescoOfertasInterval = setInterval(() => { cargarOfertas(); }, 15000);
+
+/* ----------------- Fin ----------------- */
 </script>
 </body>
 </html>
