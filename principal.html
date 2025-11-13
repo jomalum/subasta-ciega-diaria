@@ -1,423 +1,344 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Página Principal</title>
 <style>
-  /* ---------- Base ---------- */
-  :root{
-    --verde:#00897B;
-    --verde-osc:#004D40;
-    --turq:#00B8D4;
-    --bg-grad: linear-gradient(135deg, #00B8D4, #4DD0E1);
+/* ======== BASE ======== */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #00B8D4, #4DD0E1);
+  margin: 0;
+  padding: 0;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+.container {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* ======== HEADER ======== */
+.header {
+  background: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-radius: 0 0 12px 12px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header h2 {
+  margin: 0;
+  color: #00897B;
+  font-weight: bold;
+  font-size: 1.6rem;
+  word-break: break-word;
+}
+.balance {
+  font-weight: bold;
+  color: #004D40;
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 5px 0;
+}
+button {
+  background: #00897B;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+button:hover { background: #00695C; }
+button:disabled {
+  background: #B0BEC5;
+  cursor: not-allowed;
+}
+.timer {
+  margin-top: 8px;
+  color: #004D40;
+  font-size: 14px;
+  font-weight: bold;
+}
+#msg {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* ======== MODALES ======== */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+  animation: slideUp 0.3s ease;
+}
+.modal-content h3, .modal-content h2 {
+  color: #00897B;
+  margin-top: 0;
+  text-align: center;
+}
+.modal-content p { text-align: center; color: #004D40; }
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #00B8D4;
+  border-radius: 6px;
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+.modal-footer button { width: 48%; }
+
+/* Modal éxito */
+#modalExito .modal-content { text-align: center; border: 2px solid #00BFA5; }
+#modalExito h2 { color: #00796B; margin-bottom: 10px; }
+#modalExito p { font-size: 16px; color: #004D40; }
+
+/* Modal cierre sesión */
+#modalCerrar .modal-content { text-align: center; border: 2px solid #FF7043; }
+#modalCerrar h2 { color: #D84315; }
+#modalCerrar .btn-confirmar { background: #E53935; }
+#modalCerrar .btn-cancelar { background: #00897B; }
+
+/* ======== ANIMACIONES ======== */
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ======== RESPONSIVE ======== */
+@media screen and (max-width: 700px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
   }
-  html,body{height:100%; margin:0; font-family:"Segoe UI",sans-serif; background:var(--bg-grad); color:#222;}
-  .page{min-height:100%; display:flex; flex-direction:column; align-items:center; padding:18px 12px 40px;}
-
-  .container{width:100%; max-width:1100px;}
-
-  /* ---------- Header ---------- */
-  .header{
-    background:#fff; border-radius:12px; padding:14px 18px;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    box-shadow:0 4px 14px rgba(0,0,0,.12);
-    flex-wrap:wrap;
+  .header h2 { font-size: 1.3rem; }
+  .balance { font-size: 1rem; margin-bottom: 10px; }
+  button {
+    padding: 10px;
+    font-size: 0.95rem;
+    width: 100%;
+    margin-top: 6px;
   }
-  .header-left{display:flex; align-items:center; gap:12px; min-width:0;}
-  #userName{margin:0; color:var(--verde); font-weight:700; font-size:1.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .balance{font-weight:700; color:var(--verde-osc); font-size:1rem; text-align:center;}
-  .actions{display:flex; gap:10px; align-items:center;}
-  button{background:var(--verde); color:#fff; border:0; padding:10px 14px; border-radius:8px; cursor:pointer; font-weight:700;}
-  button:disabled{background:#B0BEC5; cursor:not-allowed;}
-  .timer{font-size:0.9rem; color:var(--verde-osc); margin-top:4px; text-align:center;}
-  #msg{margin-top:10px; text-align:center; font-weight:700;}
-
-  /* ---------- Subasta ---------- */
-  #subasta{
-    width:100%; max-width:950px; margin:28px auto 0; background:rgba(255,255,255,0.95);
-    border-radius:12px; padding:22px; box-shadow:0 6px 18px rgba(0,0,0,.12);
-  }
-  #subasta h2{margin:0 0 12px; text-align:center; color:var(--verde); font-size:1.5rem;}
-  #subasta-contenido{display:flex; gap:32px; justify-content:center; align-items:flex-start; flex-wrap:wrap;}
-  #producto{width:100%; max-width:420px; text-align:center;}
-  #producto img{width:100%; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.12);}
-  #producto h3{color:var(--verde-osc); margin:10px 0 0;}
-  #ofertas{flex:1; min-width:260px; max-width:420px; background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);}
-  #ofertas h4{margin:0 0 8px; text-align:center; color:var(--verde);}
-  table{width:100%; border-collapse:collapse; font-size:0.95rem;}
-  th{background:#E0F2F1; color:var(--verde-osc); padding:8px; text-align:left;}
-  td{padding:8px; border-bottom:1px solid #eee;}
-  .input-full{width:100%; padding:10px; margin-top:8px; border-radius:8px; border:1px solid var(--turq);}
-  .btn-full{width:100%; margin-top:10px; padding:10px;}
-  #oferta-msg{margin-top:8px; text-align:center; font-weight:700;}
-
-  /* ---------- Modales ---------- */
-  .modal{display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9998; justify-content:center; align-items:center;}
-  .modal.show{display:flex;}
-  .modal-content{background:#fff; border-radius:12px; padding:20px; width:92%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,.25);}
-  .modal-content h3,.modal-content h2{color:var(--verde); margin:0 0 10px; text-align:center;}
-  .modal-footer{display:flex; gap:10px; margin-top:12px;}
-  .modal-footer button{flex:1;}
-
-  /* ---------- Responsive ---------- */
-  @media (max-width:720px){
-    .header{padding:12px;}
-    #subasta{padding:16px; margin:18px 0;}
-    #subasta-contenido{gap:14px;}
-  }
+  .modal-content { width: 95%; max-width: 340px; padding: 20px; }
+  input { font-size: 0.9rem; }
+}
 </style>
 </head>
 <body>
-  <div class="page">
-    <div class="container">
-
-      <!-- Header -->
-      <div class="header" id="headerMain">
-        <div class="header-left">
-          <h2 id="userName">USUARIO</h2>
-        </div>
-
-        <div style="display:flex;flex-direction:column;align-items:center;">
-          <div class="balance">Endra 💠 <span id="saldo">0</span></div>
-          <div id="timer" class="timer"></div>
-        </div>
-
-        <div class="actions">
-          <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra</button>
-          <button id="btnCerrar" onclick="abrirModalCerrar()">Cerrar sesión</button>
-        </div>
-      </div>
-
-      <div id="msg"></div>
-
-      <!-- Subasta -->
-      <section id="subasta" aria-label="Subasta del día">
-        <h2>🔹 Subasta del Día</h2>
-        <div id="subasta-contenido">
-          
-     <div id="producto">
-
-            <img id="producto-img" src="https://m.media-amazon.com/images/I/61C33mQWG2L.jpg" alt="Producto en subasta">
-
-            <h3 id="producto-titulo">Reloj Inteligente “Endra Fit”</h3>
-
-          </div>
-          
-          <div id="ofertas">
-            <h4>🏆 Top 5 Ofertas</h4>
-            <table aria-label="Tabla de ofertas">
-              <thead><tr><th>Usuario</th><th style="text-align:right">Oferta (Endra)</th></tr></thead>
-              <tbody id="ofertas-body"><tr><td colspan="2" style="text-align:center;padding:12px;">Sin ofertas aún</td></tr></tbody>
-            </table>
-
-            <div style="margin-top:12px;">
-              <label for="montoOferta" style="color:var(--verde-osc);font-weight:700">Tu oferta (Endra):</label>
-              <input id="montoOferta" class="input-full" type="number" min="1" placeholder="Ingresa cantidad">
-              <button class="btn-full" onclick="ofrecerEndra()">Ofrecer</button>
-              <p id="oferta-msg"></p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h2 id="userName">Bienvenido</h2>
+    </div>
+    <div class="balance">
+      Endra 💠 <span id="saldo">0</span>
+    </div>
+    <div>
+      <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
+      <div id="timer" class="timer"></div>
+    </div>
+    <div>
+      <button onclick="abrirModalCerrar()">Cerrar sesión</button>
     </div>
   </div>
 
-  <!-- Modal: Registro Reclamo -->
-  <div class="modal" id="modalReclamo" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h3>Completa tus datos</h3>
-      <input id="nombre" class="input-full" placeholder="NOMBRES" />
-      <input id="apellidoP" class="input-full" placeholder="APELLIDO PATERNO" />
-      <input id="apellidoM" class="input-full" placeholder="APELLIDO MATERNO" />
-      <input id="correo" class="input-full" disabled />
-      <input id="celular" class="input-full" disabled />
-      <div class="modal-footer">
-        <button onclick="confirmarReclamo()">Confirmar</button>
-        <button onclick="cerrarModal()">Cancelar</button>
-      </div>
-    </div>
-  </div>
+  <div id="msg"></div>
+</div>
 
-  <!-- Modal: Éxito -->
-  <div class="modal" id="modalExito" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h2>🎉 Reclamo Exitoso</h2>
-      <p id="textoExito" style="text-align:center;color:var(--verde-osc);font-weight:700"></p>
-      <div style="margin-top:12px;"><button onclick="cerrarModalExito()">Cerrar</button></div>
+<!-- Modales -->
+<div class="modal" id="modalReclamo">
+  <div class="modal-content">
+    <h3>Completa tus datos</h3>
+    <input id="nombre" placeholder="NOMBRES">
+    <input id="apellidoP" placeholder="APELLIDO PATERNO">
+    <input id="apellidoM" placeholder="APELLIDO MATERNO">
+    <input id="correo" disabled>
+    <input id="celular" disabled>
+    <div class="modal-footer">
+      <button onclick="confirmarReclamo()">Confirmar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
     </div>
   </div>
+</div>
 
-  <!-- Modal: Cerrar sesión -->
-  <div class="modal" id="modalCerrar" role="dialog" aria-modal="true">
-    <div class="modal-content">
-      <h2>¿Cerrar sesión?</h2>
-      <p style="text-align:center;color:var(--verde-osc)">¿Estás seguro que deseas salir?</p>
-      <div class="modal-footer">
-        <button onclick="cerrarModalCerrar()" style="background:#00897B">Cancelar</button>
-        <button onclick="confirmarCerrarSesion()" style="background:#E53935">Cerrar sesión</button>
-      </div>
+<div class="modal" id="modalExito">
+  <div class="modal-content">
+    <h2>🎉 Reclamo Exitoso</h2>
+    <p id="textoExito"></p>
+    <button onclick="cerrarModalExito()">Cerrar</button>
+  </div>
+</div>
+
+<div class="modal" id="modalCerrar">
+  <div class="modal-content">
+    <h2>¿Cerrar sesión?</h2>
+    <p>¿Estás seguro de que deseas salir?<br>Tu progreso se mantiene guardado.</p>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="cerrarModalCerrar()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarCerrarSesion()">Cerrar sesión</button>
     </div>
   </div>
+</div>
 
 <script>
-/* ----------------- Config ----------------- */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
-
-/* Elements */
-const saldoSpan = document.getElementById('saldo');
-const userNameEl = document.getElementById('userName');
-const timerDiv = document.getElementById('timer');
-const msg = document.getElementById('msg');
-const btnReclamar = document.getElementById('btnReclamar');
-
-const modalReclamo = document.getElementById('modalReclamo');
+const modal = document.getElementById('modalReclamo');
 const modalExito = document.getElementById('modalExito');
 const modalCerrar = document.getElementById('modalCerrar');
+const saldoSpan = document.getElementById('saldo');
+const timerDiv = document.getElementById('timer');
+const msg = document.getElementById('msg');
+const userNameEl = document.getElementById('userName');
+const btnReclamar = document.getElementById('btnReclamar');
 
-const correoInput = document.getElementById('correo');
-const celularInput = document.getElementById('celular');
+const urlParams = new URLSearchParams(window.location.search);
+const email = urlParams.get('email');
+const phone = urlParams.get('phone');
 
-/* Subasta elements */
-const ofertasBody = document.getElementById('ofertas-body');
-const ofertaMsg = document.getElementById('oferta-msg');
-const montoInput = document.getElementById('montoOferta');
+document.getElementById('correo').value = email || '';
+document.getElementById('celular').value = phone || '';
+userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
 
-let saldoActual = 0;
 let datosGuardados = false;
+let saldoActual = 0;
 let contadorInterval = null;
 
-/* Read URL params (email, phone) */
-const urlParams = new URLSearchParams(window.location.search);
-const email = urlParams.get('email') || '';
-const phone = urlParams.get('phone') || '';
+// ======= Inicio =======
+window.onload = async () => { await obtenerSaldoYRestriccion(); };
 
-/* Inicializa valores visibles */
-if (email) correoInput.value = email;
-if (phone) celularInput.value = phone;
-userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "USUARIO";
-
-/* ---------- Startup ---------- */
-window.addEventListener('load', () => {
-  obtenerSaldoYRestriccion();
-  cargarOfertas();
-});
-
-/* ---------- Obtener saldo y tiempo restante del servidor ---------- */
-async function obtenerSaldoYRestriccion(){
-  try{
-    const fd = new FormData();
-    fd.append('action','reclamo');
-    fd.append('email', email);
-    fd.append('phone', phone);
-    fd.append('check', 'true');
-
-    const res = await fetch(WEB_APP_URL, { method:'POST', body: fd });
-    const data = await res.json();
-
-    if (data && data.success) {
-      saldoActual = Number(data.saldo || 0);
-      saldoSpan.textContent = saldoActual;
-      datosGuardados = !!data.datosGuardados;
-      if (data.nombresCompletos) userNameEl.textContent = data.nombresCompletos.toUpperCase();
-      if (data.waitSeconds && data.waitSeconds > 0) {
-        desactivarBotonTemporalSegundos(data.waitSeconds);
-      } else {
-        btnReclamar.disabled = false;
-      }
-    } else {
-      // En caso la API devuelva success=false (no encontrado), permitimos que el usuario vea el botón (pero backend controla)
-      btnReclamar.disabled = false;
-    }
-  }catch(err){
-    console.error('Error al obtener saldo:',err);
-    btnReclamar.disabled = false;
-  }
+async function obtenerSaldoYRestriccion() {
+  const formData = new FormData();
+  formData.append('action', 'reclamo');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  formData.append('check', 'true');
+  try {
+    const r = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
+    const result = await r.json();
+    saldoActual = result.saldo || 0;
+    saldoSpan.textContent = saldoActual;
+    if (result.waitSeconds && result.waitSeconds > 0) desactivarBotonTemporalSegundos(result.waitSeconds);
+    else btnReclamar.disabled = false;
+    if (result.datosGuardados) datosGuardados = true;
+    if (result.nombresCompletos) userNameEl.textContent = result.nombresCompletos.toUpperCase();
+  } catch (e) { console.error(e); }
 }
 
-/* ---------- Reclamar Endra (abrir modal o directamente confirmar) ---------- */
-function reclamarEndra(){
-  if (datosGuardados) {
-    // Si ya tiene datos guardados, confirmar de inmediato
-    confirmarReclamo();
-  } else {
-    // Rellenar campos correo/celular visibles y abrir modal
-    correoInput.value = email || '';
-    celularInput.value = phone || '';
-    modalReclamo.classList.add('show');
-    modalReclamo.style.display = 'flex';
-  }
-}
-function cerrarModal(){ modalReclamo.classList.remove('show'); modalReclamo.style.display='none'; }
+function reclamarEndra() { if (datosGuardados) confirmarReclamo(); else modal.style.display = 'flex'; }
+function cerrarModal() { modal.style.display = 'none'; }
 
-/* ---------- Confirmar reclamo: envía nombres (si existen) y procesa reclamo ---------- */
-async function confirmarReclamo(){
-  // Si datos no guardados, requerir nombres
+async function confirmarReclamo() {
   const nombre = document.getElementById('nombre').value.trim().toUpperCase();
   const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
   const aM = document.getElementById('apellidoM').value.trim().toUpperCase();
+  if (!datosGuardados && (!nombre || !aP || !aM)) return;
 
-  if (!datosGuardados && (!nombre || !aP || !aM)) {
-    alert('Completa tus nombres y apellidos');
-    return;
-  }
+  const formData = new FormData();
+  formData.append('action', 'reclamo');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  formData.append('nombres', nombre);
+  formData.append('apellidoP', aP);
+  formData.append('apellidoM', aM);
 
-  try{
-    const fd = new FormData();
-    fd.append('action','reclamo');
-    fd.append('email', email);
-    fd.append('phone', phone);
-    fd.append('nombres', nombre);
-    fd.append('apellidoP', aP);
-    fd.append('apellidoM', aM);
-
-    const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
-    const data = await res.json();
-
-    if (data && data.success) {
-      saldoActual = Number(data.saldo || saldoActual);
+  try {
+    const response = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
+    const result = await response.json();
+    if (result.success) {
+      saldoActual = result.saldo;
       saldoSpan.textContent = saldoActual;
+      mostrarModalExito(result.monto || 10, result.saldo);
       datosGuardados = true;
       cerrarModal();
-      mostrarModalExito(data.monto || 10, data.saldo);
-      // desactivar botón por 5 horas (servidor ya guardó TS_MS, pero ponemos contador fix)
       desactivarBotonTemporalSegundos(5 * 3600);
-    } else {
-      // Si mensaje de servidor indica tiempo restante, mostrar en msg y activar contador con waitSeconds si existe
-      msg.style.color = '#E53935';
-      msg.textContent = data && data.message ? data.message : 'No se pudo procesar reclamo';
-      if (data && data.waitSeconds) desactivarBotonTemporalSegundos(data.waitSeconds);
     }
-  }catch(err){
-    console.error('Error confirmarReclamo',err);
-    msg.style.color = '#E53935';
-    msg.textContent = 'Error de conexión.';
-  }
+  } catch (error) { console.error(error); }
 }
 
-/* ---------- Modal éxito ---------- */
-function mostrarModalExito(monto, saldo){
-  const texto = document.getElementById('textoExito');
-  texto.innerHTML = `Has ganado <b>${monto}</b> Endra.<br>Saldo total: <b>${saldo}</b> Endra.`;
-  modalExito.classList.add('show'); modalExito.style.display='flex';
+function mostrarModalExito(monto, saldo) {
+  document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
+  modalExito.style.display = 'flex';
 }
-function cerrarModalExito(){ modalExito.classList.remove('show'); modalExito.style.display='none'; }
+function cerrarModalExito() { modalExito.style.display = 'none'; }
 
-/* ---------- Desactivar botón y mostrar contador (segundos) ---------- */
-function desactivarBotonTemporalSegundos(segundos){
-  // Limpia intervalos previos
-  if (contadorInterval) { clearInterval(contadorInterval); contadorInterval = null; }
-  let restante = Math.ceil(Number(segundos) || 0);
-  if (restante <= 0) { btnReclamar.disabled = false; timerDiv.textContent=''; return; }
+function desactivarBotonTemporalSegundos(segundos) {
+  if (contadorInterval) clearInterval(contadorInterval);
+  let restante = Math.ceil(segundos);
   btnReclamar.disabled = true;
-  updateTimerText(restante);
-  contadorInterval = setInterval(()=>{
-    restante--;
+  contadorInterval = setInterval(() => {
     if (restante <= 0) {
-      clearInterval(contadorInterval); contadorInterval=null;
-      btnReclamar.disabled = false; timerDiv.textContent=''; msg.textContent='🎉 Puedes reclamar de nuevo.';
-      msg.style.color = 'var(--verde-osc)';
+      clearInterval(contadorInterval);
+      btnReclamar.disabled = false;
+      timerDiv.textContent = '';
       return;
     }
-    updateTimerText(restante);
-  },1000);
-}
-function updateTimerText(seg){
-  const h = Math.floor(seg/3600);
-  const m = Math.floor((seg%3600)/60);
-  const s = Math.floor(seg%60);
-  timerDiv.textContent = `⏳ Próximo reclamo en ${h}h ${m}m ${s}s`;
+    const h = Math.floor(restante / 3600);
+    const m = Math.floor((restante % 3600) / 60);
+    const s = Math.floor(restante % 60);
+    timerDiv.textContent = `⏳ Próximo reclamo en ${h}h ${m}m ${s}s`;
+    restante--;
+  }, 1000);
 }
 
-/* ---------- Cerrar sesión modal ---------- */
-function abrirModalCerrar(){ modalCerrar.classList.add('show'); modalCerrar.style.display='flex'; }
-function cerrarModalCerrar(){ modalCerrar.classList.remove('show'); modalCerrar.style.display='none'; }
-function confirmarCerrarSesion(){
-  cerrarModalCerrar();
-  // Redirigir al index (ajusta la ruta si la tienes en otra carpeta)
+// ======= Cerrar sesión =======
+function abrirModalCerrar() { modalCerrar.style.display = 'flex'; }
+function cerrarModalCerrar() { modalCerrar.style.display = 'none'; }
+function confirmarCerrarSesion() {
+  modalCerrar.style.display = 'none';
   window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
 }
 
-/* ================== SUBASTA ================== */
-/* Carga top5 desde servidor (Sheets) */
-async function cargarOfertas(){
-  try{
-    const fd = new FormData(); fd.append('action','listarOfertas');
-    const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
-    const data = await res.json();
-    if (data && data.success) {
-      renderOfertas(data.ofertas || []);
-    }
-  }catch(err){
-    console.error('Error cargarOfertas',err);
+// ======= BLOQUEOS =======
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = function(e) {
+  // F12, Ctrl+Shift+I/J, Ctrl+U, Ctrl+S
+  if (e.keyCode === 123 ||
+     (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+     (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83))) {
+      e.preventDefault();
+      return false;
   }
-}
-function renderOfertas(ofertas){
-  ofertasBody.innerHTML = '';
-  if (!ofertas || ofertas.length===0){
-    ofertasBody.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:12px;">Sin ofertas aún</td></tr>`;
-    return;
-  }
-  ofertas.forEach(o=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="max-width:220px; overflow:hidden; text-overflow:ellipsis;">${o.usuario}</td>
-                    <td style="text-align:right">${o.monto}</td>`;
-    ofertasBody.appendChild(tr);
-  });
-}
-
-/* Ofertar: valida saldo local y envía al servidor */
-async function ofrecerEndra(){
-  const monto = parseInt(montoInput.value,10);
-  if (!monto || monto <= 0) return;
-  if (monto > saldoActual) {
-    ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = '⚠️ Saldo insuficiente.';
-    return;
-  }
-
-  // Resta localmente (interfaz inmediata)
-  saldoActual = Math.max(0, saldoActual - monto);
-  saldoSpan.textContent = saldoActual;
-
-  // Enviar oferta al servidor
-  try{
-    const fd = new FormData();
-    fd.append('action','oferta');
-    // enviamos usuario en mayúscula para consistencia
-    const usuario = userNameEl.textContent ? userNameEl.textContent.toUpperCase() : 'USUARIO';
-    fd.append('usuario', usuario);
-    fd.append('monto', monto);
-
-    const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
-    const data = await res.json();
-    if (data && data.success) {
-      ofertaMsg.style.color = 'var(--verde-osc)';
-      ofertaMsg.textContent = '✅ Oferta registrada correctamente.';
-      montoInput.value = '';
-      // recargar top 5
-      cargarOfertas();
-    } else {
-      ofertaMsg.style.color = '#E53935';
-      ofertaMsg.textContent = (data && data.message) ? data.message : 'Error al registrar oferta.';
-      // si falla, revertir saldo local para evitar pérdida visual
-      // (mejor pedir recarga del saldo desde servidor, pero revertimos aquí)
-      // recargar saldo desde servidor:
-      obtenerSaldoYRestriccion();
-    }
-  }catch(err){
-    console.error('Error ofrecerEndra',err);
-    ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = 'Error de conexión.';
-    obtenerSaldoYRestriccion();
-  }
-}
-
-/* Opcional: refrescar ofertas cada X segundos (15s) para ver cambios sin recargar */
-let refrescoOfertasInterval = setInterval(() => { cargarOfertas(); }, 15000);
-
-/* ----------------- Fin ----------------- */
+};
 </script>
+
+  
 </body>
 </html>
+
