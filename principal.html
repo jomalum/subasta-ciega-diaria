@@ -132,14 +132,78 @@ button:disabled {
 #modalCerrar .btn-confirmar { background: #E53935; }
 #modalCerrar .btn-cancelar { background: #00897B; }
 
+/* ======== SUBASTA ======== */
+#subasta {
+  padding: 25px;
+  margin-top: 20px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+#subasta h2 {
+  text-align: center;
+  color: #00897B;
+  margin-top: 0;
+}
+#subasta-contenido {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+}
+#producto {
+  max-width: 400px;
+  text-align: center;
+}
+#producto img {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+#producto h3 {
+  color: #004D40;
+  margin-top: 10px;
+}
+#ofertas {
+  flex: 1;
+  max-width: 400px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+#ofertas table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+#ofertas th {
+  background: #E0F2F1;
+  color: #004D40;
+  padding: 8px;
+}
+#ofertas td {
+  padding: 8px;
+  border-bottom: 1px solid #E0E0E0;
+}
+#ofertas input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #00B8D4;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+#oferta-msg {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
 /* ======== ANIMACIONES ======== */
-@keyframes fadeIn {
-  from { opacity: 0; } to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 /* ======== RESPONSIVE ======== */
 @media screen and (max-width: 700px) {
@@ -149,18 +213,18 @@ button:disabled {
     padding: 15px;
   }
   .header h2 { font-size: 1.3rem; }
-  .balance { font-size: 1rem; margin-bottom: 10px; }
   button {
     padding: 10px;
     font-size: 0.95rem;
     width: 100%;
     margin-top: 6px;
   }
-  .modal-content { width: 95%; max-width: 340px; padding: 20px; }
-  input { font-size: 0.9rem; }
+  #ofertas { max-width: 100%; }
+  #producto { max-width: 100%; }
 }
 </style>
 </head>
+
 <body>
 <div class="container">
   <div class="header">
@@ -180,6 +244,37 @@ button:disabled {
   </div>
 
   <div id="msg"></div>
+
+  <!-- 🔹 SECCIÓN DE SUBASTA -->
+  <section id="subasta">
+    <h2>🔹 Subasta del Día</h2>
+    <div id="subasta-contenido">
+      <div id="producto">
+        <img id="producto-img" src="https://via.placeholder.com/400x250.png?text=Producto+en+Subasta" alt="Producto">
+        <h3 id="producto-titulo">Reloj Inteligente “Endra Fit”</h3>
+      </div>
+      <div id="ofertas">
+        <h4 style="text-align:center; color:#00897B;">🏆 Top 5 Ofertas</h4>
+        <table id="tabla-ofertas">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Oferta (Endra)</th>
+            </tr>
+          </thead>
+          <tbody id="ofertas-body">
+            <tr><td colspan="2" style="text-align:center; padding:10px;">Sin ofertas aún</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:20px;">
+          <label for="montoOferta" style="color:#004D40;">Tu oferta (Endra):</label>
+          <input type="number" id="montoOferta" min="1">
+          <button onclick="ofrecerEndra()" style="width:100%; margin-top:10px;">Ofrecer</button>
+          <p id="oferta-msg"></p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <!-- Modales -->
@@ -240,7 +335,7 @@ let datosGuardados = false;
 let saldoActual = 0;
 let contadorInterval = null;
 
-// ======= Inicio =======
+// ======= INICIO =======
 window.onload = async () => { await obtenerSaldoYRestriccion(); };
 
 async function obtenerSaldoYRestriccion() {
@@ -317,7 +412,7 @@ function desactivarBotonTemporalSegundos(segundos) {
   }, 1000);
 }
 
-// ======= Cerrar sesión =======
+// ======= CERRAR SESIÓN =======
 function abrirModalCerrar() { modalCerrar.style.display = 'flex'; }
 function cerrarModalCerrar() { modalCerrar.style.display = 'none'; }
 function confirmarCerrarSesion() {
@@ -325,10 +420,9 @@ function confirmarCerrarSesion() {
   window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
 }
 
-// ======= BLOQUEOS =======
+// ======= BLOQUEO TECLAS =======
 document.addEventListener('contextmenu', e => e.preventDefault());
 document.onkeydown = function(e) {
-  // F12, Ctrl+Shift+I/J, Ctrl+U, Ctrl+S
   if (e.keyCode === 123 ||
      (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
      (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83))) {
@@ -336,6 +430,52 @@ document.onkeydown = function(e) {
       return false;
   }
 };
+
+// =========================================================
+// 🔹 SISTEMA DE SUBASTA
+// =========================================================
+let ofertas = []; // {nombre, monto}
+const ofertasBody = document.getElementById('ofertas-body');
+const ofertaMsg = document.getElementById('oferta-msg');
+const montoInput = document.getElementById('montoOferta');
+
+function ofrecerEndra() {
+  const monto = parseInt(montoInput.value);
+  if (isNaN(monto) || monto <= 0) return;
+
+  if (monto > saldoActual) {
+    ofertaMsg.textContent = "⚠️ Saldo insuficiente para ofertar.";
+    ofertaMsg.style.color = "#E53935";
+    return;
+  }
+
+  saldoActual -= monto;
+  saldoSpan.textContent = saldoActual;
+
+  const usuario = userNameEl.textContent || "Usuario";
+
+  ofertas.push({ nombre: usuario, monto });
+  ofertas.sort((a, b) => b.monto - a.monto);
+  ofertas = ofertas.slice(0, 5);
+  actualizarTablaOfertas();
+
+  ofertaMsg.textContent = "✅ Oferta registrada correctamente.";
+  ofertaMsg.style.color = "#00897B";
+  montoInput.value = '';
+}
+
+function actualizarTablaOfertas() {
+  ofertasBody.innerHTML = '';
+  if (ofertas.length === 0) {
+    ofertasBody.innerHTML = `<tr><td colspan="2" style="text-align:center; padding:10px;">Sin ofertas aún</td></tr>`;
+    return;
+  }
+  for (const o of ofertas) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${o.nombre}</td><td style="text-align:right;">${o.monto}</td>`;
+    ofertasBody.appendChild(tr);
+  }
+}
 </script>
 </body>
 </html>
