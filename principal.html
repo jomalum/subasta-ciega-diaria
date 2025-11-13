@@ -2,32 +2,55 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Página Principal</title>
 <style>
+/* ======== BASE ======== */
 body {
   font-family: "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #00B8D4, #4DD0E1);
   margin: 0;
   padding: 0;
   color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
 }
+.container {
+  width: 100%;
+  max-width: 1100px;
+}
+
+/* ======== HEADER ======== */
 .header {
   background: white;
   padding: 15px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-radius: 0 0 12px 12px;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .header h2 {
   margin: 0;
   color: #00897B;
   font-weight: bold;
+  font-size: 1.6rem;
+  word-break: break-word;
 }
 .balance {
   font-weight: bold;
   color: #004D40;
-  font-size: 18px;
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 5px 0;
 }
 button {
   background: #00897B;
@@ -44,8 +67,19 @@ button:disabled {
   background: #B0BEC5;
   cursor: not-allowed;
 }
+.timer {
+  margin-top: 8px;
+  color: #004D40;
+  font-size: 14px;
+  font-weight: bold;
+}
+#msg {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
 
-/* --- Modal --- */
+/* ======== MODALES ======== */
 .modal {
   display: none;
   position: fixed;
@@ -65,11 +99,12 @@ button:disabled {
   box-shadow: 0 6px 14px rgba(0,0,0,0.4);
   animation: slideUp 0.3s ease;
 }
-.modal-content h3 {
+.modal-content h3, .modal-content h2 {
   color: #00897B;
   margin-top: 0;
   text-align: center;
 }
+.modal-content p { text-align: center; color: #004D40; }
 .modal-content input {
   width: 100%;
   padding: 12px;
@@ -85,36 +120,69 @@ button:disabled {
   margin-top: 15px;
 }
 .modal-footer button { width: 48%; }
-#msg {
-  text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
+
+/* Modal éxito */
+#modalExito .modal-content { text-align: center; border: 2px solid #00BFA5; }
+#modalExito h2 { color: #00796B; margin-bottom: 10px; }
+#modalExito p { font-size: 16px; color: #004D40; }
+
+/* Modal cierre sesión */
+#modalCerrar .modal-content { text-align: center; border: 2px solid #FF7043; }
+#modalCerrar h2 { color: #D84315; }
+#modalCerrar .btn-confirmar { background: #E53935; }
+#modalCerrar .btn-cancelar { background: #00897B; }
+
+/* ======== ANIMACIONES ======== */
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
 }
-.timer {
-  margin-top: 8px;
-  color: #004D40;
-  font-size: 14px;
-  font-weight: bold;
+@keyframes slideUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ======== RESPONSIVE ======== */
+@media screen and (max-width: 700px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
+  }
+  .header h2 { font-size: 1.3rem; }
+  .balance { font-size: 1rem; margin-bottom: 10px; }
+  button {
+    padding: 10px;
+    font-size: 0.95rem;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .modal-content { width: 95%; max-width: 340px; padding: 20px; }
+  input { font-size: 0.9rem; }
 }
 </style>
 </head>
-
 <body>
+<div class="container">
+  <div class="header">
+    <div class="header-left">
+      <h2 id="userName">Bienvenido</h2>
+    </div>
+    <div class="balance">
+      Endra 💠 <span id="saldo">0</span>
+    </div>
+    <div>
+      <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
+      <div id="timer" class="timer"></div>
+    </div>
+    <div>
+      <button onclick="abrirModalCerrar()">Cerrar sesión</button>
+    </div>
+  </div>
 
-<div class="header">
-  <h2 id="userName">Bienvenido</h2>
-  <div class="balance">
-    Endra 💠 <span id="saldo">0</span>
-  </div>
-  <div>
-    <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra del día</button>
-    <div id="timer" class="timer"></div>
-  </div>
+  <div id="msg"></div>
 </div>
 
-<div id="msg"></div>
-
-<!-- Modal -->
+<!-- Modales -->
 <div class="modal" id="modalReclamo">
   <div class="modal-content">
     <h3>Completa tus datos</h3>
@@ -130,13 +198,35 @@ button:disabled {
   </div>
 </div>
 
+<div class="modal" id="modalExito">
+  <div class="modal-content">
+    <h2>🎉 Reclamo Exitoso</h2>
+    <p id="textoExito"></p>
+    <button onclick="cerrarModalExito()">Cerrar</button>
+  </div>
+</div>
+
+<div class="modal" id="modalCerrar">
+  <div class="modal-content">
+    <h2>¿Cerrar sesión?</h2>
+    <p>¿Estás seguro de que deseas salir?<br>Tu progreso se mantiene guardado.</p>
+    <div class="modal-footer">
+      <button class="btn-cancelar" onclick="cerrarModalCerrar()">Cancelar</button>
+      <button class="btn-confirmar" onclick="confirmarCerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
 const modal = document.getElementById('modalReclamo');
-const btnReclamar = document.getElementById('btnReclamar');
+const modalExito = document.getElementById('modalExito');
+const modalCerrar = document.getElementById('modalCerrar');
 const saldoSpan = document.getElementById('saldo');
 const timerDiv = document.getElementById('timer');
 const msg = document.getElementById('msg');
+const userNameEl = document.getElementById('userName');
+const btnReclamar = document.getElementById('btnReclamar');
 
 const urlParams = new URLSearchParams(window.location.search);
 const email = urlParams.get('email');
@@ -144,67 +234,41 @@ const phone = urlParams.get('phone');
 
 document.getElementById('correo').value = email || '';
 document.getElementById('celular').value = phone || '';
-
-document.getElementById('userName').textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
+userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "Usuario";
 
 let datosGuardados = false;
-let siguienteReclamo = null;
 let saldoActual = 0;
+let contadorInterval = null;
 
-// ======= Cargar información del usuario al entrar =======
-window.onload = async () => {
-  await obtenerSaldoYRestriccion();
-};
+// ======= Inicio =======
+window.onload = async () => { await obtenerSaldoYRestriccion(); };
 
-// ======= Obtiene saldo actual y estado de reclamo =======
 async function obtenerSaldoYRestriccion() {
+  const formData = new FormData();
+  formData.append('action', 'reclamo');
+  formData.append('email', email);
+  formData.append('phone', phone);
+  formData.append('check', 'true');
   try {
-    const formData = new FormData();
-    formData.append('action', 'reclamo'); // usamos la misma acción, pero sin registrar
-    formData.append('email', email);
-    formData.append('phone', phone);
-    formData.append('check', 'true');
-
-    const response = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
-    const result = await response.json();
-
-    if (result.saldo) {
-      saldoActual = result.saldo;
-      saldoSpan.textContent = saldoActual;
-    }
-
-    if (result.waitHours && result.waitHours > 0) {
-      siguienteReclamo = new Date(Date.now() + result.waitHours * 3600000);
-      desactivarBotonTemporal(result.waitHours);
-    }
-
+    const r = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
+    const result = await r.json();
+    saldoActual = result.saldo || 0;
+    saldoSpan.textContent = saldoActual;
+    if (result.waitSeconds && result.waitSeconds > 0) desactivarBotonTemporalSegundos(result.waitSeconds);
+    else btnReclamar.disabled = false;
     if (result.datosGuardados) datosGuardados = true;
-  } catch (e) {
-    console.error(e);
-  }
+    if (result.nombresCompletos) userNameEl.textContent = result.nombresCompletos.toUpperCase();
+  } catch (e) { console.error(e); }
 }
 
-// ======= Muestra modal solo si no hay datos guardados =======
-function reclamarEndra() {
-  if (datosGuardados) {
-    confirmarReclamo(); // reclamo directo
-  } else {
-    modal.style.display = 'flex';
-  }
-}
-
+function reclamarEndra() { if (datosGuardados) confirmarReclamo(); else modal.style.display = 'flex'; }
 function cerrarModal() { modal.style.display = 'none'; }
 
-// ======= Enviar reclamo =======
 async function confirmarReclamo() {
   const nombre = document.getElementById('nombre').value.trim().toUpperCase();
   const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
   const aM = document.getElementById('apellidoM').value.trim().toUpperCase();
-
-  if (!datosGuardados && (!nombre || !aP || !aM)) {
-    alert("Completa tus nombres y apellidos.");
-    return;
-  }
+  if (!datosGuardados && (!nombre || !aP || !aM)) return;
 
   const formData = new FormData();
   formData.append('action', 'reclamo');
@@ -217,39 +281,32 @@ async function confirmarReclamo() {
   try {
     const response = await fetch(WEB_APP_URL, { method: 'POST', body: formData });
     const result = await response.json();
-
     if (result.success) {
-      msg.textContent = `✅ ${result.message} | Saldo total: ${result.saldo} Endra.`;
-      msg.style.color = '#00897B';
-      saldoSpan.textContent = result.saldo;
       saldoActual = result.saldo;
+      saldoSpan.textContent = saldoActual;
+      mostrarModalExito(result.monto || 10, result.saldo);
       datosGuardados = true;
       cerrarModal();
-      desactivarBotonTemporal(5);
-    } else {
-      msg.textContent = result.message;
-      msg.style.color = '#E53935';
+      desactivarBotonTemporalSegundos(5 * 3600);
     }
-
-  } catch (error) {
-    msg.textContent = 'Error de conexión.';
-    msg.style.color = '#E53935';
-    console.error(error);
-  }
+  } catch (error) { console.error(error); }
 }
 
-// ======= Desactiva botón por X horas con contador =======
-function desactivarBotonTemporal(horas) {
-  btnReclamar.disabled = true;
-  let restante = horas * 3600;
+function mostrarModalExito(monto, saldo) {
+  document.getElementById('textoExito').innerHTML = `Has ganado <b>${monto} Endra</b>.<br>Tu saldo total es de <b>${saldo} Endra</b>.`;
+  modalExito.style.display = 'flex';
+}
+function cerrarModalExito() { modalExito.style.display = 'none'; }
 
-  const intervalo = setInterval(() => {
+function desactivarBotonTemporalSegundos(segundos) {
+  if (contadorInterval) clearInterval(contadorInterval);
+  let restante = Math.ceil(segundos);
+  btnReclamar.disabled = true;
+  contadorInterval = setInterval(() => {
     if (restante <= 0) {
-      clearInterval(intervalo);
+      clearInterval(contadorInterval);
       btnReclamar.disabled = false;
       timerDiv.textContent = '';
-      msg.textContent = '🎉 Puedes reclamar de nuevo.';
-      msg.style.color = '#00897B';
       return;
     }
     const h = Math.floor(restante / 3600);
@@ -259,6 +316,28 @@ function desactivarBotonTemporal(horas) {
     restante--;
   }, 1000);
 }
+
+// ======= Cerrar sesión =======
+function abrirModalCerrar() { modalCerrar.style.display = 'flex'; }
+function cerrarModalCerrar() { modalCerrar.style.display = 'none'; }
+function confirmarCerrarSesion() {
+  modalCerrar.style.display = 'none';
+  window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
+}
+
+// ======= BLOQUEOS =======
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.onkeydown = function(e) {
+  // F12, Ctrl+Shift+I/J, Ctrl+U, Ctrl+S
+  if (e.keyCode === 123 ||
+     (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+     (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83))) {
+      e.preventDefault();
+      return false;
+  }
+};
 </script>
+
+  
 </body>
 </html>
