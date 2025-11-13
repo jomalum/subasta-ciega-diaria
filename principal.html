@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,295 +13,182 @@
     --bg-grad: linear-gradient(135deg, #00B8D4, #4DD0E1);
   }
   html,body{height:100%; margin:0; font-family:"Segoe UI",sans-serif; background:var(--bg-grad); color:#222;}
-  .page{min-height:100%; display:flex; flex-direction:column; align-items:center; padding:18px 12px 40px;}
+  .page{min-height:100%; display:flex; flex-direction:column; align-items:center;
+  padding:18px 12px 40px;}
 
   .container{width:100%; max-width:1100px;}
 
   /* ---------- Header ---------- */
   .header{
-    background:#fff; border-radius:12px; padding:14px 18px;
+    background:#fff; border-radius:12px;
+  padding:14px 18px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
     box-shadow:0 4px 14px rgba(0,0,0,.12);
     flex-wrap:wrap;
   }
-  .header-logo{font-size:1.8rem; font-weight:bold; color:var(--verde-osc);}
-  .header-saldo{
-    display:flex; align-items:center; gap:8px;
-    font-size:1.2rem; font-weight:bold;
-    background:var(--verde); color:#fff;
-    padding:6px 14px; border-radius:10px;
-  }
-  .header-user{
-    font-weight:bold; color:var(--verde-osc);
-  }
+  .header-left{display:flex; align-items:center; gap:12px; min-width:0;}
+  #userName{margin:0; color:var(--verde);
+  font-weight:700; font-size:1.2rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .balance{font-weight:700; color:var(--verde-osc); font-size:1rem; text-align:center;}
+  .actions{display:flex; gap:10px; align-items:center;}
+  button{background:var(--verde); color:#fff; border:0; padding:10px 14px;
+  border-radius:8px; cursor:pointer; font-weight:700;}
+  button:disabled{background:#B0BEC5; cursor:not-allowed;}
+  .timer{font-size:0.9rem; color:var(--verde-osc); margin-top:4px; text-align:center;}
+  #msg{margin-top:10px; text-align:center;
+  font-weight:700;}
 
   /* ---------- Subasta ---------- */
   #subasta{
-    margin:22px 0 0; background:#fff;
+    width:100%; max-width:950px; margin:28px auto 0; background:rgba(255,255,255,0.95);
     border-radius:12px; padding:22px;
-    box-shadow:0 6px 18px rgba(0,0,0,.12);
+  box-shadow:0 6px 18px rgba(0,0,0,.12);
   }
   #subasta h2{margin:0 0 12px; text-align:center; color:var(--verde); font-size:1.5rem;}
   #subasta-contenido{display:flex; gap:32px; justify-content:center; align-items:flex-start;
   flex-wrap:wrap;}
   #producto{width:100%; max-width:420px; text-align:center;}
-
-  /* 🆕 Nuevo contenedor para fijar las dimensiones a 300x300 */
-  #img-container {
-    width: 300px;
-    height: 300px;
-    margin: 0 auto 10px; /* Centra el contenedor y da margen inferior */
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.12);
-    overflow: hidden; /* Opcional: Recorte suave de la imagen dentro del border-radius */
-  }
-
-  /* 🆕 Estilo para que la imagen ocupe todo el contenedor y se ajuste sin distorsión */
+  /* 👈 CAMBIO: Tama\u00f1o fijo y escalado de imagen */
   #producto img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* CLAVE: la imagen llena el espacio sin distorsionarse (recorta si es necesario) */
+    width:300px; /* Ancho fijo predeterminado */
+    height:300px; /* Alto fijo predeterminado */
+    object-fit: contain; /* Para que la imagen entera sea visible sin recortar */
+    border-radius:12px; 
+    box-shadow:0 4px 12px rgba(0,0,0,.12);
+    margin: 0 auto; /* Centrar imagen */
+    display: block; /* Necesario para que margin: auto funcione */
   }
-  
   #producto h3{color:var(--verde-osc);
   margin:10px 0 0;}
-  
-  #ofertas{width:100%; max-width:500px;}
-  .tiempo-restante{
-    text-align:center; margin:15px 0 25px;
-    font-size:1.4rem; font-weight:bold;
-    color: #E53935; /* Color rojo para el tiempo */
-  }
-  .oferta-input{
-    display:flex; gap:10px; margin-bottom:15px;
-    align-items:center;
-  }
-  .oferta-input input{
-    flex-grow:1; padding:12px; border:1px solid var(--verde);
-    border-radius:8px; box-sizing:border-box;
-    font-size:1.1rem; text-align:center;
-  }
-  .oferta-input button{
-    padding:12px 20px; background:var(--turq); color:#fff;
-    border:none; border-radius:8px; cursor:pointer;
-    font-weight:bold; transition:background-color 0.3s;
-  }
-  .oferta-input button:hover{background:#0097A7;}
-  
-  #oferta-msg{font-weight:bold; text-align:center; min-height:20px; margin-bottom:15px;}
-  
-  .tabla-ofertas{
-    width:100%; border-collapse:collapse;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-  }
-  .tabla-ofertas th, .tabla-ofertas td{
-    padding:10px; text-align:left; border-bottom:1px solid #ddd;
-  }
-  .tabla-ofertas th{
-    background:var(--verde-osc); color:#fff;
-    text-align:center;
-  }
-  .tabla-ofertas tr:last-child td{border-bottom:none;}
-  .tabla-ofertas td:nth-child(2){font-weight:bold; color:#E53935; text-align:center;}
-  .tabla-ofertas td:nth-child(3){font-size:0.9rem; color:#666; text-align:center;}
-
-  /* ---------- Footer (Reclamo) ---------- */
-  .footer-reclamo{
-    margin-top:30px; padding:20px; background:#fff;
-    border-radius:12px; text-align:center;
-    box-shadow:0 4px 12px rgba(0,0,0,.12);
-  }
-  .footer-reclamo h3{color:var(--verde-osc); margin-top:0;}
-  .btn-reclamo{
-    padding:10px 20px; background:#FF9800; color:#fff;
-    border:none; border-radius:8px; cursor:pointer;
-    font-weight:bold; transition:background-color 0.3s;
-  }
-  .btn-reclamo:hover{background:#FB8C00;}
+  #ofertas{flex:1; min-width:260px; max-width:420px; background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 10px rgba(0,0,0,.06);}
+  #ofertas h4{margin:0 0 8px; text-align:center;
+  color:var(--verde);}
+  table{width:100%; border-collapse:collapse; font-size:0.95rem;}
+  th{background:#E0F2F1; color:var(--verde-osc); padding:8px; text-align:left;}
+  td{padding:8px; border-bottom:1px solid #eee;}
+  .input-full{width:100%; padding:10px; margin-top:8px; border-radius:8px;
+  border:1px solid var(--turq);}
+  .btn-full{width:100%; margin-top:10px; padding:10px;}
+  #oferta-msg{margin-top:8px; text-align:center; font-weight:700;}
 
   /* ---------- Modales ---------- */
-  .modal {
-    display: none; 
-    position: fixed;
-    z-index: 1000; 
-    left: 0; top: 0;
-    width: 100%; height: 100%; 
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.6); 
-  }
-  .modal-content {
-    background-color: #fefefe;
-    margin: 10% auto; 
-    padding: 25px;
-    border-radius: 10px;
-    width: 80%; 
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.3);
-  }
-  .modal-content h3 {
-    color: var(--verde-osc);
-    margin-top: 0;
-    font-size: 1.4rem;
-  }
-  .modal-content p {
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-  }
-  .modal-footer {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-  }
-  .modal-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    color: white;
-    width: 48%;
-  }
-  .modal-btn-confirm {
-    background: var(--verde);
-  }
-  .modal-btn-cancel {
-    background: #E53935;
-  }
-  .modal-success-msg {
-    color: var(--verde);
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-  .modal-input {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0;
-    border: 1px solid var(--verde); 
-    border-radius: 8px;
-    box-sizing: border-box;
-    text-align: center;
-  }
+  .modal{display:none; position:fixed;
+  inset:0; background:rgba(0,0,0,0.45); z-index:9998; justify-content:center; align-items:center;}
+  .modal.show{display:flex;}
+  .modal-content{background:#fff; border-radius:12px; padding:20px; width:92%; max-width:420px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);}
+  .modal-content h3,.modal-content h2{color:var(--verde); margin:0 0 10px; text-align:center;}
+  .modal-footer{display:flex; gap:10px;
+  margin-top:12px;}
+  .modal-footer button{flex:1;}
 
-  /* ---------- Media Query para Móviles ---------- */
-  @media (max-width: 600px) {
-    .header {
-      flex-direction: column;
-      align-items: center;
-    }
-    .header-logo, .header-user, .header-saldo {
-      margin-bottom: 5px;
-    }
-    #subasta-contenido{
-      gap:20px;
-    }
-    .oferta-input{
-      flex-direction:column;
-    }
-    .oferta-input button, .oferta-input input{
-      width:100%;
-    }
-    .tabla-ofertas th, .tabla-ofertas td{
-      font-size:0.9rem;
-      padding:8px;
-    }
+  /* ---------- Responsive ---------- */
+  @media (max-width:720px){
+    .header{padding:12px;}
+    #subasta{padding:16px;
+  margin:18px 0;}
+    #subasta-contenido{gap:14px;}
   }
-
 </style>
 </head>
-
 <body>
+  <div class="page">
+    <div class="container">
 
-<div class="page">
-  <div class="container">
+      <div class="header" id="headerMain">
+        <div class="header-left">
+          <h2 id="userName">USUARIO</h2>
+        </div>
 
-    <header class="header">
-      <div class="header-logo">ENDRA</div>
-      <div class="header-user">Usuario: <span id="userName">Cargando...</span></div>
-      <div class="header-saldo">💰 Saldo: <span id="saldo">0</span> Endras</div>
-    </header>
+        <div style="display:flex;flex-direction:column;align-items:center;">
+          <div class="balance">Endra 💠 <span id="saldo">0</span></div>
+          <div id="timer" class="timer"></div>
+      
+    </div>
 
-    <section id="subasta" aria-label="Subasta del día">
-      <h2>🔹 Subasta del Día</h2>
-      <div id="subasta-contenido">
-  
-        <div id="producto">
-          <div id="img-container"> 
-            <img id="producto-img" src="" alt="Producto en subasta">
+        <div class="actions">
+          <button id="btnReclamar" onclick="reclamarEndra()">Reclamar Endra</button>
+          <button id="btnCerrar" onclick="abrirModalCerrar()">Cerrar sesión</button>
+        </div>
+      </div>
+
+      <div id="msg"></div>
+
+      <section id="subasta" aria-label="Subasta del día">
+        <h2>🔹 Subasta del Día</h2>
+        <div id="subasta-contenido">
+    
+          
+     <div id="producto">
+
+            <img id="producto-img" src="https://drive.google.com/uc?export=view&id=1S2B7XYCK8ki66GSbdNIzS6n2qdaiS9YG" alt="Producto en subasta">
+
+            <h3 id="producto-titulo">Reloj Inteligente “Endra Fit”</h3>
+
           </div>
           
-          <h3 id="producto-titulo">Reloj Inteligente “Endra Fit”</h3>
-        </div>
-        <div id="ofertas">
-          <div class="tiempo-restante">⏳ Tiempo Restante: <span id="timer">00:00:00</span></div>
+          <div id="ofertas">
+            <h4>🏆 Top 5 Ofertas</h4>
+         
+       <table aria-label="Tabla de ofertas">
+              <thead><tr><th>Usuario</th><th style="text-align:right">Oferta (Endra)</th></tr></thead>
+              <tbody id="ofertas-body"><tr><td colspan="2" style="text-align:center;padding:12px;">Sin ofertas aún</td></tr></tbody>
+            </table>
 
-          <div class="oferta-input">
-            <input type="number" id="montoOferta" placeholder="Monto de la Oferta (Endras)" min="1">
-            <button onclick="confirmarOferta()">Pujar</button>
+            <div style="margin-top:12px;">
+              <label for="montoOferta" style="color:var(--verde-osc);font-weight:700">Tu oferta (Endra):</label>
+              <input id="montoOferta" 
+  class="input-full" type="number" min="1" placeholder="Ingresa cantidad">
+              <button class="btn-full" onclick="ofrecerEndra()">Ofrecer</button>
+              <p id="oferta-msg"></p>
+            </div>
           </div>
-          <div id="oferta-msg"></div>
-
-          <table class="tabla-ofertas">
-            <thead>
-              <tr>
-                <th>Usuario</th>
-                <th>Oferta (Endras)</th>
-                <th>Fecha/Hora</th>
-              </tr>
-            </thead>
-            <tbody id="ofertas-body">
-              <tr><td colspan="3" style="text-align:center;">Cargando ofertas...</td></tr>
-            </tbody>
-          </table>
         </div>
-        
+      </section>
+
+    </div>
+  </div>
+
+  <div class="modal" id="modalReclamo" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      
+  <h3>Completa tus datos</h3>
+      <input id="nombre" class="input-full" placeholder="NOMBRES" />
+      <input id="apellidoP" class="input-full" placeholder="APELLIDO PATERNO" />
+      <input id="apellidoM" class="input-full" placeholder="APELLIDO MATERNO" />
+      <input id="correo" class="input-full" disabled />
+      <input id="celular" class="input-full" disabled />
+      <div class="modal-footer">
+        <button onclick="confirmarReclamo()">Confirmar</button>
+        <button onclick="cerrarModal()">Cancelar</button>
       </div>
-    </section>
-
-    <footer class="footer-reclamo">
-      <h3>¿Ganaste un producto?</h3>
-      <p>Haz clic en el botón para iniciar el proceso de reclamo del producto que hayas ganado.</p>
-      <button class="btn-reclamo" id="btnReclamar" onclick="mostrarModalReclamo()">Reclamar Producto</button>
-    </footer>
-
-  </div>
-</div>
-
-
-<div id="modalReclamo" class="modal" onclick="cerrarModalFuera(event)">
-  <div class="modal-content">
-    <h3>Confirmar Reclamo</h3>
-    <p>Ingresa tu correo y celular actualizados para contactarte.</p>
-    
-    <input id="correo" class="modal-input" type="email" placeholder="Correo Electrónico" oninput="this.value=this.value.toUpperCase()">
-    <input id="celular" class="modal-input" type="text" placeholder="N° de Celular (9 dígitos)" maxlength="9" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-
-    <div class="modal-footer">
-      <button class="modal-btn modal-btn-cancel" onclick="cerrarModalReclamo()">Cancelar</button>
-      <button class="modal-btn modal-btn-confirm" onclick="enviarReclamo()">Enviar Reclamo</button>
     </div>
   </div>
-</div>
 
-<div id="modalExito" class="modal" onclick="cerrarModalFuera(event)">
-  <div class="modal-content">
-    <h3 id="modal-titulo">✅ Reclamo Registrado</h3>
-    <p id="modal-mensaje" class="modal-success-msg">Tu solicitud ha sido enviada. Nos contactaremos contigo pronto.</p>
-    <div class="modal-footer" style="justify-content:center;">
-      <button class="modal-btn modal-btn-confirm" id="modalCerrar" onclick="cerrarModalExito()">Cerrar</button>
+  <div class="modal" 
+  id="modalExito" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>🎉 Reclamo Exitoso</h2>
+      <p id="textoExito" style="text-align:center;color:var(--verde-osc);font-weight:700"></p>
+      <div style="margin-top:12px;"><button onclick="cerrarModalExito()">Cerrar</button></div>
     </div>
   </div>
-</div>
 
+  <div class="modal" id="modalCerrar" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2>¿Cerrar sesión?</h2>
+      <p style="text-align:center;color:var(--verde-osc)">¿Estás seguro que deseas salir?</p>
+      <div class="modal-footer">
+        <button onclick="cerrarModalCerrar()" style="background:#00897B">Cancelar</button>
+        <button onclick="confirmarCerrarSesion()" style="background:#E53935">Cerrar 
+  sesión</button>
+      </div>
+    </div>
+  </div>
 
 <script>
 /* ----------------- Config ----------------- */
-// ⚠️ REEMPLAZA esta URL con la URL de tu proyecto desplegado
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx1fV6Vt45V6VourCOiHPJBJ78jVc7r6RzpLRRC51sbtJSoS0P9p2aUgcT1hz-Z6zhg/exec";
-// 🔹 NUEVA CONSTANTE: ID del archivo de la imagen en Google Drive.
-// ⚠️ REEMPLAZA 'TU_ID_DE_IMAGEN_DE_DRIVE' con el ID real de tu archivo de Drive.
-const PRODUCTO_IMG_ID = "1S2B7XYCK8ki66GSbdNIzS6n2qdaiS9YG"; 
-
 /* Elements */
 const saldoSpan = document.getElementById('saldo');
 const userNameEl = document.getElementById('userName');
@@ -321,274 +207,261 @@ const celularInput = document.getElementById('celular');
 const ofertasBody = document.getElementById('ofertas-body');
 const ofertaMsg = document.getElementById('oferta-msg');
 const montoInput = document.getElementById('montoOferta');
-// 🆕 Nueva referencia al elemento de la imagen
-const productoImg = document.getElementById('producto-img'); 
-
 let saldoActual = 0;
 let datosGuardados = false;
 let contadorInterval = null;
-let msRestantesGlobal = 0; // Almacena el tiempo restante en ms
+/* Read URL params (email, phone) */
+const urlParams = new URLSearchParams(window.location.search);
+const email = urlParams.get('email') || '';
+const phone = urlParams.get('phone') || '';
 
-/* ----------------- Startup ----------------- */
+/* Inicializa valores visibles */
+if (email) correoInput.value = email;
+if (phone) celularInput.value = phone;
+userNameEl.textContent = email ? email.split('@')[0].toUpperCase() : "USUARIO";
+
+/* ---------- Startup ---------- */
 window.addEventListener('load', () => {
-  // Obtener parámetros de la URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const userEmail = urlParams.get('email');
-  // const userPhone = urlParams.get('phone'); // No usado pero útil para referencia
-
-  if (userEmail) {
-    userNameEl.textContent = userEmail.toUpperCase();
-    // 🔹 NUEVA LÍNEA: Establecer la fuente de la imagen al cargar.
-    if (PRODUCTO_IMG_ID) {
-        // La URL de la imagen ahora apunta a la Web App con action=image y el ID de Drive
-        productoImg.src = `${WEB_APP_URL}?action=image&id=${PRODUCTO_IMG_ID}`;
-    }
-    obtenerSaldoYRestriccion();
-    cargarOfertas();
-  } else {
-    // Si no hay parámetros, redirigir al login (o mostrar error)
-    userNameEl.textContent = 'ERROR';
-    mostrarModalExito('Error', 'No se pudo cargar la información del usuario. Redirigiendo...', false);
-    setTimeout(() => {
-        // Redirigir a la página de login (asumiendo que está en la raíz)
-        window.location.href = window.location.origin; 
-    }, 2000);
-  }
+  obtenerSaldoYRestriccion();
+  cargarOfertas();
 });
-
-/* ----------------- Funciones de Saldo y Tiempo ----------------- */
-async function obtenerSaldoYRestriccion() {
-  const usuario = userNameEl.textContent;
-  if (usuario === 'Cargando...' || usuario === 'ERROR') return;
-
-  try {
+/* ---------- Obtener saldo y tiempo restante del servidor ---------- */
+async function obtenerSaldoYRestriccion(){
+  try{
     const fd = new FormData();
-    fd.append('action', 'obtenerSaldoYRestriccion');
-    fd.append('usuario', usuario);
+  fd.append('action','reclamo');
+    fd.append('email', email);
+    fd.append('phone', phone);
+    fd.append('check', 'true');
 
-    const res = await fetch(WEB_APP_URL, { method: 'POST', body: fd });
-    const data = await res.json();
+    const res = await fetch(WEB_APP_URL, { method:'POST', body: fd });
+  const data = await res.json();
 
     if (data && data.success) {
       saldoActual = Number(data.saldo || 0);
-      saldoSpan.textContent = saldoActual.toLocaleString('es-ES');
-      msRestantesGlobal = Number(data.msRestantes || 0);
-      
-      // Detener el contador anterior si existe
-      if (contadorInterval) {
-        clearInterval(contadorInterval);
-      }
-      
-      // Iniciar el nuevo contador
-      iniciarContador(msRestantesGlobal);
-
+  saldoSpan.textContent = saldoActual;
+      datosGuardados = !!data.datosGuardados;
+      if (data.nombresCompletos) userNameEl.textContent = data.nombresCompletos.toUpperCase();
+  if (data.waitSeconds && data.waitSeconds > 0) {
+        desactivarBotonTemporalSegundos(data.waitSeconds);
+  } else {
+        btnReclamar.disabled = false;
+  }
     } else {
-      console.error('Error al obtener saldo y restricción:', data.message);
-      saldoSpan.textContent = 'Error';
-    }
-  } catch (err) {
-    console.error('Error de conexión al obtener saldo:', err);
-    saldoSpan.textContent = 'Error';
+      // En caso la API devuelva success=false (no encontrado), permitimos que el usuario vea el botón (pero backend controla)
+      btnReclamar.disabled = false;
+  }
+  }catch(err){
+    console.error('Error al obtener saldo:',err);
+    btnReclamar.disabled = false;
   }
 }
 
-function iniciarContador(msRestantes) {
-  let endTime = new Date().getTime() + msRestantes;
+/* ---------- Reclamar Endra (abrir modal o directamente confirmar) ---------- */
+function reclamarEndra(){
+  if (datosGuardados) {
+    // Si ya tiene datos guardados, confirmar de inmediato
+    confirmarReclamo();
+  } else {
+    // Rellenar campos correo/celular visibles y abrir modal
+    correoInput.value = email ||
+  '';
+    celularInput.value = phone || '';
+    modalReclamo.classList.add('show');
+    modalReclamo.style.display = 'flex';
+  }
+}
+function cerrarModal(){ modalReclamo.classList.remove('show'); modalReclamo.style.display='none';
+  }
+/* ---------- Confirmar reclamo: env\u00eda nombres (si existen) y procesa reclamo ---------- */
+async function confirmarReclamo(){
+  // Si datos no guardados, requerir nombres
+  const nombre = document.getElementById('nombre').value.trim().toUpperCase();
+  const aP = document.getElementById('apellidoP').value.trim().toUpperCase();
+  const aM = document.getElementById('apellidoM').value.trim().toUpperCase();
+  if (!datosGuardados && (!nombre || !aP || !aM)) {
+    alert('Completa tus nombres y apellidos');
+  return;
+  }
 
-  const updateTimer = () => {
-    const ahora = new Date().getTime();
-    let remaining = endTime - ahora;
+  try{
+    const fd = new FormData();
+    fd.append('action','reclamo');
+    fd.append('email', email);
+    fd.append('phone', phone);
+    fd.append('nombres', nombre);
+    fd.append('apellidoP', aP);
+    fd.append('apellidoM', aM);
 
-    if (remaining < 0) {
-      remaining = 0;
+    const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
+  const data = await res.json();
+
+  if (data && data.success) {
+      saldoActual = Number(data.saldo || saldoActual);
+      saldoSpan.textContent = saldoActual;
+      datosGuardados = true;
+      cerrarModal();
+  mostrarModalExito(data.monto || 10, data.saldo);
+      // desactivar bot\u00f3n por 5 horas (servidor ya guard\u00f3 TS_MS, pero ponemos contador fix)
+      desactivarBotonTemporalSegundos(5 * 3600);
+  } else {
+      // Si mensaje de servidor indica tiempo restante, mostrar en msg y activar contador con waitSeconds si existe
+      msg.style.color = '#E53935';
+  msg.textContent = data && data.message ? data.message : 'No se pudo procesar reclamo';
+      if (data && data.waitSeconds) desactivarBotonTemporalSegundos(data.waitSeconds);
+  }
+  }catch(err){
+    console.error('Error confirmarReclamo',err);
+    msg.style.color = '#E53935';
+    msg.textContent = 'Error de conexi\u00f3n.';
+  }
+}
+
+/* ---------- Modal \u00e9xito ---------- */
+function mostrarModalExito(monto, saldo){
+  const texto = document.getElementById('textoExito');
+  texto.innerHTML = `Has ganado <b>${monto}</b> Endra.<br>Saldo total: <b>${saldo}</b> Endra.`;
+  modalExito.classList.add('show');
+  modalExito.style.display='flex';
+}
+function cerrarModalExito(){
+  modalExito.classList.remove('show');
+  modalExito.style.display='none';
+  obtenerSaldoYRestriccion(); // Recargar saldo por si el reclamo cambi\u00f3 los datos
+}
+
+/* ---------- Desactivar bot\u00f3n y mostrar contador (segundos) ---------- */
+function desactivarBotonTemporalSegundos(segundos) {
+  btnReclamar.disabled = true;
+  clearInterval(contadorInterval);
+
+  let segundosRestantes = segundos;
+
+  function actualizarContador() {
+    if (segundosRestantes <= 0) {
       clearInterval(contadorInterval);
-      timerDiv.textContent = "¡FINALIZADO!";
-      ofertaMsg.textContent = "La subasta ha finalizado.";
-      ofertaMsg.style.color = '#E53935';
-      
-      // Deshabilitar la entrada de oferta
-      montoInput.disabled = true;
-      document.querySelector('.oferta-input button').disabled = true;
+      timerDiv.textContent = 'Listo para reclamar!';
+      btnReclamar.disabled = false;
       return;
     }
 
-    const h = Math.floor(remaining / (1000 * 60 * 60));
-    const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-    const s = Math.floor((remaining % (1000 * 60)) / 1000);
+    const horas = Math.floor(segundosRestantes / 3600);
+    const minutos = Math.floor((segundosRestantes % 3600) / 60);
+    const segs = segundosRestantes % 60;
 
-    const format = (num) => String(num).padStart(2, '0');
-    timerDiv.textContent = `${format(h)}:${format(m)}:${format(s)}`;
-  };
+    const h = String(horas).padStart(2, '0');
+    const m = String(minutos).padStart(2, '0');
+    const s = String(segs).padStart(2, '0');
 
-  updateTimer();
-  contadorInterval = setInterval(updateTimer, 1000);
+    timerDiv.textContent = `Disponible en: ${h}:${m}:${s}`;
+    segundosRestantes--;
+  }
+
+  actualizarContador();
+  contadorInterval = setInterval(actualizarContador, 1000);
 }
 
-/* ----------------- Funciones de Oferta ----------------- */
-function confirmarOferta() {
-  const monto = Number(montoInput.value);
-  if (monto <= 0) {
-    ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = '❌ Por favor, ingresa un monto válido.';
+
+/* ---------- Cerrar sesi\u00f3n ---------- */
+function abrirModalCerrar(){
+  modalCerrar.classList.add('show');
+  modalCerrar.style.display = 'flex';
+}
+function cerrarModalCerrar(){
+  modalCerrar.classList.remove('show');
+  modalCerrar.style.display = 'none';
+}
+function confirmarCerrarSesion(){
+  cerrarModalCerrar();
+  // Redirigir al index (ajusta la ruta si la tienes en otra carpeta)
+  window.location.href = window.location.origin + '/subasta-ciega-diaria/index.html';
+}
+
+
+/* ================== SUBASTA ================== */
+
+/* Carga top5 desde servidor (Sheets) */
+async function cargarOfertas(){
+  try{
+    const fd = new FormData();
+  fd.append('action','listarOfertas');
+    const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
+    const data = await res.json();
+    if (data && data.success) {
+      renderOfertas(data.ofertas || []);
+  }
+  }catch(err){
+    console.error('Error cargarOfertas',err);
+  }
+}
+
+function renderOfertas(ofertas){
+  ofertasBody.innerHTML = '';
+  if (!ofertas || ofertas.length===0){
+    ofertasBody.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:12px;">Sin ofertas a\u00fan</td></tr>`;
     return;
   }
+  ofertas.forEach(o=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="max-width:220px; overflow:hidden; text-overflow:ellipsis;">${o.usuario}</td> <td style="text-align:right">${o.monto}</td>`;
+    ofertasBody.appendChild(tr);
+  });
+}
+
+/* Enviar oferta al servidor */
+async function ofrecerEndra(){
+  ofertaMsg.textContent = '';
+  const monto = Number(montoInput.value);
+
+  if (isNaN(monto) || monto <= 0) {
+    ofertaMsg.style.color = '#E53935';
+    ofertaMsg.textContent = 'Ingresa un monto de oferta v\u00e1lido (mayor a 0).';
+    return;
+  }
+
   if (monto > saldoActual) {
     ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = `❌ Saldo insuficiente. Tienes ${saldoActual} Endras.`;
+    ofertaMsg.textContent = `Tu saldo (${saldoActual} Endra) es insuficiente.`;
     return;
   }
-  
-  if (msRestantesGlobal <= 0) {
-      ofertaMsg.style.color = '#E53935';
-      ofertaMsg.textContent = "La subasta ha finalizado. No puedes pujar.";
-      return;
-  }
-  
-  // Si todo es válido, procede a enviar la oferta
-  ofrecerEndra(monto);
-}
 
+  // Descontar saldo localmente
+  saldoActual -= monto;
+  saldoSpan.textContent = saldoActual;
 
-async function ofrecerEndra(monto) {
   // Enviar oferta al servidor
   try{
     const fd = new FormData();
     fd.append('action','oferta');
-    // enviamos usuario en mayúscula para consistencia
+    // enviamos usuario en may\u00fascula para consistencia
     const usuario = userNameEl.textContent ? userNameEl.textContent.toUpperCase() : 'USUARIO';
     fd.append('usuario', usuario);
     fd.append('monto', monto);
 
     const res = await fetch(WEB_APP_URL,{method:'POST', body:fd});
     const data = await res.json();
-    
-    // El servidor ya descontó el saldo, así que solo actualizamos localmente si fue exitoso
     if (data && data.success) {
       ofertaMsg.style.color = 'var(--verde-osc)';
-      ofertaMsg.textContent = data.message;
+      ofertaMsg.textContent = '✅ Oferta registrada correctamente.';
       montoInput.value = '';
-      
-      // Refrescar saldo y ofertas
-      obtenerSaldoYRestriccion(); 
+      // recargar top 5
       cargarOfertas();
     } else {
       ofertaMsg.style.color = '#E53935';
       ofertaMsg.textContent = (data && data.message) ? data.message : 'Error al registrar oferta.';
-      // Si falla por saldo, el saldo local ya es correcto, pero refrescamos por si acaso.
+      // si falla, revertir saldo local para evitar p\u00e9rdida visual
+      // (mejor pedir recarga del saldo desde servidor, pero revertimos aqu\u00ed)
+      // recargar saldo desde servidor:
       obtenerSaldoYRestriccion();
     }
   }catch(err){
     console.error('Error ofrecerEndra',err);
     ofertaMsg.style.color = '#E53935';
-    ofertaMsg.textContent = 'Error de conexión.';
+    ofertaMsg.textContent = 'Error de conexi\u00f3n.';
     obtenerSaldoYRestriccion();
   }
 }
 
-async function cargarOfertas() {
-  ofertasBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Cargando...</td></tr>';
-  
-  try {
-    const fd = new FormData();
-    fd.append('action', 'listarOfertas');
-    
-    // Usamos GET si es posible, o POST si el servidor solo acepta POST.
-    // Usaremos POST para consistencia con el servidor (doPost con action).
-    const res = await fetch(WEB_APP_URL, { method: 'POST', body: fd });
-    const data = await res.json();
-    
-    ofertasBody.innerHTML = ''; // Limpiar
-    
-    if (data && data.success && data.ofertas && data.ofertas.length > 0) {
-      data.ofertas.forEach(oferta => {
-        const row = ofertasBody.insertRow();
-        row.insertCell(0).textContent = oferta.usuario;
-        row.insertCell(1).textContent = Number(oferta.monto).toLocaleString('es-ES');
-        row.insertCell(2).textContent = oferta.fecha;
-      });
-    } else {
-      ofertasBody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aún no hay ofertas registradas.</td></tr>';
-    }
-  } catch(err) {
-    console.error('Error cargarOfertas', err);
-    ofertasBody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#E53935;">Error al cargar ofertas.</td></tr>';
-  }
-}
-
-
-/* ----------------- Funciones de Reclamo (Modal) ----------------- */
-function mostrarModalReclamo() {
-  correoInput.value = '';
-  celularInput.value = '';
-  modalReclamo.style.display = 'block';
-}
-
-function cerrarModalReclamo() {
-  modalReclamo.style.display = 'none';
-}
-
-function mostrarModalExito(titulo, mensaje, esExito = true) {
-    document.getElementById('modal-titulo').textContent = titulo;
-    document.getElementById('modal-mensaje').textContent = mensaje;
-    document.getElementById('modal-titulo').style.color = esExito ? 'var(--verde-osc)' : '#E53935';
-    document.getElementById('modal-mensaje').style.color = esExito ? 'var(--verde-osc)' : '#E53935';
-    modalExito.style.display = 'block';
-}
-
-function cerrarModalExito() {
-  modalExito.style.display = 'none';
-}
-
-function cerrarModalFuera(event) {
-    if (event.target === modalReclamo) {
-        cerrarModalReclamo();
-    }
-    if (event.target === modalExito) {
-        cerrarModalExito();
-    }
-}
-
-async function enviarReclamo() {
-  const correo = correoInput.value.trim().toUpperCase();
-  const celular = celularInput.value.trim();
-  const usuario = userNameEl.textContent;
-
-  if (!correo || celular.length !== 9) {
-    mostrarModalExito('Atención', '❌ Ingresa un correo y un celular de 9 dígitos válidos.', false);
-    return;
-  }
-
-  // Deshabilitar botón para evitar envíos múltiples
-  document.querySelector('#modalReclamo .modal-btn-confirm').disabled = true;
-  
-  try {
-    const fd = new FormData();
-    fd.append('action', 'reclamo');
-    fd.append('usuario', usuario);
-    fd.append('correo', correo);
-    fd.append('celular', celular);
-
-    const res = await fetch(WEB_APP_URL, { method: 'POST', body: fd });
-    const data = await res.json();
-    
-    cerrarModalReclamo(); // Cerrar el modal de entrada de datos
-
-    if (data && data.success) {
-      mostrarModalExito('✅ Reclamo Registrado', data.message, true);
-      btnReclamar.disabled = true; // Deshabilitar después de reclamar
-    } else {
-      mostrarModalExito('Error al Reclamar', (data && data.message) ? data.message : 'Error de servidor.', false);
-    }
-  } catch (err) {
-    console.error('Error enviarReclamo', err);
-    cerrarModalReclamo();
-    mostrarModalExito('Error de Conexión', 'No se pudo conectar con el servidor.', false);
-  } finally {
-     // Re-habilitar botón al finalizar, sea éxito o error
-    document.querySelector('#modalReclamo .modal-btn-confirm').disabled = false;
-  }
-}
 </script>
-
 </body>
 </html>
